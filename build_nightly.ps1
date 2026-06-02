@@ -1,6 +1,6 @@
 
-$DEST = "C:\Program Files (x86)\World_of_Tanks_NA\res_mods\2.2.1.3\scripts\client\gui\mods"
-$IMAGE_DEST = "C:\Program Files (x86)\World_of_Tanks_NA\res_mods\2.2.1.3\gui\pademinune"
+$DEST = "C:\Program Files\World_of_Tanks_NA\res_mods\2.3.0.0\scripts\client\gui\mods"
+$IMAGE_DEST = "C:\Program Files\World_of_Tanks_NA\res_mods\2.3.0.0\gui\pademinune"
 
 python27 -m py_compile mod_armor_pen_calculator.py
 Move-Item -Force mod_armor_pen_calculator.pyc bin/

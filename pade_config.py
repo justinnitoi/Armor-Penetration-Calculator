@@ -25,9 +25,9 @@ DEFAULT_CONFIG = {
         "display_threshold": 65,
     },
     "colors": {
-        "green_chance": "B6FF00",
+        "green_chance": "6BF40D",
         "orange_chance": "FFAD00",
-        "red_chance": "FF2717",
+        "red_chance": "E90000",
         "ricochet": "800080",
     },
     "shadow": {

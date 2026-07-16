@@ -8,7 +8,7 @@ ORANGE_TRACK_ALIAS = "pademinune_OrangeTrack"
 
 
 class TrackState:
-    ENABLED = True
+    ENABLED = False
     track_visible = False
     _last_track_color = None  # type: str | None
 

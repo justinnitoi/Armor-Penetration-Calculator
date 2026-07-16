@@ -1,12 +1,16 @@
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-$MOD_NAME = "pademinune-armor-calculator-1.7.0"
+$MOD_NAME = "pademinune-armor-pen-calc-1.7.1"
 
-$BinDir   = "$PSScriptRoot\bin"
+$BinDir   = "$PSScriptRoot\..\bin"
 $ModsDir  = "$BinDir\res\scripts\client\gui\mods"
 $ResDir   = "$BinDir\res"
 $OutDir   = "$BinDir\wotmods"
 $OutFile  = "$OutDir\$MOD_NAME.wotmod"
+
+# Ensure required directories exist
+New-Item -ItemType Directory -Force -Path $ModsDir | Out-Null
+New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
 # Copy all .pyc files from bin root into the mods directory
 Get-ChildItem -Path $BinDir -Filter "*.pyc" | ForEach-Object {

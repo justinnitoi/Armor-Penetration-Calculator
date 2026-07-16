@@ -113,9 +113,11 @@ def my_shot_result_default(
         if isJet:
             jetDist = cDetails.dist - jetStartDist
             if jetDist > 0.0:
-                lossByDist = (
-                    1.0 - jetDist * cls._SHELL_EXTRA_DATA[shell.kind].jetLossPPByDist
-                )
+                if cls._SHELL_EXTRA_DATA[shell.kind].hasPenetrationLoss:
+                    jetLossPPByDist = shell.type.piercingPowerLossFactorByDistance
+                else:
+                    jetLossPPByDist = 0.0
+                lossByDist = 1.0 - jetDist * jetLossPPByDist
 
                 # add dissipation amount onto total armor
                 lost_pen = max(
@@ -216,7 +218,7 @@ def my_shot_result_default(
         # if piercingPower <= 0.0:
         #     break
 
-        if cls._SHELL_EXTRA_DATA[shell.kind].jetLossPPByDist > 0.0:
+        if cls._SHELL_EXTRA_DATA[shell.kind].hasPenetrationLoss:
             isJet = True
             mInfo = cDetails.matInfo
             armor = mInfo.armor if mInfo is not None else 0.0

@@ -1,5 +1,8 @@
 
-$DEST = "C:\Program Files\World_of_Tanks_NA\res_mods\2.3.0.1\scripts\client\gui\mods"
+$DEST = "C:\Program Files\World_of_Tanks_NA\res_mods\2.3.1.0\scripts\client\gui\mods"
+
+New-Item -ItemType Directory -Force -Path "bin" | Out-Null
+New-Item -ItemType Directory -Force -Path $DEST | Out-Null
 
 python27 -m py_compile src/mod_armor_pen_calculator.py
 Move-Item -Force src/mod_armor_pen_calculator.pyc bin/

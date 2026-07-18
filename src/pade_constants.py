@@ -73,6 +73,12 @@ class KillLabelSettings:
     X_OFFSET = safe_get_setting("kill_label", "x_offset")
     Y_OFFSET = safe_get_setting("kill_label", "y_offset")
 
+class GunLabelSettings:
+    ENABLED = safe_get_setting("gun_label", "enabled")
+    LABEL_FORMAT = safe_get_setting("gun_label", "label_format")
+    FONT_SIZE = safe_get_setting("gun_label", "font_size")
+    X_OFFSET = safe_get_setting("gun_label", "x_offset")
+    Y_OFFSET = safe_get_setting("gun_label", "y_offset")
 
 class ShadowSettings:
     COLOR = safe_get_setting("shadow", "shadow_color")

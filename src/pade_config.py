@@ -38,6 +38,13 @@ DEFAULT_CONFIG = {
         "font_size": 14,
         "label_format": "† {value}%",
     },
+    "gun_label": {
+        "enabled": True,
+        "x_offset": -26,
+        "y_offset": 40,
+        "font_size": 16,
+        "label_format": "‡",
+    },
     "colors": {
         "green_chance": "6BF40D",
         "orange_chance": "FFAD00",
@@ -151,6 +158,13 @@ def save_flat_config(settings):
             "y_offset": settings["kill_label_y_offset"],
             "font_size": settings["kill_label_font_size"],
             "label_format": settings["kill_label_format"],
+        },
+        "gun_label": {
+            "enabled": settings["gun_label_enabled"],
+            "x_offset": settings["gun_label_x_offset"],
+            "y_offset": settings["gun_label_y_offset"],
+            "font_size": settings["gun_label_font_size"],
+            "label_format": settings["gun_label_format"],
         },
         "colors": {
             "green_chance": settings["color_green"],

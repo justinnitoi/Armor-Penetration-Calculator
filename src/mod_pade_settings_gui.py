@@ -6,6 +6,7 @@ from pade_constants import (
     AngleLabelSettings,
     EffPenLabelSettings,
     KillLabelSettings,
+    GunLabelSettings,
     Colors,
     ShadowSettings,
 )
@@ -250,6 +251,50 @@ template = {
             tooltip="{HEADER}Kill Label Format{/HEADER}{BODY}The display format of the kill label. '{value}' will be replaced with the estimated kill chance.{/BODY}",
         ),
         templates.createEmpty(10),
+        templates.createLabel("<b>— Gun Label —</b>"),
+        templates.createCheckbox(
+            "Enable Gun Label",
+            "gun_label_enabled",
+            GunLabelSettings.ENABLED,
+            tooltip="{HEADER}Enable Gun Label{/HEADER}{BODY}Show or hide the marker indicating the shot would hit the target's gun.{/BODY}",
+        ),
+        templates.createSlider(
+            "Gun Label Font Size",
+            "gun_label_font_size",
+            GunLabelSettings.FONT_SIZE,
+            5,
+            100,
+            1,
+            format="{{value}}px",
+            tooltip="{HEADER}Gun Label Font Size{/HEADER}{BODY}The size in pixels of the Gun Label.{/BODY}",
+        ),
+        templates.createNumericStepper(
+            "Gun Label Horizontal Offset",
+            "gun_label_x_offset",
+            GunLabelSettings.X_OFFSET,
+            -2000,
+            2000,
+            1,
+            manual=True,
+            tooltip="{HEADER}Gun Label Horizontal Offset{/HEADER}{BODY}The gun label's horizontal offset from the center of the screen. Positive values move it to the right.{/BODY}",
+        ),
+        templates.createNumericStepper(
+            "Gun Label Vertical Offset",
+            "gun_label_y_offset",
+            GunLabelSettings.Y_OFFSET,
+            -2000,
+            2000,
+            1,
+            manual=True,
+            tooltip="{HEADER}Gun Label Vertical Offset{/HEADER}{BODY}The gun label's vertical offset from the center of the screen. Positive values move it down.{/BODY}",
+        ),
+        templates.createInput(
+            "Gun Label Format",
+            "gun_label_format",
+            GunLabelSettings.LABEL_FORMAT,
+            tooltip="{HEADER}Gun Label Format{/HEADER}{BODY}The marker shown when the shot would hit the target's gun.{/BODY}",
+        ),
+        templates.createEmpty(10),
         templates.createLabel("<b>— Colors —</b>"),
         templates.createColorChoice(
             "High Pen Chance",
@@ -347,6 +392,11 @@ def on_settings_save(linkage, new_settings):
         KillLabelSettings.X_OFFSET = new_settings["kill_label_x_offset"]
         KillLabelSettings.Y_OFFSET = new_settings["kill_label_y_offset"]
         KillLabelSettings.LABEL_FORMAT = new_settings["kill_label_format"]
+        GunLabelSettings.ENABLED = new_settings["gun_label_enabled"]
+        GunLabelSettings.FONT_SIZE = new_settings["gun_label_font_size"]
+        GunLabelSettings.X_OFFSET = new_settings["gun_label_x_offset"]
+        GunLabelSettings.Y_OFFSET = new_settings["gun_label_y_offset"]
+        GunLabelSettings.LABEL_FORMAT = new_settings["gun_label_format"]
         Colors.GREEN = new_settings["color_green"]
         Colors.ORANGE = new_settings["color_orange"]
         Colors.RED = new_settings["color_red"]

@@ -6,6 +6,7 @@ from pade_constants import (
     EffPenLabelSettings,
     KillLabelSettings,
     ShadowSettings,
+    GunLabelSettings,
 )
 import pade_track
 from gambiter import g_guiFlash  # type: ignore
@@ -21,7 +22,7 @@ PEN_ALIAS = "pademinune_PenLabel"
 ANGLE_ALIAS = "pademinune_AngleLabel"
 EFF_PEN_ALIAS = "pademinune_EffPenLabel"
 KILL_ALIAS = "pademinune_KillLabel"
-
+GUN_ALIAS = "pademinune_GunLabel"
 
 class GuiState(object):
     def __init__(self):
@@ -30,12 +31,14 @@ class GuiState(object):
         self.angle_label = AngleLabel(ANGLE_ALIAS, AngleLabelSettings)
         self.eff_pen_label = Label(EFF_PEN_ALIAS, EffPenLabelSettings)
         self.kill_label = Label(KILL_ALIAS, KillLabelSettings)
+        self.gun_label = GunLabel(GUN_ALIAS, GunLabelSettings)
         self.labels = [
             self.armor_label,
             self.pen_label,
             self.angle_label,
             self.eff_pen_label,
             self.kill_label,
+            self.gun_label,
         ]
 
     def is_visible(self):
@@ -58,6 +61,7 @@ class GuiState(object):
         ricochet,
         hit_body,
         hit_track,
+        hit_gun,
         hit_angle,
         avg_pen,
         kill_prob,
@@ -75,6 +79,8 @@ class GuiState(object):
                 self.eff_pen_label.update_gui(int(avg_pen), color)
             if self.kill_label.settings.ENABLED and self.kill_label.visible:
                 self.kill_label.hide()
+            if self.gun_label.settings.ENABLED:
+                self.gun_label.update_gui(hit_gun, color)
         elif not hit_body:
             # shell only hits spaced armor or tracks
             color = Colors.RED
@@ -97,6 +103,8 @@ class GuiState(object):
                     )
                 elif self.kill_label.visible:
                     self.kill_label.hide()
+            if self.gun_label.settings.ENABLED:
+                self.gun_label.update_gui(hit_gun, color)
 
         if pade_track.TrackState.ENABLED:
             if hit_track and (color == Colors.GREEN or color == Colors.ORANGE):
@@ -134,7 +142,10 @@ class Label(object):
             self.last_text = None
 
     def update_gui(self, value, color):
-        interior_text = self.settings.LABEL_FORMAT.format(value=value)
+        if value is not None:
+            interior_text = self.settings.LABEL_FORMAT.format(value=value)
+        else:
+            interior_text = self.settings.LABEL_FORMAT
         new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
             font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
         )
@@ -167,6 +178,16 @@ class AngleLabel(Label):
             return
         super(AngleLabel, self).update_gui(value, color)
 
+class GunLabel(Label):
+    def __init__(self, alias, settings):
+        super(GunLabel, self).__init__(alias, settings)
+
+    def update_gui(self, hit_gun, color):
+        if not hit_gun and self.visible:
+            self.hide()
+            return
+        elif hit_gun:
+            super(GunLabel, self).update_gui(None, color)
 
 def _build_glowfilter():
     return {

@@ -41,7 +41,7 @@ DEFAULT_CONFIG = {
     "gun_label": {
         "enabled": True,
         "x_offset": -26,
-        "y_offset": 40,
+        "y_offset": 35,
         "font_size": 16,
         "label_format": "‡",
     },

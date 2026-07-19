@@ -162,12 +162,12 @@ template = {
             tooltip="{HEADER}Angle Display Threshold{/HEADER}{BODY}The minimum impact angle (in degrees) at which the angle label is shown. Set to 0 to always show it.{/BODY}",
         ),
         templates.createEmpty(10),
-        templates.createLabel("<b>— Gun Label —</b>"),
+        templates.createLabel("<b>— Gun Blocking Label —</b>"),
         templates.createCheckbox(
-            "Enable Gun Label",
+            "Enable Gun Block Label",
             "gun_label_enabled",
             GunLabelSettings.ENABLED,
-            tooltip="{HEADER}Enable Gun Label{/HEADER}{BODY}Show or hide the marker indicating the shot would hit the target's gun.{/BODY}",
+            tooltip="{HEADER}Enable Gun Block Label{/HEADER}{BODY}Show or hide the marker indicating if the shot would hit the target's gun.{/BODY}",
         ),
         templates.createSlider(
             "Gun Label Font Size",

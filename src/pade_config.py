@@ -26,7 +26,7 @@ DEFAULT_CONFIG = {
     },
     "eff_pen_label": {
         "enabled": False,
-        "x_offset": -30,
+        "x_offset": -50,
         "y_offset": 35,
         "font_size": 16,
         "label_format": "{value}",

@@ -47,9 +47,10 @@ def call_update_gui(
     ricochet,
     hit_body,
     hit_track,
+    hit_gun,
     hit_angle_cos,
-    alpha_dmg=(400, 400),
-    enemy_hp=0,
+    alpha_dmg,
+    enemy_hp,
 ):
     """alpha_dmg is a tuple of (near_alpha, far_alpha). enemy_hp is an integer of the remaining enemy hp"""
     hit_angle = int(math.degrees(math.acos(hit_angle_cos)))
@@ -63,7 +64,7 @@ def call_update_gui(
     prob = int(prob)
 
     gui_state.update_gui(
-        armor_val, prob, ricochet, hit_body, hit_track, hit_angle, avg_pen, kill_prob
+        armor_val, prob, ricochet, hit_body, hit_track, hit_gun, hit_angle, avg_pen, kill_prob
     )
 
 
@@ -83,6 +84,7 @@ def my_shot_result_default(
     ricochet = False
     hit_body = False
     hit_track = False
+    hit_gun = False
     min_hit_angle_cos = 1
 
     # Since we are outside the class, we must use the mangled names
@@ -107,8 +109,10 @@ def my_shot_result_default(
         # Track detection
         # indexes are from client/vehicle_systems/tankStructure.py in source code
         # 0 is chassis, >= 4 are extra track pairs
-        if not hit_track and (cDetails.compName == 0 or cDetails.compName >= 4):
+        if cDetails.compName == 0 or cDetails.compName >= 4:
             hit_track = True
+        elif cDetails.compName == 3:
+            hit_gun = True
 
         if isJet:
             jetDist = cDetails.dist - jetStartDist
@@ -233,6 +237,7 @@ def my_shot_result_default(
         ricochet,
         hit_body,
         hit_track,
+        hit_gun,
         min_hit_angle_cos,
         shell.armorDamage,
         entity.health,
@@ -252,6 +257,7 @@ def my_shot_result_modern_he(
     total_armor_val = 0.0
     hit_body = False
     hit_track = False
+    hit_gun = False
     min_hit_angle_cos = 1
 
     # Since we are outside the class, we must use the mangled names
@@ -280,13 +286,18 @@ def my_shot_result_modern_he(
                     False,
                     hit_body,
                     hit_track,
+                    hit_gun,
                     min_hit_angle_cos,
+                    shell.armorDamage,
+                    entity.health
                 )
                 return result
 
             # Track detection
-            if not hit_track and (cDetails.compName == 0 or cDetails.compName >= 4):
+            if cDetails.compName == 0 or cDetails.compName >= 4:
                 hit_track = True
+            elif cDetails.compName == 3:
+                hit_gun = True
 
             matInfo = cDetails.matInfo
             if (
@@ -337,7 +348,10 @@ def my_shot_result_modern_he(
                         False,
                         hit_body,
                         hit_track,
+                        hit_gun,
                         min_hit_angle_cos,
+                        shell.armorDamage,
+                        entity.health
                     )
                     return result
 
@@ -378,7 +392,10 @@ def my_shot_result_modern_he(
                         False,
                         hit_body,
                         hit_track,
+                        hit_gun,
                         min_hit_angle_cos,
+                        shell.armorDamage,
+                        entity.health
                     )
                     return _SHOT_RESULT.NOT_PIERCED
 
@@ -408,8 +425,12 @@ def my_shot_result_modern_he(
         False,
         hit_body,
         hit_track,
+        hit_gun,
         min_hit_angle_cos,
+        shell.armorDamage,
+        entity.health
     )
+
     return result
 
 

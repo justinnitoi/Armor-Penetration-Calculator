@@ -1,4 +1,5 @@
 from pade_constants import Colors
+from pade_config import is_jailbreak
 from gambiter import g_guiFlash  # type: ignore
 from gambiter.flash import COMPONENT_TYPE, COMPONENT_ALIGN  # type: ignore
 
@@ -8,7 +9,7 @@ ORANGE_TRACK_ALIAS = "pademinune_OrangeTrack"
 
 
 class TrackState:
-    ENABLED = True
+    ENABLED = is_jailbreak()
     track_visible = False
     _last_track_color = None  # type: str | None
 

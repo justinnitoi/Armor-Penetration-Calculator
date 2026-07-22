@@ -61,6 +61,11 @@ DEFAULT_CONFIG = {
 
 CONFIG_FOLDER = os.path.join("mods", "configs", "pademinune")
 CONFIG_PATH = os.path.join(CONFIG_FOLDER, "armor-calculator.json")
+JAILBREAK_FLAG_PATH = os.path.join(CONFIG_FOLDER, ".jailbreak")
+
+
+def is_jailbreak():
+    return os.path.isfile(JAILBREAK_FLAG_PATH)
 
 
 def create_config():

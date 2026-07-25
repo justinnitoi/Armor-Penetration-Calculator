@@ -17,7 +17,7 @@ DEFAULT_CONFIG = {
         "label_format": "{value}%",
     },
     "angle_label": {
-        "enabled": True,
+        "enabled": False,
         "x_offset": 30,
         "y_offset": 35,
         "font_size": 16,

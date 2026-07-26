@@ -6,7 +6,7 @@ from AvatarInputHandler import AvatarInputHandler  # type: ignore
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
-
+from pade_constants import VERSION
 from pade_gui import gui_state
 
 
@@ -64,7 +64,15 @@ def call_update_gui(
     prob = int(prob)
 
     gui_state.update_gui(
-        armor_val, prob, ricochet, hit_body, hit_track, hit_gun, hit_angle, avg_pen, kill_prob
+        armor_val,
+        prob,
+        ricochet,
+        hit_body,
+        hit_track,
+        hit_gun,
+        hit_angle,
+        avg_pen,
+        kill_prob,
     )
 
 
@@ -289,7 +297,7 @@ def my_shot_result_modern_he(
                     hit_gun,
                     min_hit_angle_cos,
                     shell.armorDamage,
-                    entity.health
+                    entity.health,
                 )
                 return result
 
@@ -351,7 +359,7 @@ def my_shot_result_modern_he(
                         hit_gun,
                         min_hit_angle_cos,
                         shell.armorDamage,
-                        entity.health
+                        entity.health,
                     )
                     return result
 
@@ -395,7 +403,7 @@ def my_shot_result_modern_he(
                         hit_gun,
                         min_hit_angle_cos,
                         shell.armorDamage,
-                        entity.health
+                        entity.health,
                     )
                     return _SHOT_RESULT.NOT_PIERCED
 
@@ -428,7 +436,7 @@ def my_shot_result_modern_he(
         hit_gun,
         min_hit_angle_cos,
         shell.armorDamage,
-        entity.health
+        entity.health,
     )
 
     return result

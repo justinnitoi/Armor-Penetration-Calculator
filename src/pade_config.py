@@ -17,12 +17,12 @@ DEFAULT_CONFIG = {
         "label_format": "{value}%",
     },
     "angle_label": {
-        "enabled": False,
+        "enabled": True,
         "x_offset": 30,
         "y_offset": 35,
         "font_size": 16,
         "label_format": "{value}°",
-        "display_threshold": 65,
+        "display_threshold": 70,
     },
     "eff_pen_label": {
         "enabled": False,

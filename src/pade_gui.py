@@ -63,10 +63,11 @@ class GuiState(object):
         hit_body,
         hit_track,
         hit_gun,
-        hit_angle,
+        angle,
         avg_pen,
         kill_prob,
     ):
+        """Assumes all arguments passed are booleans or integers"""
         if ricochet:
             # shell ricochet
             color = Colors.PURPLE
@@ -75,9 +76,9 @@ class GuiState(object):
             if self.pen_label.settings.ENABLED:
                 self.pen_label.update_gui(0, color)
             if self.angle_label.settings.ENABLED:
-                self.angle_label.update_gui(hit_angle, color)
+                self.angle_label.update_gui(angle, color)
             if self.eff_pen_label.settings.ENABLED:
-                self.eff_pen_label.update_gui(int(avg_pen), color)
+                self.eff_pen_label.update_gui(avg_pen, color)
             if self.kill_label.settings.ENABLED and self.kill_label.visible:
                 self.kill_label.hide()
             if self.gun_label.settings.ENABLED:
@@ -90,13 +91,13 @@ class GuiState(object):
             color = Colors.get_color_from_prob(prob)
 
             if self.armor_label.settings.ENABLED:
-                self.armor_label.update_gui(int(armor_value), color)
+                self.armor_label.update_gui(armor_value, color)
             if self.pen_label.settings.ENABLED:
-                self.pen_label.update_gui(int(prob), color)
+                self.pen_label.update_gui(prob, color)
             if self.angle_label.settings.ENABLED:
-                self.angle_label.update_gui(hit_angle, color)
+                self.angle_label.update_gui(angle, color)
             if self.eff_pen_label.settings.ENABLED:
-                self.eff_pen_label.update_gui(int(avg_pen), color)
+                self.eff_pen_label.update_gui(avg_pen, color)
             if self.kill_label.settings.ENABLED:
                 if kill_prob > 0:
                     self.kill_label.update_gui(

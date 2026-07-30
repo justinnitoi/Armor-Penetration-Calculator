@@ -19,15 +19,11 @@ Move-Item -Force src/pade_config.pyc bin/
 python27 -m py_compile src/mod_pade_settings_gui.py
 Move-Item -Force src/mod_pade_settings_gui.pyc bin/
 
-python27 -m py_compile src/pade_track.py
-Move-Item -Force src/pade_track.pyc bin/
-
 Copy-Item bin/mod_armor_pen_calculator.pyc $DEST
 Copy-Item bin/pade_constants.pyc $DEST
 Copy-Item bin/pade_gui.pyc $DEST
 Copy-Item bin/pade_config.pyc $DEST
 Copy-Item bin/mod_pade_settings_gui.pyc $DEST -Force
-Copy-Item bin/pade_track.pyc $DEST -Force
 
 
 Write-Output "Compiled and copied main branch mod files to '$DEST'"

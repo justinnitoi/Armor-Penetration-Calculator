@@ -1,6 +1,6 @@
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-$MOD_NAME = "pademinune-armor-pen-calc-1.7.1"
+$MOD_NAME = "pademinune-armor-pen-calc-1.8.2"
 
 $BinDir   = "$PSScriptRoot\..\bin"
 $ModsDir  = "$BinDir\res\scripts\client\gui\mods"

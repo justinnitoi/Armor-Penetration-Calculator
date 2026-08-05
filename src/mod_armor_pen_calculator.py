@@ -6,7 +6,7 @@ from AvatarInputHandler import AvatarInputHandler  # type: ignore
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
-
+from pade_constants import VERSION
 from pade_gui import gui_state
 
 
@@ -53,18 +53,25 @@ def call_update_gui(
     enemy_hp,
 ):
     """alpha_dmg is a tuple of (near_alpha, far_alpha). enemy_hp is an integer of the remaining enemy hp"""
-    hit_angle = int(math.degrees(math.acos(hit_angle_cos)))
+    angle = math.degrees(math.acos(hit_angle_cos))
 
     prob = 0
     kill_roll_prob = 0
     if not ricochet and hit_body:
         prob = get_gaussian_probability(avg_pen, armor_val)
         kill_roll_prob = get_gaussian_probability(alpha_dmg[0], enemy_hp)
-    kill_prob = int(prob * kill_roll_prob // 100)
-    prob = int(prob)
+    kill_prob = prob * kill_roll_prob // 100
 
     gui_state.update_gui(
-        armor_val, prob, ricochet, hit_body, hit_track, hit_gun, hit_angle, avg_pen, kill_prob
+        int(armor_val),
+        int(prob),
+        ricochet,
+        hit_body,
+        hit_track,
+        hit_gun,
+        int(angle),
+        int(avg_pen),
+        int(kill_prob),
     )
 
 
@@ -289,7 +296,7 @@ def my_shot_result_modern_he(
                     hit_gun,
                     min_hit_angle_cos,
                     shell.armorDamage,
-                    entity.health
+                    entity.health,
                 )
                 return result
 
@@ -351,7 +358,7 @@ def my_shot_result_modern_he(
                         hit_gun,
                         min_hit_angle_cos,
                         shell.armorDamage,
-                        entity.health
+                        entity.health,
                     )
                     return result
 
@@ -395,7 +402,7 @@ def my_shot_result_modern_he(
                         hit_gun,
                         min_hit_angle_cos,
                         shell.armorDamage,
-                        entity.health
+                        entity.health,
                     )
                     return _SHOT_RESULT.NOT_PIERCED
 
@@ -428,7 +435,7 @@ def my_shot_result_modern_he(
         hit_gun,
         min_hit_angle_cos,
         shell.armorDamage,
-        entity.health
+        entity.health,
     )
 
     return result

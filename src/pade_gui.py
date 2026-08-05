@@ -7,8 +7,8 @@ from pade_constants import (
     KillLabelSettings,
     ShadowSettings,
     GunLabelSettings,
+    TrackLabelSettings,
 )
-import pade_track
 from gambiter import g_guiFlash  # type: ignore
 from gambiter.flash import COMPONENT_TYPE, COMPONENT_ALIGN  # type: ignore
 
@@ -24,6 +24,7 @@ EFF_PEN_ALIAS = "pademinune_EffPenLabel"
 KILL_ALIAS = "pademinune_KillLabel"
 GUN_ALIAS = "pademinune_GunLabel"
 
+
 class GuiState(object):
     def __init__(self):
         self.armor_label = Label(ARMOR_ALIAS, ArmorLabelSettings)
@@ -32,6 +33,7 @@ class GuiState(object):
         self.eff_pen_label = Label(EFF_PEN_ALIAS, EffPenLabelSettings)
         self.kill_label = Label(KILL_ALIAS, KillLabelSettings)
         self.gun_label = GunLabel(GUN_ALIAS, GunLabelSettings)
+        self.track_label = TrackLabel(TrackLabelSettings)
         self.labels = [
             self.armor_label,
             self.pen_label,
@@ -39,6 +41,7 @@ class GuiState(object):
             self.eff_pen_label,
             self.kill_label,
             self.gun_label,
+            self.track_label,
         ]
 
     def is_visible(self):
@@ -51,8 +54,6 @@ class GuiState(object):
         for label in self.labels:
             if label.visible:
                 label.hide()
-        if pade_track.TrackState.ENABLED and pade_track.TrackState.track_visible:
-            pade_track.hide_track_label()
 
     def update_gui(
         self,
@@ -62,10 +63,11 @@ class GuiState(object):
         hit_body,
         hit_track,
         hit_gun,
-        hit_angle,
+        angle,
         avg_pen,
         kill_prob,
     ):
+        """Assumes all arguments passed are booleans or integers"""
         if ricochet:
             # shell ricochet
             color = Colors.PURPLE
@@ -74,9 +76,9 @@ class GuiState(object):
             if self.pen_label.settings.ENABLED:
                 self.pen_label.update_gui(0, color)
             if self.angle_label.settings.ENABLED:
-                self.angle_label.update_gui(hit_angle, color)
+                self.angle_label.update_gui(angle, color)
             if self.eff_pen_label.settings.ENABLED:
-                self.eff_pen_label.update_gui(int(avg_pen), color)
+                self.eff_pen_label.update_gui(avg_pen, color)
             if self.kill_label.settings.ENABLED and self.kill_label.visible:
                 self.kill_label.hide()
             if self.gun_label.settings.ENABLED:
@@ -89,13 +91,13 @@ class GuiState(object):
             color = Colors.get_color_from_prob(prob)
 
             if self.armor_label.settings.ENABLED:
-                self.armor_label.update_gui(int(armor_value), color)
+                self.armor_label.update_gui(armor_value, color)
             if self.pen_label.settings.ENABLED:
-                self.pen_label.update_gui(int(prob), color)
+                self.pen_label.update_gui(prob, color)
             if self.angle_label.settings.ENABLED:
-                self.angle_label.update_gui(hit_angle, color)
+                self.angle_label.update_gui(angle, color)
             if self.eff_pen_label.settings.ENABLED:
-                self.eff_pen_label.update_gui(int(avg_pen), color)
+                self.eff_pen_label.update_gui(avg_pen, color)
             if self.kill_label.settings.ENABLED:
                 if kill_prob > 0:
                     self.kill_label.update_gui(
@@ -106,11 +108,11 @@ class GuiState(object):
             if self.gun_label.settings.ENABLED:
                 self.gun_label.update_gui(hit_gun, color)
 
-        if pade_track.TrackState.ENABLED:
+        if self.track_label.settings.ENABLED:
             if hit_track and (color == Colors.GREEN or color == Colors.ORANGE):
-                pade_track.update_track_label(color)
-            elif pade_track.TrackState.track_visible:
-                pade_track.hide_track_label()
+                self.track_label.update_gui(color)
+            elif self.track_label.visible:
+                self.track_label.hide()
 
     def update_properties(self):
         for label in self.labels:
@@ -178,6 +180,7 @@ class AngleLabel(Label):
             return
         super(AngleLabel, self).update_gui(value, color)
 
+
 class GunLabel(Label):
     def __init__(self, alias, settings):
         super(GunLabel, self).__init__(alias, settings)
@@ -188,6 +191,63 @@ class GunLabel(Label):
             return
         elif hit_gun:
             super(GunLabel, self).update_gui(None, color)
+
+
+class ImageLabel(object):
+    def __init__(self, settings):
+        self.settings = settings
+        self.visible = False
+        self.current_state = None
+        self.state_aliases = []
+        for alias, image_path in settings.IMAGES:
+            properties = {
+                "image": image_path,
+                "alpha": 1,
+                "x": settings.X_OFFSET,
+                "y": settings.Y_OFFSET,
+                "alignX": COMPONENT_ALIGN.CENTER,
+                "alignY": COMPONENT_ALIGN.CENTER,
+                "visible": False,
+            }
+            self.state_aliases.append(alias)
+            g_guiFlash.createComponent(alias, COMPONENT_TYPE.IMAGE, properties)
+
+    def hide(self):
+        if self.visible:
+            current_alias = self.state_aliases[self.current_state]
+            g_guiFlash.updateComponent(current_alias, {"visible": False})
+            self.visible = False
+            self.current_state = None
+
+    def update_gui(self, next_state):
+        if next_state == self.current_state and self.visible:
+            return
+
+        if self.visible:
+            old_alias = self.state_aliases[self.current_state]
+            g_guiFlash.updateComponent(old_alias, {"visible": False})
+        next_alias = self.state_aliases[next_state]
+        self.current_state = next_state
+        self.visible = True
+        g_guiFlash.updateComponent(next_alias, {"visible": True})
+
+    def update_properties(self):
+        pass
+
+
+class TrackLabel(ImageLabel):
+    def __init__(self, settings):
+        super(TrackLabel, self).__init__(settings)
+
+    def update_gui(self, color):
+        if color == Colors.GREEN:
+            next_state = 0
+        elif color == Colors.ORANGE:
+            next_state = 1
+        else:
+            raise ValueError("Next track state is not green or orange.")
+        return super(TrackLabel, self).update_gui(next_state)
+
 
 def _build_glowfilter():
     return {

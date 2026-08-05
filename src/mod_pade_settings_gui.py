@@ -9,6 +9,7 @@ from pade_constants import (
     GunLabelSettings,
     Colors,
     ShadowSettings,
+    VERSION,
 )
 from pade_config import save_flat_config
 from pade_gui import gui_state

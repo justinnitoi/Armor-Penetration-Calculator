@@ -1,4 +1,4 @@
-from pade_config import user_settings, DEFAULT_CONFIG
+from pade_config import user_settings, DEFAULT_CONFIG, is_jailbreak
 
 
 def safe_get_color(color):
@@ -13,6 +13,9 @@ def safe_get_setting(label, attribute):
     if label not in user_settings or attribute not in user_settings[label]:
         return default
     return user_settings[label][attribute]
+
+
+VERSION = "1.8.2"
 
 
 class Colors(object):
@@ -73,6 +76,7 @@ class KillLabelSettings:
     X_OFFSET = safe_get_setting("kill_label", "x_offset")
     Y_OFFSET = safe_get_setting("kill_label", "y_offset")
 
+
 class GunLabelSettings:
     ENABLED = safe_get_setting("gun_label", "enabled")
     LABEL_FORMAT = safe_get_setting("gun_label", "label_format")
@@ -80,8 +84,19 @@ class GunLabelSettings:
     X_OFFSET = safe_get_setting("gun_label", "x_offset")
     Y_OFFSET = safe_get_setting("gun_label", "y_offset")
 
+
 class ShadowSettings:
     COLOR = safe_get_setting("shadow", "shadow_color")
     ALPHA = safe_get_setting("shadow", "shadow_alpha")
     LENGTH = safe_get_setting("shadow", "shadow_length")
     STRENGTH = safe_get_setting("shadow", "shadow_strength")
+
+
+class TrackLabelSettings:
+    ENABLED = is_jailbreak()
+    X_OFFSET = 0
+    Y_OFFSET = 0
+    IMAGES = [
+        ("pademinune_GreenTrack", "img://gui/pademinune/crosshair-32-green.png"),
+        ("pademinune_OrangeTrack", "img://gui/pademinune/crosshair-32-orange.png"),
+    ]

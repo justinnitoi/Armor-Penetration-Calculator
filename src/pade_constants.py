@@ -15,7 +15,7 @@ def safe_get_setting(label, attribute):
     return user_settings[label][attribute]
 
 
-VERSION = "1.8.2"
+VERSION = "1.8.3"
 
 
 class Colors(object):

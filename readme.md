@@ -1,19 +1,8 @@
-# Armor Penetration Calculator Nightly
+# Armor Penetration Calculator 2
 
 ## Overview
 
-This is the nightly version.
-
-> *How is this different from the main version?*
-
-This version has no config gui and adds an indicator when a shot will hit a track.
-
-### Features
-- Everything in the main version but without a config gui.
-- An indicator for track hits.
-
-### Config
-You can change the display settings (text size, color, position) using the config file found in `mods/configs/pademinune`.
+Armor Penetration Calculator has moved to using gameface and no longer relies on guiflash.
 
 ## Installation
 

@@ -1,0 +1,94 @@
+
+@font-face {
+    font-family: "PF DIN Max Compressed";
+    src: url("PFDINMax-CompressedBook.ttf") format("truetype");
+    font-weight: 350; /* Book sits below Regular -- lighter, editorial feel */
+}
+
+@font-face {
+    font-family: "PF DIN Max Compressed";
+    src: url("PFDINMax-CompressedRegular.ttf") format("truetype");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "PF DIN Max Compressed";
+    src: url("PFDINMax-CompressedMedium.ttf") format("truetype");
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: "PF DIN Max Compressed";
+    src: url("PFDINMax-CompressedSemiBold.ttf") format("truetype");
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: "PF DIN Max Compressed";
+    src: url("PFDINMax-CompressedBold.ttf") format("truetype");
+    font-weight: 700;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 256px;
+    height: 256px;
+    background: transparent;
+    overflow: hidden;
+    pointer-events: none;
+    /* anchor point for the absolutely-positioned rows below */
+    position: relative; 
+}
+
+
+/* all left and right offsets from now on are relative to an objects center */
+.centered-label {
+    position: absolute;
+    left: 128px;
+    transform: translate(-50%, -50%);
+    font-family: "PF DIN Max Compressed", Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+    z-index: 1;
+}
+
+#armor-label {
+    top: 155px; /* 35px center - 15px */
+    color: #6BF40D;
+}
+
+#prob-label {
+    top: 180px; /* 35px center + 15px */
+    color: #f40d30;
+    font-size: 16px;
+}
+
+#angle-label {
+    top: 165px;   /* body's vertical center (70px / 2) -- same line as center */
+    left: 165px;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+#label-bg {
+    position: absolute;
+    top: 165px;   /* body's vertical center for a 256x256 box */
+    left: 128px;  /* body's horizontal center */
+    transform: translate(-50%, -50%);
+    width: 100px;  /* manually sized -- tune to fit both rows */
+    height: 50px;  /* manually sized -- tune to fit both rows */
+    background-color: rgb(0, 0, 0);
+    border-radius: 4px;
+    z-index: 0;
+}
+
+
+#ap-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 9000;
+}

@@ -8,6 +8,7 @@ from items.components.component_constants import (  # type: ignore
 )
 from pade_constants import VERSION
 from pade_gui import gui_state
+import mod_APBattleView
 
 
 def log(message):
@@ -62,17 +63,21 @@ def call_update_gui(
         kill_roll_prob = get_gaussian_probability(alpha_dmg[0], enemy_hp)
     kill_prob = prob * kill_roll_prob // 100
 
-    gui_state.update_gui(
-        int(armor_val),
-        int(prob),
-        ricochet,
-        hit_body,
-        hit_track,
-        hit_gun,
-        int(angle),
-        int(avg_pen),
-        int(kill_prob),
+    mod_APBattleView.update(
+        str(int(armor_val)), "{}%".format(int(prob)), "{}°".format(int(angle))
     )
+
+    # gui_state.update_gui(
+    #     int(armor_val),
+    #     int(prob),
+    #     ricochet,
+    #     hit_body,
+    #     hit_track,
+    #     hit_gun,
+    #     int(angle),
+    #     int(avg_pen),
+    #     int(kill_prob),
+    # )
 
 
 log("Mod is loading")

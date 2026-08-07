@@ -66,7 +66,7 @@ html, body {
     font-family: "PF DIN Max Compressed", "Warhelios", Arial, sans-serif;
     font-size: 20px;
     font-weight: 400;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.75);
     white-space: nowrap;
     z-index: 1;
 }
@@ -96,10 +96,10 @@ html, body {
     transform: translate(-50%, -50%);
     width: 90px;  /* manually sized -- tune to fit both rows */
     height: 50px;  /* manually sized -- tune to fit both rows */
-    background: rgba(18, 18, 18, 0.82);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     z-index: 0;
 }
 

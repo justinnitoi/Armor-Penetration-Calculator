@@ -51,19 +51,24 @@ html, body {
     font-family: "PF DIN Max Compressed", Arial, sans-serif;
     font-size: 20px;
     font-weight: 400;
-    text-shadow: 0 0 4px rgba(0, 0, 0, 0.85);
+    text-shadow:
+        -1px -1px 1px rgba(0, 0, 0, 0.65),
+         1px -1px 1px rgba(0, 0, 0, 0.65),
+        -1px  1px 1px rgba(0, 0, 0, 0.65),
+         1px  1px 1px rgba(0, 0, 0, 0.65),
+         0 1px 2px rgba(0, 0, 0, 0.4);
     white-space: nowrap;
     z-index: 1;
 }
 
 #armor-label {
     top: 155px; /* 35px center - 15px */
-    color: #f4370d;
+    color: #6BF40D;
 }
 
 #prob-label {
     top: 180px; /* 35px center + 15px */
-    color: #f4370d;
+    color: #6BF40D;
     font-size: 16px;
 }
 
@@ -81,8 +86,13 @@ html, body {
     transform: translate(-50%, -50%);
     width: 100px;  /* manually sized -- tune to fit both rows */
     height: 50px;  /* manually sized -- tune to fit both rows */
-    background-color: rgba(0, 0, 0, 0.4);
+    background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.045) 0px, rgba(255, 255, 255, 0.045) 1px, transparent 1px, transparent 4px),
+        repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.12) 0px, rgba(0, 0, 0, 0.12) 1px, transparent 1px, transparent 4px),
+        linear-gradient(180deg, rgba(35, 32, 28, 0.62) 0%, rgba(12, 11, 9, 0.62) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.55);
     border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     z-index: 0;
 }
 

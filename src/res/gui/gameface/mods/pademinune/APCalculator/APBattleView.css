@@ -29,6 +29,18 @@
     font-weight: 700;
 }
 
+@font-face {
+    font-family: "Warhelios";
+    src: url("Warhelios-Regular.ttf") format("truetype");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "Warhelios";
+    src: url("Warhelios-Bold.ttf") format("truetype");
+    font-weight: 700;
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -39,7 +51,10 @@ html, body {
     pointer-events: none;
     /* anchor point for the absolutely-positioned rows below */
     position: relative; 
-    background-color: lightcyan;
+    /* background-color: lightcyan; */
+    background-image: url("wot-background.jpg");
+    background-size: 256px 256px;
+    background-repeat: no-repeat; 
 }
 
 
@@ -48,7 +63,7 @@ html, body {
     position: absolute;
     left: 128px;
     transform: translate(-50%, -50%);
-    font-family: "PF DIN Max Compressed", Arial, sans-serif;
+    font-family: "PF DIN Max Compressed", "Warhelios", Arial, sans-serif;
     font-size: 20px;
     font-weight: 400;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -69,7 +84,7 @@ html, body {
 
 #angle-label {
     top: 165px;   /* body's vertical center (70px / 2) -- same line as center */
-    left: 165px;
+    left: 160px;
     color: #ffffff;
     font-size: 16px;
 }
@@ -79,7 +94,7 @@ html, body {
     top: 165px;   /* body's vertical center for a 256x256 box */
     left: 128px;  /* body's horizontal center */
     transform: translate(-50%, -50%);
-    width: 100px;  /* manually sized -- tune to fit both rows */
+    width: 90px;  /* manually sized -- tune to fit both rows */
     height: 50px;  /* manually sized -- tune to fit both rows */
     background: rgba(18, 18, 18, 0.82);
     border: 1px solid rgba(255, 255, 255, 0.08);

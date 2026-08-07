@@ -39,6 +39,7 @@ html, body {
     pointer-events: none;
     /* anchor point for the absolutely-positioned rows below */
     position: relative; 
+    background-color: lightcyan;
 }
 
 
@@ -57,12 +58,12 @@ html, body {
 
 #armor-label {
     top: 155px; /* 35px center - 15px */
-    color: #6BF40D;
+    color: #f4370d;
 }
 
 #prob-label {
     top: 180px; /* 35px center + 15px */
-    color: #f40d30;
+    color: #f4370d;
     font-size: 16px;
 }
 
@@ -80,7 +81,7 @@ html, body {
     transform: translate(-50%, -50%);
     width: 100px;  /* manually sized -- tune to fit both rows */
     height: 50px;  /* manually sized -- tune to fit both rows */
-    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
     border-radius: 4px;
     z-index: 0;
 }

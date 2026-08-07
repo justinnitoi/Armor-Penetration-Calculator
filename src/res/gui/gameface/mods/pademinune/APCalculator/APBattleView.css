@@ -96,7 +96,7 @@ html, body {
     transform: translate(-50%, -50%);
     width: 90px;  /* manually sized -- tune to fit both rows */
     height: 50px;  /* manually sized -- tune to fit both rows */
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);

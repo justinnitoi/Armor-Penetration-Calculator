@@ -225,7 +225,7 @@ def push(
         if angle_visible is not None:
             tx.setAngleVisible(angle_visible)
         if angle_color is not None:
-            tx.setProbColor(angle_color)
+            tx.setAngleColor(angle_color)
 
 
 # --- open/close, tied to the battle lifecycle ------------------------------------
@@ -250,34 +250,12 @@ def open_window(x=0, y=0):
 
 
 def close_window():
-    global _active, _visible
+    global _active
     if _active is None:
         return
     window, _view = _active
     _active = None
-    _visible = False
     window.destroy()
-
-
-def hide():
-    """Public API: hide the label without touching its current text/color.
-    No-op if the window isn't open or the label is already hidden -- mirrors
-    Label.hide()'s "if self.visible" guard in pade_gui.py, so callers (e.g.
-    my_get_shot_result, which may run every frame) can call this freely."""
-    global _visible
-    if _active is None or not _visible:
-        return
-    _window, view = _active
-    rvm = view.viewModel
-    if rvm is None:
-        return
-    with rvm.transaction() as tx:
-        tx.setVisible(False)
-    _visible = False
-
-
-def is_visible():
-    return _visible
 
 
 def _on_avatar_ready(*args, **kwargs):

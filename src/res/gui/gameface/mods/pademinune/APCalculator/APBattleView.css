@@ -52,9 +52,9 @@ html, body {
     /* anchor point for the absolutely-positioned rows below */
     position: relative; 
     /* background-color: lightcyan; */
-    background-image: url("wot-background.jpg");
+    /* background-image: url("wot-background.jpg");
     background-size: 256px 256px;
-    background-repeat: no-repeat; 
+    background-repeat: no-repeat;  */
 }
 
 
@@ -63,9 +63,9 @@ html, body {
     position: absolute;
     left: 128px;
     transform: translate(-50%, -50%);
-    font-family: "PF DIN Max Compressed", "Warhelios", Arial, sans-serif;
+    font-family: "Warhelios", "PF DIN Max Compressed", Arial, sans-serif;
     font-size: 20px;
-    font-weight: 400;
+    font-weight: 700;
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.75);
     white-space: nowrap;
     z-index: 1;
@@ -96,7 +96,7 @@ html, body {
     transform: translate(-50%, -50%);
     width: 90px;  /* manually sized -- tune to fit both rows */
     height: 50px;  /* manually sized -- tune to fit both rows */
-    background: rgba(0, 0, 0, 0.4);
+    /* background: rgba(0, 0, 0, 0); */
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);

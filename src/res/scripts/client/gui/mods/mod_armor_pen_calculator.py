@@ -6,7 +6,7 @@ from AvatarInputHandler import AvatarInputHandler  # type: ignore
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
-from pade_constants import VERSION
+from pade_constants import VERSION, Colors
 from pade_gui import gui_state
 import mod_APBattleView
 
@@ -63,9 +63,19 @@ def call_update_gui(
         kill_roll_prob = get_gaussian_probability(alpha_dmg[0], enemy_hp)
     kill_prob = prob * kill_roll_prob // 100
 
-    mod_APBattleView.update(
-        str(int(armor_val)), "{}%".format(int(prob)), "{}°".format(int(angle))
-    )
+    if ricochet:
+        # mirrors GuiState.update_gui's ricochet branch in pade_gui.py
+        mod_APBattleView.update("-", "0%", "{}°".format(int(angle)), color=Colors.PURPLE)
+    elif not hit_body:
+        # shell only hit spaced armor/tracks -- nothing meaningful to show
+        mod_APBattleView.hide()
+    else:
+        mod_APBattleView.update(
+            str(int(armor_val)),
+            "{}%".format(int(prob)),
+            "{}°".format(int(angle)),
+            color=Colors.get_color_from_prob(prob),
+        )
 
     # gui_state.update_gui(
     #     int(armor_val),
@@ -452,15 +462,18 @@ original_getShotResult = gun_marker_ctrl._CrosshairShotResults.getShotResult.__f
 def my_get_shot_result(cls, gunMarker, excludeTeam=0, piercingMultiplier=1):
     """Override for original getShotResult. Is only called when reticle is visible."""
     result = original_getShotResult(cls, gunMarker, excludeTeam, piercingMultiplier)
-    if result == _SHOT_RESULT.UNDEFINED and gui_state.is_visible():
-        # only call hide if the gui is still visible
-        gui_state.hide_all()
+    if result == _SHOT_RESULT.UNDEFINED:
+        # each hide() call below no-ops on its own if that widget is already hidden
+        if gui_state.is_visible():
+            gui_state.hide_all()
+        mod_APBattleView.hide()
     return result
 
 
 def on_load_match():
     """Called when the player spawns into a map."""
     gui_state.hide_all()
+    mod_APBattleView.hide()
 
     # log("New match detected: Resetting GUI.")
 
@@ -468,6 +481,7 @@ def on_load_match():
 def on_leave_match():
     """Called when the player leaves a match"""
     gui_state.hide_all()
+    mod_APBattleView.hide()
 
     # log('Player has left the match. Resetting GUI.')
 
@@ -480,6 +494,7 @@ def my_activate_postmortem(self, *args, **kwargs):
     original_activate_postmortem(self, *args, **kwargs)
 
     gui_state.hide_all()
+    mod_APBattleView.hide()
     # log('Player is dead. Hiding GUI.')
 
 

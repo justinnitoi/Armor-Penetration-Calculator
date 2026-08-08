@@ -236,6 +236,7 @@ class AngleLabel(object):
             self.hide()
             return
         
+        color = Colors.WHITE
         interior_text = self.settings.LABEL_FORMAT.format(value=value)
 
         new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(

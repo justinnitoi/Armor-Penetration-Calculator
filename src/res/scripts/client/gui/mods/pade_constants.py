@@ -24,6 +24,7 @@ class Colors(object):
     ORANGE = safe_get_color("orange_chance")
     GREEN = safe_get_color("green_chance")
     GREY = "808080"
+    WHITE = "FFFFFF"
     PURPLE = safe_get_color("ricochet")
 
     @classmethod

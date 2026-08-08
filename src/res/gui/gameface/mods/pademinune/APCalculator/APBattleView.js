@@ -12,7 +12,7 @@ const observer = ModelObserver();
 const armorEl = document.getElementById("armor-label");
 const probEl = document.getElementById("prob-label");
 const angleEl = document.getElementById("angle-label");
-// const bgEl = document.getElementById("label-bg");
+const bgEl = document.getElementById("label-bg");
 
 
 // display:"" defers to the CSS default (shown), "none" drops it from layout
@@ -45,10 +45,8 @@ function render(model) {
 
     // Background box tracks whichever row is visible; borrows armor's color
     // (falling back through prob/angle) since it no longer has its own.
-    // const anyVisible = armorVisible || probVisible || angleVisible;
-    // bgEl.style.display = anyVisible ? "" : "none";
-    // const bgColor = model.armorColor || model.probColor || model.angleColor;
-    // bgEl.style.borderColor = bgColor ? "#" + bgColor + "59" : ""; // ~35% alpha, matches the default CSS border
+    const anyVisible = armorVisible || probVisible || angleVisible;
+    bgEl.style.display = anyVisible ? "" : "none";
 }
 
 engine.whenReady.then(() => {

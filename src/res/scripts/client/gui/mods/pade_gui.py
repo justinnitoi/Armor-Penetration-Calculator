@@ -11,6 +11,7 @@ from pade_constants import (
 )
 from gambiter import g_guiFlash  # type: ignore
 from gambiter.flash import COMPONENT_TYPE, COMPONENT_ALIGN  # type: ignore
+from mod_APBattleView import update_gameface
 
 
 def log(message):
@@ -27,21 +28,21 @@ GUN_ALIAS = "pademinune_GunLabel"
 
 class GuiState(object):
     def __init__(self):
-        self.armor_label = Label(ARMOR_ALIAS, ArmorLabelSettings)
-        self.pen_label = Label(PEN_ALIAS, PenLabelSettings)
-        self.angle_label = AngleLabel(ANGLE_ALIAS, AngleLabelSettings)
-        self.eff_pen_label = Label(EFF_PEN_ALIAS, EffPenLabelSettings)
-        self.kill_label = Label(KILL_ALIAS, KillLabelSettings)
-        self.gun_label = GunLabel(GUN_ALIAS, GunLabelSettings)
-        self.track_label = TrackLabel(TrackLabelSettings)
+        self.armor_label = ArmorLabel(ArmorLabelSettings)
+        self.prob_label = ProbLabel(PenLabelSettings)
+        self.angle_label = AngleLabel(AngleLabelSettings)
+        # self.eff_pen_label = Label(EFF_PEN_ALIAS, EffPenLabelSettings)
+        # self.kill_label = Label(KILL_ALIAS, KillLabelSettings)
+        # self.gun_label = GunLabel(GUN_ALIAS, GunLabelSettings)
+        # self.track_label = TrackLabel(TrackLabelSettings)
         self.labels = [
             self.armor_label,
-            self.pen_label,
+            self.prob_label,
             self.angle_label,
-            self.eff_pen_label,
-            self.kill_label,
-            self.gun_label,
-            self.track_label,
+            # self.eff_pen_label,
+            # self.kill_label,
+            # self.gun_label,
+            # self.track_label,
         ]
 
     def is_visible(self):
@@ -73,16 +74,16 @@ class GuiState(object):
             color = Colors.PURPLE
             if self.armor_label.settings.ENABLED:
                 self.armor_label.update_gui("-", color)
-            if self.pen_label.settings.ENABLED:
-                self.pen_label.update_gui(0, color)
+            if self.prob_label.settings.ENABLED:
+                self.prob_label.update_gui(0, color)
             if self.angle_label.settings.ENABLED:
                 self.angle_label.update_gui(angle, color)
-            if self.eff_pen_label.settings.ENABLED:
-                self.eff_pen_label.update_gui(avg_pen, color)
-            if self.kill_label.settings.ENABLED and self.kill_label.visible:
-                self.kill_label.hide()
-            if self.gun_label.settings.ENABLED:
-                self.gun_label.update_gui(hit_gun, color)
+            # if self.eff_pen_label.settings.ENABLED:
+            #     self.eff_pen_label.update_gui(avg_pen, color)
+            # if self.kill_label.settings.ENABLED and self.kill_label.visible:
+            #     self.kill_label.hide()
+            # if self.gun_label.settings.ENABLED:
+            #     self.gun_label.update_gui(hit_gun, color)
         elif not hit_body:
             # shell only hits spaced armor or tracks
             color = Colors.RED
@@ -92,27 +93,27 @@ class GuiState(object):
 
             if self.armor_label.settings.ENABLED:
                 self.armor_label.update_gui(armor_value, color)
-            if self.pen_label.settings.ENABLED:
-                self.pen_label.update_gui(prob, color)
+            if self.prob_label.settings.ENABLED:
+                self.prob_label.update_gui(prob, color)
             if self.angle_label.settings.ENABLED:
                 self.angle_label.update_gui(angle, color)
-            if self.eff_pen_label.settings.ENABLED:
-                self.eff_pen_label.update_gui(avg_pen, color)
-            if self.kill_label.settings.ENABLED:
-                if kill_prob > 0:
-                    self.kill_label.update_gui(
-                        kill_prob, Colors.get_color_from_prob(kill_prob)
-                    )
-                elif self.kill_label.visible:
-                    self.kill_label.hide()
-            if self.gun_label.settings.ENABLED:
-                self.gun_label.update_gui(hit_gun, color)
+            # if self.eff_pen_label.settings.ENABLED:
+            #     self.eff_pen_label.update_gui(avg_pen, color)
+            # if self.kill_label.settings.ENABLED:
+            #     if kill_prob > 0:
+            #         self.kill_label.update_gui(
+            #             kill_prob, Colors.get_color_from_prob(kill_prob)
+            #         )
+            #     elif self.kill_label.visible:
+            #         self.kill_label.hide()
+            # if self.gun_label.settings.ENABLED:
+            #     self.gun_label.update_gui(hit_gun, color)
 
-        if self.track_label.settings.ENABLED:
-            if hit_track and (color == Colors.GREEN or color == Colors.ORANGE):
-                self.track_label.update_gui(color)
-            elif self.track_label.visible:
-                self.track_label.hide()
+        # if self.track_label.settings.ENABLED:
+        #     if hit_track and (color == Colors.GREEN or color == Colors.ORANGE):
+        #         self.track_label.update_gui(color)
+        #     elif self.track_label.visible:
+        #         self.track_label.hide()
 
     def update_properties(self):
         for label in self.labels:
@@ -120,25 +121,14 @@ class GuiState(object):
 
 
 class Label(object):
-    def __init__(self, alias, settings):
-        self.alias = alias
+    def __init__(self, settings):
         self.settings = settings
         self.visible = False
         self.last_text = None
-        properties = {
-            "isHtml": True,
-            "text": "",
-            "glowfilter": _build_glowfilter(),
-            "alignX": COMPONENT_ALIGN.CENTER,
-            "alignY": COMPONENT_ALIGN.CENTER,
-            "x": settings.X_OFFSET,
-            "y": settings.Y_OFFSET,
-            "visible": False,
-        }
-        g_guiFlash.createComponent(alias, COMPONENT_TYPE.LABEL, properties)
 
     def hide(self):
         if self.visible:
+            # send update to gameface to hide label
             g_guiFlash.updateComponent(self.alias, {"visible": False})
             self.visible = False
             self.last_text = None
@@ -148,6 +138,7 @@ class Label(object):
             interior_text = self.settings.LABEL_FORMAT.format(value=value)
         else:
             interior_text = self.settings.LABEL_FORMAT
+
         new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
             font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
         )
@@ -158,6 +149,7 @@ class Label(object):
         self.last_text = new_text
         self.visible = True
         g_guiFlash.updateComponent(self.alias, {"text": new_text, "visible": True})
+        # send update to gameface to update the label with interior_text and color
 
     def update_properties(self):
         new_properties = {
@@ -170,15 +162,93 @@ class Label(object):
         g_guiFlash.updateComponent(self.alias, new_properties)
 
 
-class AngleLabel(Label):
-    def __init__(self, alias, settings):
-        super(AngleLabel, self).__init__(alias, settings)
+class ArmorLabel(object):
+    def __init__(self, settings):
+        self.settings = settings
+        self.visible = False
+        self.last_text = None
+
+    def hide(self):
+        if self.visible:
+            # send update to gameface to hide label
+            update_gameface(armor_visible=False)
+            self.visible = False
+            self.last_text = None
+
+    def update_gui(self, value, color):
+        interior_text = self.settings.LABEL_FORMAT.format(value=value)
+
+        new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
+            font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
+        )
+
+        if new_text == self.last_text and self.visible:
+            return
+
+        self.last_text = new_text
+        self.visible = True
+        # send update to gameface to update the label with interior_text and color
+        update_gameface(armor_text=interior_text, armor_visible=True, armor_color=color)
+
+class ProbLabel(object):
+    def __init__(self, settings):
+        self.settings = settings
+        self.visible = False
+        self.last_text = None
+
+    def hide(self):
+        if self.visible:
+            # send update to gameface to hide label
+            update_gameface(prob_visible=False)
+            self.visible = False
+            self.last_text = None
+
+    def update_gui(self, value, color):
+        interior_text = self.settings.LABEL_FORMAT.format(value=value)
+
+        new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
+            font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
+        )
+
+        if new_text == self.last_text and self.visible:
+            return
+
+        self.last_text = new_text
+        self.visible = True
+        # send update to gameface to update the label with interior_text and color
+        update_gameface(prob_text=interior_text, prob_visible=True, prob_color=color)
+
+class AngleLabel(object):
+    def __init__(self, settings):
+        self.settings = settings
+        self.visible = False
+        self.last_text = None
+
+    def hide(self):
+        if self.visible:
+            # send update to gameface to hide label
+            update_gameface(angle_visible=False)
+            self.visible = False
+            self.last_text = None
 
     def update_gui(self, value, color):
         if value < self.settings.DISPLAY_THRESHOLD:
             self.hide()
             return
-        super(AngleLabel, self).update_gui(value, color)
+        
+        interior_text = self.settings.LABEL_FORMAT.format(value=value)
+
+        new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
+            font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
+        )
+
+        if new_text == self.last_text and self.visible:
+            return
+
+        self.last_text = new_text
+        self.visible = True
+        # send update to gameface to update the label with interior_text and color
+        update_gameface(angle_text=interior_text, angle_visible=True, angle_color=color)
 
 
 class GunLabel(Label):

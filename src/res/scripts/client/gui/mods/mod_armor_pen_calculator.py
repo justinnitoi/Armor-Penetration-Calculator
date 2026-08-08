@@ -65,7 +65,9 @@ def call_update_gui(
 
     if ricochet:
         # mirrors GuiState.update_gui's ricochet branch in pade_gui.py
-        mod_APBattleView.update("-", "0%", "{}°".format(int(angle)), color=Colors.PURPLE)
+        mod_APBattleView.update(
+            "-", "0%", "{}°".format(int(angle)), color=Colors.PURPLE
+        )
     elif not hit_body:
         # shell only hit spaced armor/tracks -- nothing meaningful to show
         mod_APBattleView.hide()

@@ -9,8 +9,6 @@ from pade_constants import (
     GunLabelSettings,
     TrackLabelSettings,
 )
-from gambiter import g_guiFlash  # type: ignore
-from gambiter.flash import COMPONENT_TYPE, COMPONENT_ALIGN  # type: ignore
 from mod_APBattleView import update_gameface
 
 
@@ -115,52 +113,6 @@ class GuiState(object):
         #     elif self.track_label.visible:
         #         self.track_label.hide()
 
-    def update_properties(self):
-        for label in self.labels:
-            label.update_properties()
-
-
-class Label(object):
-    def __init__(self, settings):
-        self.settings = settings
-        self.visible = False
-        self.last_text = None
-
-    def hide(self):
-        if self.visible:
-            # send update to gameface to hide label
-            g_guiFlash.updateComponent(self.alias, {"visible": False})
-            self.visible = False
-            self.last_text = None
-
-    def update_gui(self, value, color):
-        if value is not None:
-            interior_text = self.settings.LABEL_FORMAT.format(value=value)
-        else:
-            interior_text = self.settings.LABEL_FORMAT
-
-        new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
-            font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
-        )
-
-        if new_text == self.last_text and self.visible:
-            return
-
-        self.last_text = new_text
-        self.visible = True
-        g_guiFlash.updateComponent(self.alias, {"text": new_text, "visible": True})
-        # send update to gameface to update the label with interior_text and color
-
-    def update_properties(self):
-        new_properties = {
-            "x": self.settings.X_OFFSET,
-            "y": self.settings.Y_OFFSET,
-            "glowfilter": _build_glowfilter(),
-        }
-        if not self.settings.ENABLED:
-            self.hide()
-        g_guiFlash.updateComponent(self.alias, new_properties)
-
 
 class ArmorLabel(object):
     def __init__(self, settings):
@@ -250,85 +202,6 @@ class AngleLabel(object):
         self.visible = True
         # send update to gameface to update the label with interior_text and color
         update_gameface(angle_text=interior_text, angle_visible=True, angle_color=color)
-
-
-class GunLabel(Label):
-    def __init__(self, alias, settings):
-        super(GunLabel, self).__init__(alias, settings)
-
-    def update_gui(self, hit_gun, color):
-        if not hit_gun and self.visible:
-            self.hide()
-            return
-        elif hit_gun:
-            super(GunLabel, self).update_gui(None, color)
-
-
-class ImageLabel(object):
-    def __init__(self, settings):
-        self.settings = settings
-        self.visible = False
-        self.current_state = None
-        self.state_aliases = []
-        for alias, image_path in settings.IMAGES:
-            properties = {
-                "image": image_path,
-                "alpha": 1,
-                "x": settings.X_OFFSET,
-                "y": settings.Y_OFFSET,
-                "alignX": COMPONENT_ALIGN.CENTER,
-                "alignY": COMPONENT_ALIGN.CENTER,
-                "visible": False,
-            }
-            self.state_aliases.append(alias)
-            g_guiFlash.createComponent(alias, COMPONENT_TYPE.IMAGE, properties)
-
-    def hide(self):
-        if self.visible:
-            current_alias = self.state_aliases[self.current_state]
-            g_guiFlash.updateComponent(current_alias, {"visible": False})
-            self.visible = False
-            self.current_state = None
-
-    def update_gui(self, next_state):
-        if next_state == self.current_state and self.visible:
-            return
-
-        if self.visible:
-            old_alias = self.state_aliases[self.current_state]
-            g_guiFlash.updateComponent(old_alias, {"visible": False})
-        next_alias = self.state_aliases[next_state]
-        self.current_state = next_state
-        self.visible = True
-        g_guiFlash.updateComponent(next_alias, {"visible": True})
-
-    def update_properties(self):
-        pass
-
-
-class TrackLabel(ImageLabel):
-    def __init__(self, settings):
-        super(TrackLabel, self).__init__(settings)
-
-    def update_gui(self, color):
-        if color == Colors.GREEN:
-            next_state = 0
-        elif color == Colors.ORANGE:
-            next_state = 1
-        else:
-            raise ValueError("Next track state is not green or orange.")
-        return super(TrackLabel, self).update_gui(next_state)
-
-
-def _build_glowfilter():
-    return {
-        "color": int(ShadowSettings.COLOR, 16),
-        "alpha": ShadowSettings.ALPHA / 10.0,
-        "blurX": ShadowSettings.LENGTH,
-        "blurY": ShadowSettings.LENGTH,
-        "strength": ShadowSettings.STRENGTH,
-        "quality": 2,
-    }
 
 
 log("Starting creation of armor and penetration gui components")

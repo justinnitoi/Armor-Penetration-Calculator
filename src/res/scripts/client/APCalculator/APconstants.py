@@ -86,13 +86,6 @@ class GunLabelSettings:
     Y_OFFSET = safe_get_setting("gun_label", "y_offset")
 
 
-class ShadowSettings:
-    COLOR = safe_get_setting("shadow", "shadow_color")
-    ALPHA = safe_get_setting("shadow", "shadow_alpha")
-    LENGTH = safe_get_setting("shadow", "shadow_length")
-    STRENGTH = safe_get_setting("shadow", "shadow_strength")
-
-
 class TrackLabelSettings:
     ENABLED = is_jailbreak()
     X_OFFSET = 0

@@ -5,7 +5,6 @@ from APCalculator.APconstants import (
     AngleLabelSettings,
     EffPenLabelSettings,
     KillLabelSettings,
-    ShadowSettings,
     GunLabelSettings,
     TrackLabelSettings,
 )

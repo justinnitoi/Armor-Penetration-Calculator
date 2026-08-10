@@ -51,12 +51,6 @@ DEFAULT_CONFIG = {
         "red_chance": "E90000",
         "ricochet": "800080",
     },
-    "shadow": {
-        "shadow_color": "000000",
-        "shadow_alpha": 8,
-        "shadow_length": 3,
-        "shadow_strength": 7,
-    },
 }
 
 CONFIG_FOLDER = os.path.join("mods", "configs", "pademinune")

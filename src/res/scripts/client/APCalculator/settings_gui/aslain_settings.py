@@ -129,4 +129,21 @@ def on_settings_save(linkage, new_settings):
         save_flat_config(new_settings)
 
 
+if hasattr(g_modsSettingsApi, "resetFeatureHighlights"):
+    g_modsSettingsApi.setModDefaults(
+        mod_linkage,
+        {
+            "armor_label_enabled": True,
+            "armor_label_format": "{value}",
+            "pen_label_enabled": True,
+            "pen_label_format": "{value}%",
+            "angle_label_enabled": True,
+            "angle_label_format": "{value}°",
+            "color_green": "6BF40D",
+            "color_orange": "FFAD00",
+            "color_red": "E90000",
+            "color_ricochet": "800080",
+        },
+    )
+
 g_modsSettingsApi.setModTemplate(mod_linkage, template, on_settings_save, None)

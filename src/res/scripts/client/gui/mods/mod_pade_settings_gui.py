@@ -1,6 +1,6 @@
 from gui.modsSettingsApi import g_modsSettingsApi, templates  # type: ignore
 
-from pade_constants import (
+from APCalculator.pade_constants import (
     ArmorLabelSettings,
     PenLabelSettings,
     AngleLabelSettings,
@@ -11,8 +11,8 @@ from pade_constants import (
     ShadowSettings,
     VERSION,
 )
-from pade_config import save_flat_config
-from pade_gui import gui_state
+from APCalculator.pade_config import save_flat_config
+from APCalculator.pade_gui import gui_state
 
 mod_linkage = "pade_armor_calculator"
 modDataVersion = 1

@@ -6,8 +6,8 @@ from AvatarInputHandler import AvatarInputHandler  # type: ignore
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
-from pade_constants import VERSION, Colors
-from pade_gui import gui_state
+from APCalculator.pade_constants import VERSION, Colors
+from APCalculator.pade_gui import gui_state
 
 def log(message):
     print("pademinune's Armor Calc: " + str(message))

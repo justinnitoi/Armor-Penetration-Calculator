@@ -9,7 +9,7 @@ from pade_constants import (
     GunLabelSettings,
     TrackLabelSettings,
 )
-from mod_APBattleView import update_gameface
+from APCalculator.APBattleView import update_gameface
 
 
 def log(message):

@@ -1,4 +1,4 @@
-from pade_config import user_settings, DEFAULT_CONFIG, is_jailbreak
+from APCalculator.pade_config import user_settings, DEFAULT_CONFIG, is_jailbreak
 
 
 def safe_get_color(color):

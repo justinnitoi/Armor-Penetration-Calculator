@@ -25,12 +25,14 @@ $ErrorActionPreference = "Stop"
 # --- paths -----------------------------------------------------------------------
 $SourceRoot = Join-Path $PSScriptRoot "..\src"
 
-$PyModsSrcDir = Join-Path $SourceRoot "res\scripts\client\gui\mods"
-$WebSrcDir    = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
+$PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
+$PyAPCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\APCalculator"
+$WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
 
-$PyDestDir     = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
-$WebDestDir    = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
-$ResMapDestDir = Join-Path $WotRoot "mods\configs\res_map"
+$PyDestDir             = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
+$PyAPCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\APCalculator"
+$WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
+$ResMapDestDir         = Join-Path $WotRoot "mods\configs\res_map"
 
 # --- helper -----------------------------------------------------------------------
 function Remove-IfExists($path, $label) {
@@ -58,6 +60,17 @@ $PyModules = Get-ChildItem -Path $PyModsSrcDir -Filter "*.py" -ErrorAction Silen
 foreach ($module in $PyModules) {
     $pycName = [System.IO.Path]::ChangeExtension($module.Name, ".pyc")
     Remove-IfExists (Join-Path $PyDestDir $pycName) $pycName
+}
+
+Write-Host "Removing compiled APCalculator package ..."
+$PyAPCalculatorModules = Get-ChildItem -Path $PyAPCalculatorSrcDir -Filter "*.py" -ErrorAction SilentlyContinue
+foreach ($module in $PyAPCalculatorModules) {
+    $pycName = [System.IO.Path]::ChangeExtension($module.Name, ".pyc")
+    Remove-IfExists (Join-Path $PyAPCalculatorDestDir $pycName) $pycName
+}
+if ((Test-Path $PyAPCalculatorDestDir) -and ((Get-ChildItem $PyAPCalculatorDestDir -Force | Measure-Object).Count -eq 0)) {
+    Remove-Item $PyAPCalculatorDestDir -Force
+    Write-Host "  removed empty directory: $PyAPCalculatorDestDir"
 }
 
 # --- 2. remove the Gameface web assets ------------------------------------------------

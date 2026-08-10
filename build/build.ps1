@@ -1,11 +1,12 @@
 <#
   build.ps1
 
-  Compiles every mod_*.py / pade_*.py under res\scripts\client\gui\mods with
-  Python 2.7 (bytecode is version-locked -- the WoT client cannot load Python 3
-  bytecode) and deploys pademinune's Armor Penetration Calculator as LOOSE
-  res_mods override files, plus the Gameface web assets and res_map
-  registration. Does NOT package a .wotmod -- see package.ps1 for that.
+  Compiles every *.py under res\scripts\client\gui\mods and
+  res\scripts\client\APCalculator with Python 2.7 (bytecode is version-locked
+  -- the WoT client cannot load Python 3 bytecode) and deploys pademinune's
+  Armor Penetration Calculator as LOOSE res_mods override files, plus the
+  Gameface web assets and res_map registration. Does NOT package a .wotmod --
+  see package.ps1 for that.
 
   Run this from anywhere -- paths are resolved relative to this script, not the
   working directory. Close World of Tanks first -- a running client locks files
@@ -27,13 +28,15 @@ $ErrorActionPreference = "Stop"
 # --- paths -----------------------------------------------------------------------
 $SourceRoot = Join-Path $PSScriptRoot "..\src"
 
-$PyModsSrcDir = Join-Path $SourceRoot "res\scripts\client\gui\mods"
-$WebSrcDir    = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
-$ResMapSrc    = Join-Path $SourceRoot "res\mods\configs\res_map\APBattleView.json"
+$PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
+$PyAPCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\APCalculator"
+$WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
+$ResMapSrc            = Join-Path $SourceRoot "res\mods\configs\res_map\APBattleView.json"
 
-$PyDestDir     = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
-$WebDestDir    = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
-$ResMapDestDir = Join-Path $WotRoot "mods\configs\res_map"
+$PyDestDir             = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
+$PyAPCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\APCalculator"
+$WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
+$ResMapDestDir         = Join-Path $WotRoot "mods\configs\res_map"
 
 # --- helpers -----------------------------------------------------------------------
 function Ensure-Dir($path) {
@@ -57,6 +60,47 @@ function Copy-One($src, $destDir, $label) {
     }
 }
 
+# Compiles every *.py directly under $srcDir with Python 2.7 and moves the
+# resulting .pyc into $destDir, clearing any stale .py/.pyc sibling first (a
+# stale sibling of either kind can shadow the fresh file and silently run old
+# code).
+function Invoke-PyCompile($srcDir, $destDir) {
+    $modules = Get-ChildItem -Path $srcDir -Filter "*.py"
+    if ($modules.Count -eq 0) {
+        throw "No .py files found in '$srcDir'"
+    }
+
+    Ensure-Dir $destDir
+
+    foreach ($module in $modules) {
+        Write-Host "Compiling $($module.Name) ..."
+        & $Python27 -m py_compile $module.FullName
+        if ($LASTEXITCODE -ne 0) {
+            throw "py_compile failed on $($module.Name) (exit $LASTEXITCODE). Check '$Python27' is Python 2.7 and on PATH."
+        }
+
+        $compiled = [System.IO.Path]::ChangeExtension($module.FullName, ".pyc")
+        if (-not (Test-Path $compiled)) {
+            throw "Expected compiled output not found: $compiled"
+        }
+
+        foreach ($ext in @(".py", ".pyc")) {
+            $stale = Join-Path $destDir ([System.IO.Path]::ChangeExtension($module.Name, $ext))
+            if (Test-Path $stale) {
+                Remove-Item $stale -Force
+                Write-Host "  removed stale: $(Split-Path $stale -Leaf)"
+            }
+        }
+
+        try {
+            Move-Item -Path $compiled -Destination $destDir -Force
+            Write-Host "  moved: $($module.BaseName).pyc -> $destDir"
+        } catch {
+            throw "Failed to move the compiled .pyc -- is WorldOfTanks.exe running? $($_.Exception.Message)"
+        }
+    }
+}
+
 # --- 0. sanity + elevation hint -----------------------------------------------------
 if (-not (Test-Path $WotRoot)) {
     throw "WoT install not found: $WotRoot (pass -WotRoot to override)"
@@ -68,42 +112,8 @@ if (-not $isAdmin) {
 }
 
 # --- 1. compile every Python module -------------------------------------------------
-$PyModules = Get-ChildItem -Path $PyModsSrcDir -Filter "*.py"
-if ($PyModules.Count -eq 0) {
-    throw "No .py files found in '$PyModsSrcDir'"
-}
-
-Ensure-Dir $PyDestDir
-
-foreach ($module in $PyModules) {
-    Write-Host "Compiling $($module.Name) ..."
-    & $Python27 -m py_compile $module.FullName
-    if ($LASTEXITCODE -ne 0) {
-        throw "py_compile failed on $($module.Name) (exit $LASTEXITCODE). Check '$Python27' is Python 2.7 and on PATH."
-    }
-
-    $compiled = [System.IO.Path]::ChangeExtension($module.FullName, ".pyc")
-    if (-not (Test-Path $compiled)) {
-        throw "Expected compiled output not found: $compiled"
-    }
-
-    # A stale sibling .py or .pyc at the destination can shadow the fresh file and
-    # silently run old code -- clean both before every redeploy.
-    foreach ($ext in @(".py", ".pyc")) {
-        $stale = Join-Path $PyDestDir ([System.IO.Path]::ChangeExtension($module.Name, $ext))
-        if (Test-Path $stale) {
-            Remove-Item $stale -Force
-            Write-Host "  removed stale: $(Split-Path $stale -Leaf)"
-        }
-    }
-
-    try {
-        Move-Item -Path $compiled -Destination $PyDestDir -Force
-        Write-Host "  moved: $($module.BaseName).pyc -> $PyDestDir"
-    } catch {
-        throw "Failed to move the compiled .pyc -- is WorldOfTanks.exe running? $($_.Exception.Message)"
-    }
-}
+Invoke-PyCompile $PyModsSrcDir $PyDestDir
+Invoke-PyCompile $PyAPCalculatorSrcDir $PyAPCalculatorDestDir
 
 # --- 2. copy the Gameface web assets ------------------------------------------------
 Write-Host "Copying gameface assets ..."

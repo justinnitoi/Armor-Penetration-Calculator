@@ -44,6 +44,39 @@ function Remove-IfExists($path, $label) {
     }
 }
 
+# Removes the compiled .pyc for every *.py under $srcDir -- including
+# subfolders, e.g. a settings_gui sub-package -- from $destDir at the same
+# relative subpath, then prunes any subdirectories left empty by that (deepest
+# first, so a chain of now-empty parents is fully cleaned up too).
+function Remove-CompiledPyDir($srcDir, $destDir) {
+    $modules = Get-ChildItem -Path $srcDir -Filter "*.py" -Recurse -ErrorAction SilentlyContinue
+    if ($modules.Count -gt 0) {
+        $srcDirFull = (Resolve-Path $srcDir).Path.TrimEnd('\')
+        foreach ($module in $modules) {
+            $relPath = $module.FullName.Substring($srcDirFull.Length + 1)
+            $relSubDir = Split-Path $relPath -Parent
+            $moduleDestDir = if ($relSubDir) { Join-Path $destDir $relSubDir } else { $destDir }
+            $pycName = [System.IO.Path]::ChangeExtension($module.Name, ".pyc")
+            $label = if ($relSubDir) { Join-Path $relSubDir $pycName } else { $pycName }
+            Remove-IfExists (Join-Path $moduleDestDir $pycName) $label
+        }
+    }
+
+    if (-not (Test-Path $destDir)) { return }
+    Get-ChildItem -Path $destDir -Recurse -Directory |
+        Sort-Object { $_.FullName.Length } -Descending |
+        ForEach-Object {
+            if ((Get-ChildItem $_.FullName -Force | Measure-Object).Count -eq 0) {
+                Remove-Item $_.FullName -Force
+                Write-Host "  removed empty directory: $($_.FullName)"
+            }
+        }
+    if ((Get-ChildItem $destDir -Force | Measure-Object).Count -eq 0) {
+        Remove-Item $destDir -Force
+        Write-Host "  removed empty directory: $destDir"
+    }
+}
+
 # --- 0. sanity + elevation hint -----------------------------------------------------
 if (-not (Test-Path $WotRoot)) {
     throw "WoT install not found: $WotRoot (pass -WotRoot to override)"
@@ -63,15 +96,7 @@ foreach ($module in $PyModules) {
 }
 
 Write-Host "Removing compiled APCalculator package ..."
-$PyAPCalculatorModules = Get-ChildItem -Path $PyAPCalculatorSrcDir -Filter "*.py" -ErrorAction SilentlyContinue
-foreach ($module in $PyAPCalculatorModules) {
-    $pycName = [System.IO.Path]::ChangeExtension($module.Name, ".pyc")
-    Remove-IfExists (Join-Path $PyAPCalculatorDestDir $pycName) $pycName
-}
-if ((Test-Path $PyAPCalculatorDestDir) -and ((Get-ChildItem $PyAPCalculatorDestDir -Force | Measure-Object).Count -eq 0)) {
-    Remove-Item $PyAPCalculatorDestDir -Force
-    Write-Host "  removed empty directory: $PyAPCalculatorDestDir"
-}
+Remove-CompiledPyDir $PyAPCalculatorSrcDir $PyAPCalculatorDestDir
 
 # --- 2. remove the Gameface web assets ------------------------------------------------
 Write-Host "Removing gameface assets ..."

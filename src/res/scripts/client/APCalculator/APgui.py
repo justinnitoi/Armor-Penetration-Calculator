@@ -1,4 +1,4 @@
-from pade_constants import (
+from APCalculator.APconstants import (
     Colors,
     ArmorLabelSettings,
     PenLabelSettings,
@@ -13,15 +13,7 @@ from APCalculator.APBattleView import update_gameface
 
 
 def log(message):
-    print("pademinune's Gui: " + str(message))
-
-
-ARMOR_ALIAS = "pademinune_ArmorLabel"
-PEN_ALIAS = "pademinune_PenLabel"
-ANGLE_ALIAS = "pademinune_AngleLabel"
-EFF_PEN_ALIAS = "pademinune_EffPenLabel"
-KILL_ALIAS = "pademinune_KillLabel"
-GUN_ALIAS = "pademinune_GunLabel"
+    print("AP Calculator Gui: " + str(message))
 
 
 class GuiState(object):
@@ -142,6 +134,7 @@ class ArmorLabel(object):
         # send update to gameface to update the label with interior_text and color
         update_gameface(armor_text=interior_text, armor_visible=True, armor_color=color)
 
+
 class ProbLabel(object):
     def __init__(self, settings):
         self.settings = settings
@@ -170,6 +163,7 @@ class ProbLabel(object):
         # send update to gameface to update the label with interior_text and color
         update_gameface(prob_text=interior_text, prob_visible=True, prob_color=color)
 
+
 class AngleLabel(object):
     def __init__(self, settings):
         self.settings = settings
@@ -187,7 +181,7 @@ class AngleLabel(object):
         if value < self.settings.DISPLAY_THRESHOLD:
             self.hide()
             return
-        
+
         color = Colors.WHITE
         interior_text = self.settings.LABEL_FORMAT.format(value=value)
 
@@ -204,7 +198,7 @@ class AngleLabel(object):
         update_gameface(angle_text=interior_text, angle_visible=True, angle_color=color)
 
 
-log("Starting creation of armor and penetration gui components")
+log("Starting creation of AP Calculator gui components")
 
 
 gui_state = GuiState()

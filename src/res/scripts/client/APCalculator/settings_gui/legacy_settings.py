@@ -1,18 +1,14 @@
 from gui.modsSettingsApi import g_modsSettingsApi, templates  # type: ignore
 
-from APCalculator.pade_constants import (
+from APCalculator.APconstants import (
     ArmorLabelSettings,
     PenLabelSettings,
     AngleLabelSettings,
-    EffPenLabelSettings,
-    KillLabelSettings,
-    GunLabelSettings,
     Colors,
-    ShadowSettings,
     VERSION,
 )
-from APCalculator.pade_config import save_flat_config
-from APCalculator.pade_gui import gui_state
+from APCalculator.APconfig import save_flat_config
+from APCalculator.APgui import gui_state
 
 mod_linkage = "pade_armor_calculator"
 modDataVersion = 1
@@ -104,50 +100,24 @@ template = {
 
 def on_settings_save(linkage, new_settings):
     if linkage == mod_linkage:
+        # Only fields the template above actually creates controls for --
+        # font size, offsets, and the eff_pen/kill/gun/shadow settings aren't
+        # exposed in this GUI, so they aren't in new_settings at all.
         ArmorLabelSettings.ENABLED = new_settings["armor_label_enabled"]
-        ArmorLabelSettings.FONT_SIZE = new_settings["armor_label_font_size"]
-        ArmorLabelSettings.X_OFFSET = new_settings["armor_label_x_offset"]
-        ArmorLabelSettings.Y_OFFSET = new_settings["armor_label_y_offset"]
         ArmorLabelSettings.LABEL_FORMAT = new_settings["armor_label_format"]
         PenLabelSettings.ENABLED = new_settings["pen_label_enabled"]
-        PenLabelSettings.FONT_SIZE = new_settings["pen_label_font_size"]
-        PenLabelSettings.X_OFFSET = new_settings["pen_label_x_offset"]
-        PenLabelSettings.Y_OFFSET = new_settings["pen_label_y_offset"]
         PenLabelSettings.LABEL_FORMAT = new_settings["pen_label_format"]
         AngleLabelSettings.ENABLED = new_settings["angle_label_enabled"]
-        AngleLabelSettings.FONT_SIZE = new_settings["angle_label_font_size"]
-        AngleLabelSettings.X_OFFSET = new_settings["angle_label_x_offset"]
-        AngleLabelSettings.Y_OFFSET = new_settings["angle_label_y_offset"]
         AngleLabelSettings.LABEL_FORMAT = new_settings["angle_label_format"]
         AngleLabelSettings.DISPLAY_THRESHOLD = new_settings[
             "angle_label_display_threshold"
         ]
-        EffPenLabelSettings.ENABLED = new_settings["eff_pen_label_enabled"]
-        EffPenLabelSettings.FONT_SIZE = new_settings["eff_pen_label_font_size"]
-        EffPenLabelSettings.X_OFFSET = new_settings["eff_pen_label_x_offset"]
-        EffPenLabelSettings.Y_OFFSET = new_settings["eff_pen_label_y_offset"]
-        EffPenLabelSettings.LABEL_FORMAT = new_settings["eff_pen_label_format"]
-        KillLabelSettings.ENABLED = new_settings["kill_label_enabled"]
-        KillLabelSettings.FONT_SIZE = new_settings["kill_label_font_size"]
-        KillLabelSettings.X_OFFSET = new_settings["kill_label_x_offset"]
-        KillLabelSettings.Y_OFFSET = new_settings["kill_label_y_offset"]
-        KillLabelSettings.LABEL_FORMAT = new_settings["kill_label_format"]
-        GunLabelSettings.ENABLED = new_settings["gun_label_enabled"]
-        GunLabelSettings.FONT_SIZE = new_settings["gun_label_font_size"]
-        GunLabelSettings.X_OFFSET = new_settings["gun_label_x_offset"]
-        GunLabelSettings.Y_OFFSET = new_settings["gun_label_y_offset"]
-        GunLabelSettings.LABEL_FORMAT = new_settings["gun_label_format"]
         Colors.GREEN = new_settings["color_green"]
         Colors.ORANGE = new_settings["color_orange"]
         Colors.RED = new_settings["color_red"]
         Colors.PURPLE = new_settings["color_ricochet"]
-        ShadowSettings.COLOR = new_settings["shadow_color"]
-        ShadowSettings.ALPHA = new_settings["shadow_alpha"]
-        ShadowSettings.LENGTH = new_settings["shadow_length"]
-        ShadowSettings.STRENGTH = new_settings["shadow_strength"]
 
         save_flat_config(new_settings)
-        gui_state.update_properties()
 
 
 g_modsSettingsApi.setModTemplate(mod_linkage, template, on_settings_save, None)

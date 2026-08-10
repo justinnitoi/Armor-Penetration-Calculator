@@ -60,23 +60,26 @@ function Copy-One($src, $destDir, $label) {
     }
 }
 
-# Compiles every *.py directly under $srcDir with Python 2.7 and moves the
-# resulting .pyc into $destDir, clearing any stale .py/.pyc sibling first (a
-# stale sibling of either kind can shadow the fresh file and silently run old
-# code).
+# Compiles every *.py under $srcDir -- including subfolders, e.g. a settings_gui
+# sub-package -- with Python 2.7 and moves each resulting .pyc into $destDir at
+# the same relative subpath, clearing any stale .py/.pyc sibling first (a stale
+# sibling of either kind can shadow the fresh file and silently run old code).
 function Invoke-PyCompile($srcDir, $destDir) {
-    $modules = Get-ChildItem -Path $srcDir -Filter "*.py"
+    $srcDirFull = (Resolve-Path $srcDir).Path.TrimEnd('\')
+    $modules = Get-ChildItem -Path $srcDir -Filter "*.py" -Recurse
     if ($modules.Count -eq 0) {
         throw "No .py files found in '$srcDir'"
     }
 
-    Ensure-Dir $destDir
-
     foreach ($module in $modules) {
-        Write-Host "Compiling $($module.Name) ..."
+        $relPath = $module.FullName.Substring($srcDirFull.Length + 1)
+        $relSubDir = Split-Path $relPath -Parent
+        $moduleDestDir = if ($relSubDir) { Join-Path $destDir $relSubDir } else { $destDir }
+
+        Write-Host "Compiling $relPath ..."
         & $Python27 -m py_compile $module.FullName
         if ($LASTEXITCODE -ne 0) {
-            throw "py_compile failed on $($module.Name) (exit $LASTEXITCODE). Check '$Python27' is Python 2.7 and on PATH."
+            throw "py_compile failed on $relPath (exit $LASTEXITCODE). Check '$Python27' is Python 2.7 and on PATH."
         }
 
         $compiled = [System.IO.Path]::ChangeExtension($module.FullName, ".pyc")
@@ -84,8 +87,10 @@ function Invoke-PyCompile($srcDir, $destDir) {
             throw "Expected compiled output not found: $compiled"
         }
 
+        Ensure-Dir $moduleDestDir
+
         foreach ($ext in @(".py", ".pyc")) {
-            $stale = Join-Path $destDir ([System.IO.Path]::ChangeExtension($module.Name, $ext))
+            $stale = Join-Path $moduleDestDir ([System.IO.Path]::ChangeExtension($module.Name, $ext))
             if (Test-Path $stale) {
                 Remove-Item $stale -Force
                 Write-Host "  removed stale: $(Split-Path $stale -Leaf)"
@@ -93,8 +98,8 @@ function Invoke-PyCompile($srcDir, $destDir) {
         }
 
         try {
-            Move-Item -Path $compiled -Destination $destDir -Force
-            Write-Host "  moved: $($module.BaseName).pyc -> $destDir"
+            Move-Item -Path $compiled -Destination $moduleDestDir -Force
+            Write-Host "  moved: $($module.BaseName).pyc -> $moduleDestDir"
         } catch {
             throw "Failed to move the compiled .pyc -- is WorldOfTanks.exe running? $($_.Exception.Message)"
         }

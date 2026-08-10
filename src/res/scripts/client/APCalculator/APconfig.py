@@ -127,49 +127,26 @@ def migrate_config(user_config):
 
 
 def save_flat_config(settings):
+    """settings is the new_settings dict handed back by a settings-gui provider
+    (aslain_settings.py / legacy_settings.py) -- only contains keys for
+    controls that provider's template actually creates. Anything not exposed
+    in that GUI (font size, offsets, eff_pen/kill/gun labels, shadow) isn't in
+    `settings` at all, so merge onto the existing on-disk config instead of
+    rebuilding it from scratch, or those fields would be wiped back to
+    DEFAULT_CONFIG on every save."""
     config = {
         "armor_label": {
             "enabled": settings["armor_label_enabled"],
-            "x_offset": settings["armor_label_x_offset"],
-            "y_offset": settings["armor_label_y_offset"],
-            "font_size": settings["armor_label_font_size"],
             "label_format": settings["armor_label_format"],
         },
         "pen_label": {
             "enabled": settings["pen_label_enabled"],
-            "x_offset": settings["pen_label_x_offset"],
-            "y_offset": settings["pen_label_y_offset"],
-            "font_size": settings["pen_label_font_size"],
             "label_format": settings["pen_label_format"],
         },
         "angle_label": {
             "enabled": settings["angle_label_enabled"],
-            "x_offset": settings["angle_label_x_offset"],
-            "y_offset": settings["angle_label_y_offset"],
-            "font_size": settings["angle_label_font_size"],
             "label_format": settings["angle_label_format"],
             "display_threshold": settings["angle_label_display_threshold"],
-        },
-        "eff_pen_label": {
-            "enabled": settings["eff_pen_label_enabled"],
-            "x_offset": settings["eff_pen_label_x_offset"],
-            "y_offset": settings["eff_pen_label_y_offset"],
-            "font_size": settings["eff_pen_label_font_size"],
-            "label_format": settings["eff_pen_label_format"],
-        },
-        "kill_label": {
-            "enabled": settings["kill_label_enabled"],
-            "x_offset": settings["kill_label_x_offset"],
-            "y_offset": settings["kill_label_y_offset"],
-            "font_size": settings["kill_label_font_size"],
-            "label_format": settings["kill_label_format"],
-        },
-        "gun_label": {
-            "enabled": settings["gun_label_enabled"],
-            "x_offset": settings["gun_label_x_offset"],
-            "y_offset": settings["gun_label_y_offset"],
-            "font_size": settings["gun_label_font_size"],
-            "label_format": settings["gun_label_format"],
         },
         "colors": {
             "green_chance": settings["color_green"],
@@ -177,16 +154,14 @@ def save_flat_config(settings):
             "red_chance": settings["color_red"],
             "ricochet": settings["color_ricochet"],
         },
-        "shadow": {
-            "shadow_color": settings["shadow_color"],
-            "shadow_alpha": settings["shadow_alpha"],
-            "shadow_length": settings["shadow_length"],
-            "shadow_strength": settings["shadow_strength"],
-        },
     }
 
+    merged = read_config()
+    for section, values in config.items():
+        merged.setdefault(section, {}).update(values)
+
     with open(CONFIG_PATH, "w") as f:
-        json.dump(config, f, indent=4)
+        json.dump(merged, f, indent=4)
 
 
 if not os.path.isfile(CONFIG_PATH):

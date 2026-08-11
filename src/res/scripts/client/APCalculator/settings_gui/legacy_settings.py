@@ -37,13 +37,13 @@ template = {
         templates.createLabel("<b>— Probability Label —</b>"),
         templates.createCheckbox(
             "Enable Probability Label",
-            "pen_label_enabled",
+            "prob_label_enabled",
             PenLabelSettings.ENABLED,
             tooltip="{HEADER}Enable Probability Label{/HEADER}{BODY}Show or hide the penetration probability label.{/BODY}",
         ),
         templates.createInput(
-            "Pen Label Format",
-            "pen_label_format",
+            "Prob Label Format",
+            "prob_label_format",
             PenLabelSettings.FORMAT,
             tooltip="{HEADER}Probability Label Format{/HEADER}{BODY}The display format of the probability label. '{prob}' will be replaced with the penetration probability.{/BODY}",
         ),

@@ -27,6 +27,7 @@ def update_constants(config):
     AngleLabelSettings.ENABLED = config["angle_label"]["enabled"]
     AngleLabelSettings.FORMAT = config["angle_label"]["format"]
     AngleLabelSettings.DISPLAY_THRESHOLD = config["angle_label"]["display_threshold"]
+    AngleLabelSettings.WHITE = config["angle_label"]["white"]
 
     Colors.HIGH_CHANCE = config["colors"]["high_chance"]
     Colors.MEDIUM_CHANCE = config["colors"]["medium_chance"]
@@ -73,3 +74,4 @@ class AngleLabelSettings:
     ENABLED = safe_get_setting("angle_label", "enabled")
     FORMAT = safe_get_setting("angle_label", "format")
     DISPLAY_THRESHOLD = safe_get_setting("angle_label", "display_threshold")
+    WHITE = safe_get_setting("angle_label", "white")

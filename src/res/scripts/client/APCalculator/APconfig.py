@@ -14,6 +14,7 @@ DEFAULT_CONFIG = {
         "enabled": True,
         "format": "{value}°",
         "display_threshold": 70,
+        "white": True,
     },
     "colors": {
         "high_chance": "6BF40D",
@@ -73,6 +74,7 @@ def nested(flat_config):
             "enabled": flat_config["angle_label_enabled"],
             "format": flat_config["angle_label_format"],
             "display_threshold": flat_config["angle_label_display_threshold"],
+            "white": flat_config["angle_label_white"]
         },
         "colors": {
             "high_chance": flat_config["colors_high_chance"],

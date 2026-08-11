@@ -165,7 +165,9 @@ class AngleLabel(object):
             self.hide()
             return
 
-        color = Colors.WHITE
+        if self.settings.WHITE:
+            color = Colors.WHITE
+
         state = (value, color)
         if state == self.last_state and self.visible:
             return

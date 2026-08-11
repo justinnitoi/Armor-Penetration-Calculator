@@ -1,45 +1,10 @@
 
 @font-face {
     font-family: "PF DIN Max Compressed";
-    src: url("PFDINMax-CompressedBook.ttf") format("truetype");
-    font-weight: 350; /* Book sits below Regular -- lighter, editorial feel */
-}
-
-@font-face {
-    font-family: "PF DIN Max Compressed";
-    src: url("PFDINMax-CompressedRegular.ttf") format("truetype");
-    font-weight: 400;
-}
-
-@font-face {
-    font-family: "PF DIN Max Compressed";
-    src: url("PFDINMax-CompressedMedium.ttf") format("truetype");
-    font-weight: 500;
-}
-
-@font-face {
-    font-family: "PF DIN Max Compressed";
-    src: url("PFDINMax-CompressedSemiBold.ttf") format("truetype");
-    font-weight: 600;
-}
-
-@font-face {
-    font-family: "PF DIN Max Compressed";
     src: url("PFDINMax-CompressedBold.ttf") format("truetype");
     font-weight: 700;
 }
 
-@font-face {
-    font-family: "Warhelios";
-    src: url("Warhelios-Regular.ttf") format("truetype");
-    font-weight: 400;
-}
-
-@font-face {
-    font-family: "Warhelios";
-    src: url("Warhelios-Bold.ttf") format("truetype");
-    font-weight: 700;
-}
 
 html, body {
     margin: 0;
@@ -63,7 +28,7 @@ html, body {
     position: absolute;
     left: 128px;
     transform: translate(-50%, -50%);
-    font-family: "PF DIN Max Compressed", "Warhelios", Arial, sans-serif;
+    font-family: "PF DIN Max Compressed", Arial, sans-serif;
     font-size: 22px;
     font-weight: 700;
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.75);

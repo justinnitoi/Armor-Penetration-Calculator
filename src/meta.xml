@@ -1,11 +1,11 @@
 <root>
     <!-- Reverse-domain unique id. Controls load order; mods with the same id
          are treated as versions/parts of the same modification. -->
-    <id>aa.pademinune.armor_calc</id>
+    <id>aa.AP-Calculator-2</id>
     <!-- Compared character-by-character (ASCII). Use zero-padded segments. -->
     <version>2.0.0</version>
-    <name>pademinune's Armor Penetration Calculator</name>
-    <description>pademinune's Armor Penetration Calculator
+    <name>pademinune's Armor Penetration Calculator 2</name>
+    <description>pademinune's Armor Penetration Calculator 2
 
 REQUIRES OpenWG Gameface (install it first) - without it the overlay will not appear.
 

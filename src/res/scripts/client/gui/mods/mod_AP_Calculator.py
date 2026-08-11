@@ -75,7 +75,6 @@ def call_update_gui(
     )
 
 
-
 # functin override
 def my_shot_result_default(
     cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity

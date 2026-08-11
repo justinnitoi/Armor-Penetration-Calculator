@@ -6,12 +6,12 @@ from AvatarInputHandler import AvatarInputHandler  # type: ignore
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
-from APCalculator.APconstants import VERSION, Colors
+from APCalculator.debug import log
+
+log("Mod has started loading.")
+
+from APCalculator.APconstants import VERSION
 from APCalculator.APgui import gui_state
-
-
-def log(message):
-    print("pademinune's Armor Calc: " + str(message))
 
 
 def get_gaussian_probability(avg_pen, armor_val):
@@ -74,8 +74,6 @@ def call_update_gui(
         int(kill_prob),
     )
 
-
-log("Mod is loading")
 
 
 # functin override
@@ -503,4 +501,4 @@ g_playerEvents.onAvatarBecomeNonPlayer += on_leave_match
 # Called when your tank is destroyed
 AvatarInputHandler.activatePostmortem = my_activate_postmortem
 
-log("Mod has finished loading")
+log("Mod has finished loading.")

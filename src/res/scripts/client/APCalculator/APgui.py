@@ -3,16 +3,8 @@ from APCalculator.APconstants import (
     ArmorLabelSettings,
     PenLabelSettings,
     AngleLabelSettings,
-    EffPenLabelSettings,
-    KillLabelSettings,
-    GunLabelSettings,
-    TrackLabelSettings,
 )
 from APCalculator.APBattleView import update_gameface
-
-
-def log(message):
-    print("AP Calculator Gui: " + str(message))
 
 
 class GuiState(object):
@@ -60,7 +52,7 @@ class GuiState(object):
         """Assumes all arguments passed are booleans or integers"""
         if ricochet:
             # shell ricochet
-            color = Colors.PURPLE
+            color = Colors.RICOCHET
             if self.armor_label.settings.ENABLED:
                 self.armor_label.update_gui("-", color)
             if self.prob_label.settings.ENABLED:
@@ -75,7 +67,7 @@ class GuiState(object):
             #     self.gun_label.update_gui(hit_gun, color)
         elif not hit_body:
             # shell only hits spaced armor or tracks
-            color = Colors.RED
+            color = Colors.LOW_CHANCE
             self.hide_all()
         else:
             color = Colors.get_color_from_prob(prob)
@@ -119,10 +111,10 @@ class ArmorLabel(object):
             self.last_text = None
 
     def update_gui(self, value, color):
-        interior_text = self.settings.LABEL_FORMAT.format(value=value)
+        interior_text = self.settings.FORMAT.format(value=value)
 
-        new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
-            font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
+        new_text = "<color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
+            color=color, interior_text=interior_text
         )
 
         if new_text == self.last_text and self.visible:
@@ -148,10 +140,10 @@ class ProbLabel(object):
             self.last_text = None
 
     def update_gui(self, value, color):
-        interior_text = self.settings.LABEL_FORMAT.format(value=value)
+        interior_text = self.settings.FORMAT.format(value=value)
 
-        new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
-            font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
+        new_text = "<color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
+            color=color, interior_text=interior_text
         )
 
         if new_text == self.last_text and self.visible:
@@ -182,10 +174,10 @@ class AngleLabel(object):
             return
 
         color = Colors.WHITE
-        interior_text = self.settings.LABEL_FORMAT.format(value=value)
+        interior_text = self.settings.FORMAT.format(value=value)
 
-        new_text = "<font size='{font_size}' color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
-            font_size=self.settings.FONT_SIZE, color=color, interior_text=interior_text
+        new_text = "<color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
+            color=color, interior_text=interior_text
         )
 
         if new_text == self.last_text and self.visible:
@@ -197,10 +189,4 @@ class AngleLabel(object):
         update_gameface(angle_text=interior_text, angle_visible=True, angle_color=color)
 
 
-log("Starting creation of AP Calculator gui components")
-
-
 gui_state = GuiState()
-
-
-log("GUI components have been created!")

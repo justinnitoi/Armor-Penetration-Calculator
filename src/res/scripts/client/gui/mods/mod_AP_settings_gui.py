@@ -1,6 +1,5 @@
-import APCalculator.debug
+from APCalculator.debug import log
 
-log = APCalculator.debug.create_logger(__file__)
 
 try:
     from gui.aslainMenu import g_modsSettingsApi, templates  # type: ignore

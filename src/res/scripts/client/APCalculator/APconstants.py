@@ -1,5 +1,7 @@
 from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, is_jailbreak
 
+VERSION = "2.0.0"
+
 
 def safe_get_color(color):
     default = DEFAULT_CONFIG.get("colors", "808080").get(color, "808080")
@@ -15,82 +17,59 @@ def safe_get_setting(label, attribute):
     return user_settings[label][attribute]
 
 
-VERSION = "2.0.0"
+def update_constants(config):
+    ArmorLabelSettings.ENABLED = config["armor_label"]["enabled"]
+    ArmorLabelSettings.FORMAT = config["armor_label"]["format"]
+
+    PenLabelSettings.ENABLED = config["prob_label"]["enabled"]
+    PenLabelSettings.FORMAT = config["prob_label"]["format"]
+
+    AngleLabelSettings.ENABLED = config["angle_label"]["enabled"]
+    AngleLabelSettings.FORMAT = config["angle_label"]["format"]
+    AngleLabelSettings.FORMAT = config["angle_label"]["display_threshold"]
+
+    Colors.HIGH_CHANCE = config["colors"]["high_chance"]
+    Colors.MEDIUM_CHANCE = config["colors"]["medium_chance"]
+    Colors.LOW_CHANCE = config["colors"]["low_chance"]
+    Colors.RICOCHET = config["colors"]["ricochet"]
 
 
 class Colors(object):
-    RED = safe_get_color("red_chance")
+    HIGH_CHANCE = safe_get_color("high_chance")
+    MEDIUM_CHANCE = safe_get_color("medium_chance")
+    LOW_CHANCE = safe_get_color("low_chance")
+    RICOCHET = safe_get_color("ricochet")
+
+    GREEN = "6BF40D"
+    ORANGE = "FFAD00"
+    RED = "E90000"
+    PURPLE = "800080"
+
     YELLOW = "FFFF00"
-    ORANGE = safe_get_color("orange_chance")
-    GREEN = safe_get_color("green_chance")
     GREY = "808080"
     WHITE = "FFFFFF"
-    PURPLE = safe_get_color("ricochet")
 
     @classmethod
     def get_color_from_prob(cls, prob):
         if prob <= 7:
-            return cls.RED
+            return cls.LOW_CHANCE
         elif prob >= 93:
-            return cls.GREEN
+            return cls.HIGH_CHANCE
         else:
-            return cls.ORANGE
+            return cls.MEDIUM_CHANCE
 
 
 class ArmorLabelSettings:
     ENABLED = safe_get_setting("armor_label", "enabled")
-    LABEL_FORMAT = safe_get_setting("armor_label", "label_format")
-    FONT_SIZE = safe_get_setting("armor_label", "font_size")
-    X_OFFSET = safe_get_setting("armor_label", "x_offset")
-    Y_OFFSET = safe_get_setting("armor_label", "y_offset")
+    FORMAT = safe_get_setting("armor_label", "format")
 
 
 class PenLabelSettings:
-    ENABLED = safe_get_setting("pen_label", "enabled")
-    LABEL_FORMAT = safe_get_setting("pen_label", "label_format")
-    FONT_SIZE = safe_get_setting("pen_label", "font_size")
-    X_OFFSET = safe_get_setting("pen_label", "x_offset")
-    Y_OFFSET = safe_get_setting("pen_label", "y_offset")
+    ENABLED = safe_get_setting("prob_label", "enabled")
+    FORMAT = safe_get_setting("prob_label", "format")
 
 
 class AngleLabelSettings:
     ENABLED = safe_get_setting("angle_label", "enabled")
-    LABEL_FORMAT = safe_get_setting("angle_label", "label_format")
-    FONT_SIZE = safe_get_setting("angle_label", "font_size")
-    X_OFFSET = safe_get_setting("angle_label", "x_offset")
-    Y_OFFSET = safe_get_setting("angle_label", "y_offset")
+    FORMAT = safe_get_setting("angle_label", "format")
     DISPLAY_THRESHOLD = safe_get_setting("angle_label", "display_threshold")
-
-
-class EffPenLabelSettings:
-    ENABLED = safe_get_setting("eff_pen_label", "enabled")
-    LABEL_FORMAT = safe_get_setting("eff_pen_label", "label_format")
-    FONT_SIZE = safe_get_setting("eff_pen_label", "font_size")
-    X_OFFSET = safe_get_setting("eff_pen_label", "x_offset")
-    Y_OFFSET = safe_get_setting("eff_pen_label", "y_offset")
-
-
-class KillLabelSettings:
-    ENABLED = safe_get_setting("kill_label", "enabled")
-    LABEL_FORMAT = safe_get_setting("kill_label", "label_format")
-    FONT_SIZE = safe_get_setting("kill_label", "font_size")
-    X_OFFSET = safe_get_setting("kill_label", "x_offset")
-    Y_OFFSET = safe_get_setting("kill_label", "y_offset")
-
-
-class GunLabelSettings:
-    ENABLED = safe_get_setting("gun_label", "enabled")
-    LABEL_FORMAT = safe_get_setting("gun_label", "label_format")
-    FONT_SIZE = safe_get_setting("gun_label", "font_size")
-    X_OFFSET = safe_get_setting("gun_label", "x_offset")
-    Y_OFFSET = safe_get_setting("gun_label", "y_offset")
-
-
-class TrackLabelSettings:
-    ENABLED = is_jailbreak()
-    X_OFFSET = 0
-    Y_OFFSET = 0
-    IMAGES = [
-        ("pademinune_GreenTrack", "img://gui/pademinune/crosshair-32-green.png"),
-        ("pademinune_OrangeTrack", "img://gui/pademinune/crosshair-32-orange.png"),
-    ]

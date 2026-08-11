@@ -101,27 +101,23 @@ class ArmorLabel(object):
     def __init__(self, settings):
         self.settings = settings
         self.visible = False
-        self.last_text = None
+        self.last_state = None
 
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
             update_gameface(armor_visible=False)
             self.visible = False
-            self.last_text = None
+            self.last_state = None
 
     def update_gui(self, value, color):
-        interior_text = self.settings.FORMAT.format(value=value)
-
-        new_text = "<color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
-            color=color, interior_text=interior_text
-        )
-
-        if new_text == self.last_text and self.visible:
+        state = (value, color)
+        if state == self.last_state and self.visible:
             return
 
-        self.last_text = new_text
+        self.last_state = state
         self.visible = True
+        interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
         update_gameface(armor_text=interior_text, armor_visible=True, armor_color=color)
 
@@ -130,27 +126,23 @@ class ProbLabel(object):
     def __init__(self, settings):
         self.settings = settings
         self.visible = False
-        self.last_text = None
+        self.last_state = None
 
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
             update_gameface(prob_visible=False)
             self.visible = False
-            self.last_text = None
+            self.last_state = None
 
     def update_gui(self, value, color):
-        interior_text = self.settings.FORMAT.format(value=value)
-
-        new_text = "<color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
-            color=color, interior_text=interior_text
-        )
-
-        if new_text == self.last_text and self.visible:
+        state = (value, color)
+        if state == self.last_state and self.visible:
             return
 
-        self.last_text = new_text
+        self.last_state = state
         self.visible = True
+        interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
         update_gameface(prob_text=interior_text, prob_visible=True, prob_color=color)
 
@@ -159,14 +151,14 @@ class AngleLabel(object):
     def __init__(self, settings):
         self.settings = settings
         self.visible = False
-        self.last_text = None
+        self.last_state = None
 
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
             update_gameface(angle_visible=False)
             self.visible = False
-            self.last_text = None
+            self.last_state = None
 
     def update_gui(self, value, color):
         if value < self.settings.DISPLAY_THRESHOLD:
@@ -174,17 +166,13 @@ class AngleLabel(object):
             return
 
         color = Colors.WHITE
-        interior_text = self.settings.FORMAT.format(value=value)
-
-        new_text = "<color='#{color}' face='$FieldFont'>{interior_text}</font>".format(
-            color=color, interior_text=interior_text
-        )
-
-        if new_text == self.last_text and self.visible:
+        state = (value, color)
+        if state == self.last_state and self.visible:
             return
 
-        self.last_text = new_text
+        self.last_state = state
         self.visible = True
+        interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
         update_gameface(angle_text=interior_text, angle_visible=True, angle_color=color)
 

@@ -39,7 +39,7 @@ class APBattleVM(ViewModel):
     this stack -- see setVisible for the bool->string encoding."""
 
     def __init__(self):
-        super(APBattleVM, self).__init__(properties=5, commands=0)
+        super(APBattleVM, self).__init__(properties=9, commands=0)
 
     def _initialize(self):
         super(APBattleVM, self)._initialize()

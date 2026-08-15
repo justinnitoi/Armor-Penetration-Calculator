@@ -19,13 +19,10 @@ def safe_get_setting(label, attribute):
 
 def update_constants(config):
     ArmorLabelSettings.ENABLED = config["armor_label"]["enabled"]
-    ArmorLabelSettings.FORMAT = config["armor_label"]["format"]
 
-    PenLabelSettings.ENABLED = config["prob_label"]["enabled"]
-    PenLabelSettings.FORMAT = config["prob_label"]["format"]
+    ProbLabelSettings.ENABLED = config["prob_label"]["enabled"]
 
     AngleLabelSettings.ENABLED = config["angle_label"]["enabled"]
-    AngleLabelSettings.FORMAT = config["angle_label"]["format"]
     AngleLabelSettings.DISPLAY_THRESHOLD = config["angle_label"]["display_threshold"]
     AngleLabelSettings.WHITE = config["angle_label"]["white"]
 
@@ -106,16 +103,16 @@ class Colorblind(object):
 
 class ArmorLabelSettings:
     ENABLED = safe_get_setting("armor_label", "enabled")
-    FORMAT = safe_get_setting("armor_label", "format")
+    FORMAT = "{value}"
 
 
-class PenLabelSettings:
+class ProbLabelSettings:
     ENABLED = safe_get_setting("prob_label", "enabled")
-    FORMAT = safe_get_setting("prob_label", "format")
+    FORMAT = "{value}%"
 
 
 class AngleLabelSettings:
     ENABLED = safe_get_setting("angle_label", "enabled")
-    FORMAT = safe_get_setting("angle_label", "format")
+    FORMAT = "{value}°"
     DISPLAY_THRESHOLD = safe_get_setting("angle_label", "display_threshold")
     WHITE = safe_get_setting("angle_label", "white")

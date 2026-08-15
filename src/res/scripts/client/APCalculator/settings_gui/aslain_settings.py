@@ -2,7 +2,7 @@ from gui.aslainMenu import g_modsSettingsApi, templates  # type: ignore
 
 from APCalculator.APconstants import (
     ArmorLabelSettings,
-    PenLabelSettings,
+    ProbLabelSettings,
     AngleLabelSettings,
     Colors,
     Colorblind,
@@ -104,31 +104,17 @@ template = {
             ArmorLabelSettings.ENABLED,
             tooltip="{HEADER}Enable Armor Label{/HEADER}{BODY}Show or hide the effective armor value label.{/BODY}",
         ),
-        [
-            templates.createInput(
-                "Armor Label Format",
-                "armor_label_format",
-                ArmorLabelSettings.FORMAT,
-                tooltip="{HEADER}Armor Label Format{/HEADER}{BODY}The display format of the armor label. '{armor}' will be replaced with the armor value.{/BODY}",
-            ),
-        ],
+        [],
     )
     + [templates.createLabel("<b>— Probability Label —</b>")]
     + templates.createControlsGroup(
         templates.createCheckbox(
             "Enable Probability Label",
             "prob_label_enabled",
-            PenLabelSettings.ENABLED,
+            ProbLabelSettings.ENABLED,
             tooltip="{HEADER}Enable Probability Label{/HEADER}{BODY}Show or hide the penetration probability label.{/BODY}",
         ),
-        [
-            templates.createInput(
-                "Prob Label Format",
-                "prob_label_format",
-                PenLabelSettings.FORMAT,
-                tooltip="{HEADER}Probability Label Format{/HEADER}{BODY}The display format of the probability label. '{prob}' will be replaced with the penetration probability.{/BODY}",
-            ),
-        ],
+        [],
     )
     + [templates.createLabel("<b>— Angle Label —</b>")]
     + templates.createControlsGroup(
@@ -139,12 +125,6 @@ template = {
             tooltip="{HEADER}Enable Angle Label{/HEADER}{BODY}Show or hide the impact angle label.{/BODY}",
         ),
         [
-            templates.createInput(
-                "Angle Label Format",
-                "angle_label_format",
-                AngleLabelSettings.FORMAT,
-                tooltip="{HEADER}Angle Label Format{/HEADER}{BODY}The display format of the angle label. '{angle}' will be replaced with the impact angle in degrees.{/BODY}",
-            ),
             templates.createNumericStepper(
                 "Angle Display Threshold",
                 "angle_label_display_threshold",

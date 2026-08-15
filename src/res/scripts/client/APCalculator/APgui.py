@@ -1,7 +1,7 @@
 from APCalculator.APconstants import (
     Colors,
     ArmorLabelSettings,
-    PenLabelSettings,
+    ProbLabelSettings,
     AngleLabelSettings,
     get_color_from_prob,
     get_low_chance_color,
@@ -13,7 +13,7 @@ from APCalculator.APBattleView import update_gameface
 class GuiState(object):
     def __init__(self):
         self.armor_label = ArmorLabel(ArmorLabelSettings)
-        self.prob_label = ProbLabel(PenLabelSettings)
+        self.prob_label = ProbLabel(ProbLabelSettings)
         self.angle_label = AngleLabel(AngleLabelSettings)
         self.labels = [
             self.armor_label,

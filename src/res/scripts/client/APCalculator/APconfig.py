@@ -4,15 +4,12 @@ import os
 DEFAULT_CONFIG = {
     "armor_label": {
         "enabled": True,
-        "format": "{value}",
     },
     "prob_label": {
         "enabled": True,
-        "format": "{value}%",
     },
     "angle_label": {
         "enabled": True,
-        "format": "{value}°",
         "display_threshold": 70,
         "white": True,
     },
@@ -71,15 +68,12 @@ def nested(flat_config):
     config = {
         "armor_label": {
             "enabled": flat_config["armor_label_enabled"],
-            "format": flat_config["armor_label_format"],
         },
         "prob_label": {
             "enabled": flat_config["prob_label_enabled"],
-            "format": flat_config["prob_label_format"],
         },
         "angle_label": {
             "enabled": flat_config["angle_label_enabled"],
-            "format": flat_config["angle_label_format"],
             "display_threshold": flat_config["angle_label_display_threshold"],
             "white": flat_config["angle_label_white"],
         },

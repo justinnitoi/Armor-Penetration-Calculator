@@ -96,7 +96,7 @@ def _colorSection():
 template = {
     "modDisplayName": "pademinune's Armor Penetration Calculator 2",
     "enabled": True,
-    "column1": [templates.createLabel("<b>— Armor Label —</b>")]
+    "column1": [templates.createLabel("<b>— Labels —</b>")]
     + templates.createControlsGroup(
         templates.createCheckbox(
             "Enable Armor Label",
@@ -106,7 +106,6 @@ template = {
         ),
         [],
     )
-    + [templates.createLabel("<b>— Probability Label —</b>")]
     + templates.createControlsGroup(
         templates.createCheckbox(
             "Enable Probability Label",
@@ -116,7 +115,6 @@ template = {
         ),
         [],
     )
-    + [templates.createLabel("<b>— Angle Label —</b>")]
     + templates.createControlsGroup(
         templates.createCheckbox(
             "Enable Angle Label",

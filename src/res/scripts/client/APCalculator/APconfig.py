@@ -22,6 +22,13 @@ DEFAULT_CONFIG = {
         "low_chance": "E90000",
         "ricochet": "800080",
     },
+    "colorblind": {
+        "enabled": False,
+        "high_chance": "EFEB05",
+        "medium_chance": "FF8AFF",
+        "low_chance": "9D00FF",
+        "ricochet": "9D00FF",
+    },
 }
 
 CONFIG_FOLDER = os.path.join(
@@ -81,6 +88,13 @@ def nested(flat_config):
             "medium_chance": flat_config["colors_medium_chance"],
             "low_chance": flat_config["colors_low_chance"],
             "ricochet": flat_config["colors_ricochet"],
+        },
+        "colorblind": {
+            "enabled": flat_config["colorblind_enabled"],
+            "high_chance": flat_config["colorblind_high_chance"],
+            "medium_chance": flat_config["colorblind_medium_chance"],
+            "low_chance": flat_config["colorblind_low_chance"],
+            "ricochet": flat_config["colorblind_ricochet"],
         },
     }
     return config

@@ -1,6 +1,6 @@
 from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, is_jailbreak
 
-VERSION = "2.0.0"
+VERSION = "2.0.0D"
 
 
 def safe_get_color(color):
@@ -34,6 +34,33 @@ def update_constants(config):
     Colors.LOW_CHANCE = config["colors"]["low_chance"]
     Colors.RICOCHET = config["colors"]["ricochet"]
 
+    Colorblind.ENABLED = config["colorblind"]["enabled"]
+    Colorblind.HIGH_CHANCE = config["colorblind"]["high_chance"]
+    Colorblind.MEDIUM_CHANCE = config["colorblind"]["medium_chance"]
+    Colorblind.LOW_CHANCE = config["colorblind"]["low_chance"]
+    Colorblind.RICOCHET = config["colorblind"]["ricochet"]
+
+
+def get_color_from_prob(prob):
+    if not Colorblind.ENABLED:
+        return Colors.get_color_from_prob(prob)
+    else:
+        return Colorblind.get_color_from_prob(prob)
+
+
+def get_ricochet_color():
+    if not Colorblind.ENABLED:
+        return Colors.RICOCHET
+    else:
+        return Colorblind.RICOCHET
+
+
+def get_low_chance_color():
+    if not Colorblind.ENABLED:
+        return Colors.LOW_CHANCE
+    else:
+        return Colorblind.LOW_CHANCE
+
 
 class Colors(object):
     HIGH_CHANCE = safe_get_color("high_chance")
@@ -49,6 +76,23 @@ class Colors(object):
     YELLOW = "FFFF00"
     GREY = "808080"
     WHITE = "FFFFFF"
+
+    @classmethod
+    def get_color_from_prob(cls, prob):
+        if prob <= 7:
+            return cls.LOW_CHANCE
+        elif prob >= 93:
+            return cls.HIGH_CHANCE
+        else:
+            return cls.MEDIUM_CHANCE
+
+
+class Colorblind(object):
+    ENABLED = safe_get_setting("colorblind", "enabled")
+    HIGH_CHANCE = safe_get_setting("colorblind", "high_chance")
+    MEDIUM_CHANCE = safe_get_setting("colorblind", "medium_chance")
+    LOW_CHANCE = safe_get_setting("colorblind", "low_chance")
+    RICOCHET = safe_get_setting("colorblind", "ricochet")
 
     @classmethod
     def get_color_from_prob(cls, prob):

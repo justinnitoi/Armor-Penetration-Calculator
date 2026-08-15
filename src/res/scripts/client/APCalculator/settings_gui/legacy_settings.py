@@ -15,7 +15,7 @@ from APCalculator.APconfig import (
     DEFAULT_CONFIG,
 )
 
-mod_linkage = "pade_armor_calculator"
+mod_linkage = "pade_armor_calculator_2"
 
 template = {
     "modDisplayName": "pademinune's Armor Penetration Calculator 2",
@@ -71,10 +71,10 @@ template = {
             tooltip="{HEADER}Angle Display Threshold{/HEADER}{BODY}The minimum impact angle (in degrees) at which the angle label is shown. Set to 0 to always show it.{/BODY}",
         ),
         templates.createCheckbox(
-                "Angle Color is always White",
-                "angle_label_white",
-                AngleLabelSettings.WHITE,
-                tooltip="{HEADER}Angle Color is always White{/HEADER}{BODY}Toggle between having the angle label color always be White, or to mimic the penetration chance color.{/BODY}",
+            "Angle Color is always White",
+            "angle_label_white",
+            AngleLabelSettings.WHITE,
+            tooltip="{HEADER}Angle Color is always White{/HEADER}{BODY}Toggle between having the angle label color always be White, or to mimic the penetration chance color.{/BODY}",
         ),
     ],
     "column2": [

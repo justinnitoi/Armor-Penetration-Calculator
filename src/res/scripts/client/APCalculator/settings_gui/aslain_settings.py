@@ -53,21 +53,25 @@ def _colorSection():
             "High Pen Chance",
             "colorblind_high_chance",
             Colorblind.HIGH_CHANCE,
+            tooltip="{HEADER}High Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is high (>93%).{/BODY}",
         ),
         templates.createColorChoice(
             "Medium Pen Chance",
             "colorblind_medium_chance",
             Colorblind.MEDIUM_CHANCE,
+            tooltip="{HEADER}Medium Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is medium.{/BODY}",
         ),
         templates.createColorChoice(
             "Low Pen Chance",
             "colorblind_low_chance",
             Colorblind.LOW_CHANCE,
+            tooltip="{HEADER}Low Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is low (<7%).{/BODY}",
         ),
         templates.createColorChoice(
             "Ricochet",
             "colorblind_ricochet",
             Colorblind.RICOCHET,
+            tooltip="{HEADER}Ricochet Color{/HEADER}{BODY}Color shown when the shell will ricochet.{/BODY}",
         ),
     ]
 

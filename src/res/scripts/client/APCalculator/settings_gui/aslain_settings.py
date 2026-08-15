@@ -133,13 +133,17 @@ template = {
     ],
 }
 
+
 def onButtonClicked(linkage, varName, value):
     if linkage == mod_linkage and varName == "discord_button":
-        import BigWorld
+        import BigWorld  # type: ignore
+
         BigWorld.wg_openWebBrowser(DISCORD_URL)
     if linkage == mod_linkage and varName == "donate_button":
-        import BigWorld
+        import BigWorld  # type: ignore
+
         BigWorld.wg_openWebBrowser(DONATE_URL)
+
 
 def on_settings_save(linkage, new_settings):
     if linkage == mod_linkage:
@@ -152,4 +156,6 @@ if hasattr(g_modsSettingsApi, "setModDefaults"):
     flattened_default = flattened(DEFAULT_CONFIG)
     g_modsSettingsApi.setModDefaults(mod_linkage, flattened_default)
 
-g_modsSettingsApi.setModTemplate(mod_linkage, template, on_settings_save, buttonHandler=onButtonClicked)
+g_modsSettingsApi.setModTemplate(
+    mod_linkage, template, on_settings_save, buttonHandler=onButtonClicked
+)

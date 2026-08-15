@@ -16,6 +16,8 @@ from APCalculator.APconfig import (
 )
 
 mod_linkage = "pade_armor_calculator_2"
+DISCORD_URL = "https://discord.gg/PrzqyneRXv"
+DONATE_URL = "https://ko-fi.com/pademinune"
 
 template = {
     "modDisplayName": "pademinune's Armor Penetration Calculator 2",
@@ -103,8 +105,36 @@ template = {
             Colors.RICOCHET,
             tooltip="{HEADER}Ricochet Color{/HEADER}{BODY}Color shown when the shell will ricochet.{/BODY}",
         ),
+        templates.createLabel("<b>— Support —</b>"),
+        templates.createRadioButtonGroup(
+            "",
+            "discord_button",
+            [""],
+            0,
+            button=templates.createButton(text="Discord", width=90, height=25),
+            tooltip="{HEADER}Discord Server{/HEADER}{BODY}Join the Discord for updates, bug reports, and feature requests.{/BODY}"
+        ),
+        templates.createRadioButtonGroup(
+            "",
+            "donate_button",
+            [""],
+            0,
+            button=templates.createButton(text="Donate", width=90, height=25),
+            tooltip="{HEADER}Support development{/HEADER}{BODY}If the calculator's been useful, a donation helps cover the time spent maintaining and improving it.{/BODY}"
+        ),
     ],
 }
+
+
+def onButtonClicked(linkage, varName, value):
+    if linkage == mod_linkage and varName == "discord_button":
+        import BigWorld  # type: ignore
+
+        BigWorld.wg_openWebBrowser(DISCORD_URL)
+    if linkage == mod_linkage and varName == "donate_button":
+        import BigWorld  # type: ignore
+
+        BigWorld.wg_openWebBrowser(DONATE_URL)
 
 
 def on_settings_save(linkage, new_settings):
@@ -114,4 +144,6 @@ def on_settings_save(linkage, new_settings):
         save_config(nested_config)
 
 
-g_modsSettingsApi.setModTemplate(mod_linkage, template, on_settings_save, None)
+g_modsSettingsApi.setModTemplate(
+    mod_linkage, template, on_settings_save, buttonHandler=onButtonClicked
+)

@@ -2,9 +2,10 @@
   uninstall.ps1
 
   Removes the loose res_mods override files that build.ps1 deploys: compiled
-  .pyc modules, the Gameface web assets, and the res_map registration. Derives
-  the same paths from the same source tree as build.ps1, so it always matches
-  whatever build.ps1 last put there instead of a hardcoded file list going stale.
+  .pyc modules, the Gameface web assets, the settings-tooltip icons, and the
+  res_map registration. Derives the same paths from the same source tree as
+  build.ps1, so it always matches whatever build.ps1 last put there instead of
+  a hardcoded file list going stale.
 
   Run this from anywhere -- paths are resolved relative to this script, not the
   working directory. Close World of Tanks first -- a running client locks files
@@ -28,10 +29,12 @@ $SourceRoot = Join-Path $PSScriptRoot "..\src"
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
 $PyAPCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\APCalculator"
 $WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
+$IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
 
 $PyDestDir             = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
 $PyAPCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\APCalculator"
 $WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
+$IconsDestDir          = Join-Path $WotRoot "res_mods\$Version\gui\maps\icons\APCalculator2"
 $ResMapDestDir         = Join-Path $WotRoot "mods\configs\res_map"
 
 # --- helper -----------------------------------------------------------------------
@@ -108,7 +111,17 @@ if ((Test-Path $WebDestDir) -and ((Get-ChildItem $WebDestDir -Force | Measure-Ob
     Write-Host "  removed empty directory: $WebDestDir"
 }
 
-# --- 3. remove the res_map registration -----------------------------------------------
+# --- 3. remove the settings-tooltip icons ----------------------------------------------
+Write-Host "Removing settings-tooltip icons ..."
+Get-ChildItem -Path $IconsSrcDir -File -ErrorAction SilentlyContinue | ForEach-Object {
+    Remove-IfExists (Join-Path $IconsDestDir $_.Name) $_.Name
+}
+if ((Test-Path $IconsDestDir) -and ((Get-ChildItem $IconsDestDir -Force | Measure-Object).Count -eq 0)) {
+    Remove-Item $IconsDestDir -Force
+    Write-Host "  removed empty directory: $IconsDestDir"
+}
+
+# --- 4. remove the res_map registration -----------------------------------------------
 Write-Host "Removing res_map entry ..."
 Remove-IfExists (Join-Path $ResMapDestDir "APBattleView.json") "APBattleView.json"
 

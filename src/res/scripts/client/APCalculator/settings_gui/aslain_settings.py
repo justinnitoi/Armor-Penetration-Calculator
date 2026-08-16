@@ -102,7 +102,13 @@ template = {
             "Enable Armor Label",
             "armor_label_enabled",
             ArmorLabelSettings.ENABLED,
-            tooltip="{HEADER}Enable Armor Label{/HEADER}{BODY}Show or hide the effective armor value label.{/BODY}",
+            tooltip=(
+                "{HEADER}Enable Armor Label{/HEADER}"
+                "{BODY}Show or hide the effective armor value label.<br><br>"
+                "<img src='img://gui/maps/icons/APCalculator2/full-cropped.png' width='220' height='120'>"
+                "<img src='img://gui/maps/icons/APCalculator2/no-armor-cropped.png' width='220' height='120'>"
+                "{/BODY}"
+            ),
         ),
         [],
     )
@@ -111,7 +117,12 @@ template = {
             "Enable Probability Label",
             "prob_label_enabled",
             ProbLabelSettings.ENABLED,
-            tooltip="{HEADER}Enable Probability Label{/HEADER}{BODY}Show or hide the penetration probability label.{/BODY}",
+            tooltip=(
+                "{HEADER}Enable Probability Label{/HEADER}{BODY}Show or hide the penetration probability label.<br><br>"
+                "<img src='img://gui/maps/icons/APCalculator2/full-cropped.png' width='220' height='120'>"
+                "<img src='img://gui/maps/icons/APCalculator2/no-prob-cropped.png' width='220' height='120'>"
+                "{/BODY}"
+            ),
         ),
         [],
     )
@@ -120,7 +131,12 @@ template = {
             "Enable Angle Label",
             "angle_label_enabled",
             AngleLabelSettings.ENABLED,
-            tooltip="{HEADER}Enable Angle Label{/HEADER}{BODY}Show or hide the impact angle label.{/BODY}",
+            tooltip=(
+                "{HEADER}Enable Angle Label{/HEADER}{BODY}Show or hide the impact angle label.<br><br>"
+                "<img src='img://gui/maps/icons/APCalculator2/full-angle-cropped.png' width='220' height='120'>"
+                "<img src='img://gui/maps/icons/APCalculator2/no-angle-cropped.png' width='220' height='120'>"
+                "{/BODY}"
+            ),
         ),
         [
             templates.createNumericStepper(
@@ -137,7 +153,13 @@ template = {
                 "Angle Color is always White",
                 "angle_label_white",
                 AngleLabelSettings.WHITE,
-                tooltip="{HEADER}Angle Color is always White{/HEADER}{BODY}Toggle between having the angle label color always be White, or to mimic the penetration chance color.{/BODY}",
+                tooltip=(
+                    "{HEADER}Angle Color is always White{/HEADER}"
+                    "{BODY}Toggle between having the angle label color always be White, or to mimic the penetration chance color.<br><br>"
+                    "<img src='img://gui/maps/icons/APCalculator2/full-angle-cropped.png' width='220' height='120'>"
+                    "<img src='img://gui/maps/icons/APCalculator2/angle-colored-cropped.png' width='220' height='120'>"
+                    "{/BODY}"
+                ),
             ),
         ],
     ),

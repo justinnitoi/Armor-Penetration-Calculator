@@ -4,10 +4,10 @@
   Compiles every *.py under src\res\scripts\client\gui\mods and
   src\res\scripts\client\APCalculator with Python 2.7 -- the same compile step
   build.ps1 uses -- then stages the result plus the Gameface web assets, the
-  res_map registration, and meta.xml under bin\, and zips it all into a
-  .wotmod package (ZIP_STORED, meta.xml at the archive root, everything else
-  under res\). Unlike build.ps1 this does NOT touch a WoT install -- it only
-  produces bin\wotmods\<name>.wotmod.
+  settings-tooltip icons, the res_map registration, and meta.xml under bin\,
+  and zips it all into a .wotmod package (ZIP_STORED, meta.xml at the archive
+  root, everything else under res\). Unlike build.ps1 this does NOT touch a
+  WoT install -- it only produces bin\wotmods\<name>.wotmod.
 
   The staging directory is wiped before every run so a package never mixes
   freshly compiled output with leftovers from a previous src layout.
@@ -37,12 +37,14 @@ $OutDir     = Join-Path $BinDir "wotmods"
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
 $PyAPCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\APCalculator"
 $WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
+$IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
 $ResMapSrc            = Join-Path $SourceRoot "res\mods\configs\res_map\APBattleView.json"
 $MetaSrc              = Join-Path $SourceRoot "meta.xml"
 
 $PyModsDestDir         = Join-Path $ResDir "scripts\client\gui\mods"
 $PyAPCalculatorDestDir = Join-Path $ResDir "scripts\client\APCalculator"
 $WebDestDir            = Join-Path $ResDir "gui\gameface\mods\pademinune\APCalculator"
+$IconsDestDir          = Join-Path $ResDir "gui\maps\icons\APCalculator2"
 $ResMapDestDir         = Join-Path $ResDir "mods\configs\res_map"
 
 # Mod version comes from meta.xml so the package name can't drift out of sync
@@ -107,15 +109,22 @@ Get-ChildItem -Path $WebSrcDir -File | ForEach-Object {
     Copy-Item $_.FullName -Destination $WebDestDir -Force
 }
 
-# --- 3. copy the res_map registration -----------------------------------------------
+# --- 3. copy the settings-tooltip icons ----------------------------------------------
+Write-Host "Copying settings-tooltip icons ..."
+Ensure-Dir $IconsDestDir
+Get-ChildItem -Path $IconsSrcDir -File | ForEach-Object {
+    Copy-Item $_.FullName -Destination $IconsDestDir -Force
+}
+
+# --- 4. copy the res_map registration -----------------------------------------------
 Write-Host "Copying res_map entry ..."
 Ensure-Dir $ResMapDestDir
 Copy-Item $ResMapSrc -Destination $ResMapDestDir -Force
 
-# --- 4. copy meta.xml (archive root, alongside res\, not inside it) -----------------
+# --- 5. copy meta.xml (archive root, alongside res\, not inside it) -----------------
 Copy-Item $MetaSrc -Destination $StageDir -Force
 
-# --- 5. zip the staging dir into the .wotmod package ---------------------------------
+# --- 6. zip the staging dir into the .wotmod package ---------------------------------
 if (Test-Path $OutFile) { Remove-Item $OutFile -Force }
 
 # includeBaseDirectory=false: entries come out as "res\..." and "meta.xml" at the

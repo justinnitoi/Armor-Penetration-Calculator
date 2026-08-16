@@ -5,8 +5,8 @@
   res\scripts\client\APCalculator with Python 2.7 (bytecode is version-locked
   -- the WoT client cannot load Python 3 bytecode) and deploys pademinune's
   Armor Penetration Calculator as LOOSE res_mods override files, plus the
-  Gameface web assets and res_map registration. Does NOT package a .wotmod --
-  see package.ps1 for that.
+  Gameface web assets, settings-tooltip icons, and res_map registration.
+  Does NOT package a .wotmod -- see package.ps1 for that.
 
   Run this from anywhere -- paths are resolved relative to this script, not the
   working directory. Close World of Tanks first -- a running client locks files
@@ -31,11 +31,13 @@ $SourceRoot = Join-Path $PSScriptRoot "..\src"
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
 $PyAPCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\APCalculator"
 $WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
+$IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
 $ResMapSrc            = Join-Path $SourceRoot "res\mods\configs\res_map\APBattleView.json"
 
 $PyDestDir             = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
 $PyAPCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\APCalculator"
 $WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
+$IconsDestDir          = Join-Path $WotRoot "res_mods\$Version\gui\maps\icons\APCalculator2"
 $ResMapDestDir         = Join-Path $WotRoot "mods\configs\res_map"
 
 # --- helpers -----------------------------------------------------------------------
@@ -126,7 +128,13 @@ Get-ChildItem -Path $WebSrcDir -File | ForEach-Object {
     Copy-One $_.FullName $WebDestDir $_.Name
 }
 
-# --- 3. copy the res_map registration -----------------------------------------------
+# --- 3. copy the settings-tooltip icons ----------------------------------------------
+Write-Host "Copying settings-tooltip icons ..."
+Get-ChildItem -Path $IconsSrcDir -File | ForEach-Object {
+    Copy-One $_.FullName $IconsDestDir $_.Name
+}
+
+# --- 4. copy the res_map registration -----------------------------------------------
 Write-Host "Copying res_map entry ..."
 Copy-One $ResMapSrc $ResMapDestDir "APBattleView.json"
 

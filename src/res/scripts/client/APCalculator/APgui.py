@@ -38,11 +38,7 @@ class GuiState(object):
         prob,
         ricochet,
         hit_body,
-        hit_track,
-        hit_gun,
         angle,
-        avg_pen,
-        kill_prob,
     ):
         """Assumes all arguments passed are booleans or integers"""
         if ricochet:

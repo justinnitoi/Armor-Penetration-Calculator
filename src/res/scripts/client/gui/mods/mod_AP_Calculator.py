@@ -56,22 +56,15 @@ def call_update_gui(
     angle = math.degrees(math.acos(hit_angle_cos))
 
     prob = 0
-    kill_roll_prob = 0
     if not ricochet and hit_body:
         prob = get_gaussian_probability(avg_pen, armor_val)
-        kill_roll_prob = get_gaussian_probability(alpha_dmg[0], enemy_hp)
-    kill_prob = prob * kill_roll_prob // 100
 
     gui_state.update_gui(
         int(armor_val),
         int(prob),
         ricochet,
         hit_body,
-        hit_track,
-        hit_gun,
         int(angle),
-        int(avg_pen),
-        int(kill_prob),
     )
 
 

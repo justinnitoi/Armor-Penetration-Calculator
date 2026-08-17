@@ -1,6 +1,6 @@
 from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, is_jailbreak
 
-VERSION = "2.0.0D"
+VERSION = "2.0.0"
 
 
 def safe_get_color(color):

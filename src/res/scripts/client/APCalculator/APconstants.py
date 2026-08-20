@@ -2,14 +2,6 @@ from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, is_jailbreak
 
 VERSION = "2.0.0"
 
-
-def safe_get_color(color):
-    default = DEFAULT_CONFIG.get("colors", "808080").get(color, "808080")
-    if "colors" not in user_settings or color not in user_settings["colors"]:
-        return default
-    return user_settings["colors"][color]
-
-
 def safe_get_setting(label, attribute):
     default = DEFAULT_CONFIG[label][attribute]
     if label not in user_settings or attribute not in user_settings[label]:
@@ -60,10 +52,10 @@ def get_low_chance_color():
 
 
 class Colors(object):
-    HIGH_CHANCE = safe_get_color("high_chance")
-    MEDIUM_CHANCE = safe_get_color("medium_chance")
-    LOW_CHANCE = safe_get_color("low_chance")
-    RICOCHET = safe_get_color("ricochet")
+    HIGH_CHANCE = safe_get_setting(label="colors", attribute="high_chance")
+    MEDIUM_CHANCE = safe_get_setting(label="colors", attribute="medium_chance")
+    LOW_CHANCE = safe_get_setting(label="colors", attribute="low_chance")
+    RICOCHET = safe_get_setting(label="colors", attribute="ricochet")
 
     GREEN = "6BF40D"
     ORANGE = "FFAD00"

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# type: ignore
 """Simple Label -- the smallest possible in-battle Gameface overlay.
 
 Shows armor/prob/angle text over the battle HUD, for the length of the battle.
@@ -10,9 +8,9 @@ battle-lifecycle -> JS pipeline visible with nothing else in the way.
 Python 2.7 (BigWorld) runtime. OpenWG GameFace is a hard dependency.
 """
 
-from debug_utils import LOG_CURRENT_EXCEPTION
+from debug_utils import LOG_CURRENT_EXCEPTION # type: ignore
 
-from frameworks.wulf import (
+from frameworks.wulf import ( # type: ignore
     ViewModel,
     ViewSettings,
     ViewFlags,
@@ -20,8 +18,8 @@ from frameworks.wulf import (
     WindowLayer,
     PositionAnchor,
 )
-from gui.impl.pub import ViewImpl, WindowImpl
-from openwg_gameface import ModDynAccessor
+from gui.impl.pub import ViewImpl, WindowImpl # type: ignore
+from openwg_gameface import ModDynAccessor # type: ignore
 
 _FAR = 1 << 20  # sentinel outside any real screen -- move() clamps to the true edge
 
@@ -273,8 +271,8 @@ def _on_avatar_teardown(*args, **kwargs):
 
 
 def _install():
-    import openwg_gameface  # noqa: F401  -- hard dependency, raises if absent
-    from PlayerEvents import g_playerEvents
+    import openwg_gameface  # type: ignore
+    from PlayerEvents import g_playerEvents # type: ignore
 
     # Global arena hooks: persist across battles, unlike per-battle controllers.
     g_playerEvents.onAvatarReady += _on_avatar_ready

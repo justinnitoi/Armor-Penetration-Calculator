@@ -57,22 +57,22 @@ def _colorSection():
     ]
     colorblind = [
         templates.createColorChoice(
-            "High Pen Chance",
+            "Colorblind High Pen Chance",
             "colorblind_high_chance",
             Colorblind.HIGH_CHANCE,
         ),
         templates.createColorChoice(
-            "Medium Pen Chance",
+            "Colorblind Medium Pen Chance",
             "colorblind_medium_chance",
             Colorblind.MEDIUM_CHANCE,
         ),
         templates.createColorChoice(
-            "Low Pen Chance",
+            "Colorblind Low Pen Chance",
             "colorblind_low_chance",
             Colorblind.LOW_CHANCE,
         ),
         templates.createColorChoice(
-            "Ricochet",
+            "Colorblind Ricochet",
             "colorblind_ricochet",
             Colorblind.RICOCHET,
         ),

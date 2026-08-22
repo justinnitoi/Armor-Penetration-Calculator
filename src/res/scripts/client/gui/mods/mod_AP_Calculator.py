@@ -8,7 +8,7 @@ from items.components.component_constants import (  # type: ignore
 )
 from APCalculator.debug import log
 
-log("Mod has started loading.")
+log("Mod core has started loading.")
 
 from APCalculator.APconstants import VERSION
 from APCalculator.APgui import gui_state
@@ -493,4 +493,4 @@ g_playerEvents.onAvatarBecomeNonPlayer += on_leave_match
 # Called when your tank is destroyed
 AvatarInputHandler.activatePostmortem = my_activate_postmortem
 
-log("Mod has finished loading.")
+log("Mod core has finished loading.")

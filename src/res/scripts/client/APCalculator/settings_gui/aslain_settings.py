@@ -15,10 +15,7 @@ from APCalculator.APconfig import (
     save_config,
     DEFAULT_CONFIG,
 )
-
-mod_linkage = "pade_armor_calculator_2"
-DISCORD_URL = "https://discord.gg/PrzqyneRXv"
-DONATE_URL = "https://ko-fi.com/pademinune"
+from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE
 
 
 def _colorSection():
@@ -27,25 +24,37 @@ def _colorSection():
             "High Pen Chance",
             "colors_high_chance",
             Colors.HIGH_CHANCE,
-            tooltip="{HEADER}High Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is high (>93%).{/BODY}",
+            tooltip=(
+                "{HEADER}High Pen Chance Color{/HEADER}",
+                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}",
+            ),
         ),
         templates.createColorChoice(
             "Medium Pen Chance",
             "colors_medium_chance",
             Colors.MEDIUM_CHANCE,
-            tooltip="{HEADER}Medium Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is medium.{/BODY}",
+            tooltip=(
+                "{HEADER}Medium Pen Chance Color{/HEADER}",
+                "{BODY}Color shown when penetration probability is medium.{/BODY}",
+            ),
         ),
         templates.createColorChoice(
             "Low Pen Chance",
             "colors_low_chance",
             Colors.LOW_CHANCE,
-            tooltip="{HEADER}Low Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is low (<7%).{/BODY}",
+            tooltip=(
+                "{HEADER}Low Pen Chance Color{/HEADER}",
+                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}",
+            ),
         ),
         templates.createColorChoice(
             "Ricochet",
             "colors_ricochet",
             Colors.RICOCHET,
-            tooltip="{HEADER}Ricochet Color{/HEADER}{BODY}Color shown when the shell will ricochet.{/BODY}",
+            tooltip=(
+                "{HEADER}Ricochet Color{/HEADER}",
+                "{BODY}Color shown when the shell will ricochet.{/BODY}",
+            ),
         ),
     ]
     colorblind = [
@@ -53,25 +62,37 @@ def _colorSection():
             "High Pen Chance",
             "colorblind_high_chance",
             Colorblind.HIGH_CHANCE,
-            tooltip="{HEADER}High Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is high (>93%).{/BODY}",
+            tooltip=(
+                "{HEADER}High Pen Chance Color{/HEADER}",
+                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}",
+            ),
         ),
         templates.createColorChoice(
             "Medium Pen Chance",
             "colorblind_medium_chance",
             Colorblind.MEDIUM_CHANCE,
-            tooltip="{HEADER}Medium Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is medium.{/BODY}",
+            tooltip=(
+                "{HEADER}Medium Pen Chance Color{/HEADER}",
+                "{BODY}Color shown when penetration probability is medium.{/BODY}",
+            ),
         ),
         templates.createColorChoice(
             "Low Pen Chance",
             "colorblind_low_chance",
             Colorblind.LOW_CHANCE,
-            tooltip="{HEADER}Low Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is low (<7%).{/BODY}",
+            tooltip=(
+                "{HEADER}Low Pen Chance Color{/HEADER}",
+                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}",
+            ),
         ),
         templates.createColorChoice(
             "Ricochet",
             "colorblind_ricochet",
             Colorblind.RICOCHET,
-            tooltip="{HEADER}Ricochet Color{/HEADER}{BODY}Color shown when the shell will ricochet.{/BODY}",
+            tooltip=(
+                "{HEADER}Ricochet Color{/HEADER}",
+                "{BODY}Color shown when the shell will ricochet.{/BODY}",
+            ),
         ),
     ]
 
@@ -79,7 +100,10 @@ def _colorSection():
         "Use colorblind colors",
         "colorblind_enabled",
         Colorblind.ENABLED,
-        tooltip="{HEADER}Colorblind-friendly palette{/HEADER}{BODY}Swap to a colorblind-safe color scheme, editable below.{/BODY}",
+        tooltip=(
+            "{HEADER}Colorblind-friendly palette{/HEADER}",
+            "{BODY}Swap to a colorblind-safe color scheme, editable below.{/BODY}",
+        ),
     )
 
     if hasattr(templates, "visibleWhen"):
@@ -147,7 +171,11 @@ template = {
                 90,
                 1,
                 manual=True,
-                tooltip="{HEADER}Angle Display Threshold{/HEADER}{BODY}The minimum impact angle (in degrees) at which the angle label is shown. Set to 0 to always show it.{/BODY}",
+                tooltip=(
+                    "{HEADER}Angle Display Threshold{/HEADER}",
+                    "{BODY}The minimum impact angle (in degrees) at which the angle label is shown.",
+                    " Set to 0 to always show it.{/BODY}",
+                ),
             ),
             templates.createCheckbox(
                 "Angle Color is always White",
@@ -155,10 +183,11 @@ template = {
                 AngleLabelSettings.WHITE,
                 tooltip=(
                     "{HEADER}Angle Color is always White{/HEADER}"
-                    "{BODY}Toggle between having the angle label color always be White, or to mimic the penetration chance color.<br><br>"
+                    "{BODY}Toggle between having the angle label color always be White,",
+                    " or to mimic the penetration chance color.<br><br>",
                     "<img src='img://gui/maps/icons/APCalculator2/full-angle-cropped.png' width='220' height='120'>"
                     "<img src='img://gui/maps/icons/APCalculator2/angle-colored-cropped.png' width='220' height='120'>"
-                    "{/BODY}"
+                    "{/BODY}",
                 ),
             ),
         ],
@@ -186,18 +215,18 @@ template = {
 
 
 def onButtonClicked(linkage, varName, value):
-    if linkage == mod_linkage and varName == "discord_button":
+    if linkage == MOD_LINKAGE and varName == "discord_button":
         import BigWorld  # type: ignore
 
         BigWorld.wg_openWebBrowser(DISCORD_URL)
-    if linkage == mod_linkage and varName == "donate_button":
+    if linkage == MOD_LINKAGE and varName == "donate_button":
         import BigWorld  # type: ignore
 
         BigWorld.wg_openWebBrowser(DONATE_URL)
 
 
 def on_settings_save(linkage, new_settings):
-    if linkage == mod_linkage:
+    if linkage == MOD_LINKAGE:
         nested_config = nested(new_settings)
         update_constants(nested_config)
         save_config(nested_config)
@@ -205,8 +234,8 @@ def on_settings_save(linkage, new_settings):
 
 if hasattr(g_modsSettingsApi, "setModDefaults"):
     flattened_default = flattened(DEFAULT_CONFIG)
-    g_modsSettingsApi.setModDefaults(mod_linkage, flattened_default)
+    g_modsSettingsApi.setModDefaults(MOD_LINKAGE, flattened_default)
 
 g_modsSettingsApi.setModTemplate(
-    mod_linkage, template, on_settings_save, buttonHandler=onButtonClicked
+    MOD_LINKAGE, template, on_settings_save, buttonHandler=onButtonClicked
 )

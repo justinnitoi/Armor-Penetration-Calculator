@@ -13,10 +13,7 @@ from APCalculator.APconfig import (
     nested,
     save_config,
 )
-
-mod_linkage = "pade_armor_calculator_2"
-DISCORD_URL = "https://discord.gg/PrzqyneRXv"
-DONATE_URL = "https://ko-fi.com/pademinune"
+from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE
 
 
 def _colorSection():
@@ -176,23 +173,23 @@ template = {
 
 
 def onButtonClicked(linkage, varName, value):
-    if linkage == mod_linkage and varName == "discord_button":
+    if linkage == MOD_LINKAGE and varName == "discord_button":
         import BigWorld  # type: ignore
 
         BigWorld.wg_openWebBrowser(DISCORD_URL)
-    if linkage == mod_linkage and varName == "donate_button":
+    if linkage == MOD_LINKAGE and varName == "donate_button":
         import BigWorld  # type: ignore
 
         BigWorld.wg_openWebBrowser(DONATE_URL)
 
 
 def on_settings_save(linkage, new_settings):
-    if linkage == mod_linkage:
+    if linkage == MOD_LINKAGE:
         nested_config = nested(new_settings)
         update_constants(nested_config)
         save_config(nested_config)
 
 
 g_modsSettingsApi.setModTemplate(
-    mod_linkage, template, on_settings_save, buttonHandler=onButtonClicked
+    MOD_LINKAGE, template, on_settings_save, buttonHandler=onButtonClicked
 )

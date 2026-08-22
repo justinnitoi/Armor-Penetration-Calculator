@@ -2,6 +2,7 @@ from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, is_jailbreak
 
 VERSION = "2.0.0"
 
+
 def safe_get_setting(label, attribute):
     default = DEFAULT_CONFIG[label][attribute]
     if label not in user_settings or attribute not in user_settings[label]:

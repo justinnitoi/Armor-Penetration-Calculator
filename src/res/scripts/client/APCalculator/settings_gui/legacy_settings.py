@@ -22,25 +22,37 @@ def _colorSection():
             "High Pen Chance",
             "colors_high_chance",
             Colors.HIGH_CHANCE,
-            tooltip="{HEADER}High Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is high (>93%).{/BODY}",
+            tooltip=(
+                "{HEADER}High Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}"
+            ),
         ),
         templates.createColorChoice(
             "Medium Pen Chance",
             "colors_medium_chance",
             Colors.MEDIUM_CHANCE,
-            tooltip="{HEADER}Medium Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is medium.{/BODY}",
+            tooltip=(
+                "{HEADER}Medium Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is medium.{/BODY}"
+            ),
         ),
         templates.createColorChoice(
             "Low Pen Chance",
             "colors_low_chance",
             Colors.LOW_CHANCE,
-            tooltip="{HEADER}Low Pen Chance Color{/HEADER}{BODY}Color shown when penetration probability is low (<7%).{/BODY}",
+            tooltip=(
+                "{HEADER}Low Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}"
+            ),
         ),
         templates.createColorChoice(
             "Ricochet",
             "colors_ricochet",
             Colors.RICOCHET,
-            tooltip="{HEADER}Ricochet Color{/HEADER}{BODY}Color shown when the shell will ricochet.{/BODY}",
+            tooltip=(
+                "{HEADER}Ricochet Color{/HEADER}"
+                "{BODY}Color shown when the shell will ricochet.{/BODY}"
+            ),
         ),
     ]
     colorblind = [
@@ -70,7 +82,10 @@ def _colorSection():
         "Use colorblind colors",
         "colorblind_enabled",
         Colorblind.ENABLED,
-        tooltip="{HEADER}Colorblind-friendly palette{/HEADER}{BODY}Swap to a colorblind-safe color scheme, editable below.{/BODY}",
+        tooltip=(
+            "{HEADER}Colorblind-friendly palette{/HEADER}"
+            "{BODY}Swap to a colorblind-safe color scheme, editable below.{/BODY}"
+        ),
     )
 
     if hasattr(templates, "visibleWhen"):
@@ -107,7 +122,8 @@ template = {
             "prob_label_enabled",
             ProbLabelSettings.ENABLED,
             tooltip=(
-                "{HEADER}Enable Probability Label{/HEADER}{BODY}Show or hide the penetration probability label.<br><br>"
+                "{HEADER}Enable Probability Label{/HEADER}"
+                "{BODY}Show or hide the penetration probability label.<br><br>"
                 "<img src='img://gui/maps/icons/APCalculator2/full-cropped.png' width='220' height='120'>"
                 "<img src='img://gui/maps/icons/APCalculator2/no-prob-cropped.png' width='220' height='120'>"
                 "{/BODY}"
@@ -119,7 +135,8 @@ template = {
             "angle_label_enabled",
             AngleLabelSettings.ENABLED,
             tooltip=(
-                "{HEADER}Enable Angle Label{/HEADER}{BODY}Show or hide the impact angle label.<br><br>"
+                "{HEADER}Enable Angle Label{/HEADER}"
+                "{BODY}Show or hide the impact angle label.<br><br>"
                 "<img src='img://gui/maps/icons/APCalculator2/full-angle-cropped.png' width='220' height='120'>"
                 "<img src='img://gui/maps/icons/APCalculator2/no-angle-cropped.png' width='220' height='120'>"
                 "{/BODY}"
@@ -133,7 +150,11 @@ template = {
             90,
             1,
             manual=True,
-            tooltip="{HEADER}Angle Display Threshold{/HEADER}{BODY}The minimum impact angle (in degrees) at which the angle label is shown. Set to 0 to always show it.{/BODY}",
+            tooltip=(
+                "{HEADER}Angle Display Threshold{/HEADER}"
+                "{BODY}The minimum impact angle (in degrees) at which the angle "
+                "label is shown. Set to 0 to always show it.{/BODY}"
+            ),
         ),
         templates.createCheckbox(
             "Angle Color is always White",
@@ -141,7 +162,8 @@ template = {
             AngleLabelSettings.WHITE,
             tooltip=(
                 "{HEADER}Angle Color is always White{/HEADER}"
-                "{BODY}Toggle between having the angle label color always be White, or to mimic the penetration chance color.<br><br>"
+                "{BODY}Toggle between having the angle label color always be White, "
+                "or to mimic the penetration chance color.<br><br>"
                 "<img src='img://gui/maps/icons/APCalculator2/full-angle-cropped.png' width='220' height='120'>"
                 "<img src='img://gui/maps/icons/APCalculator2/angle-colored-cropped.png' width='220' height='120'>"
                 "{/BODY}"
@@ -158,7 +180,10 @@ template = {
             [""],
             0,
             button=templates.createButton(text="Discord", width=90, height=25),
-            tooltip="{HEADER}Discord Server{/HEADER}{BODY}Join the Discord for updates, bug reports, and feature requests.{/BODY}",
+            tooltip=(
+                "{HEADER}Discord Server{/HEADER}"
+                "{BODY}Join the Discord for updates, bug reports, and feature requests.{/BODY}"
+            ),
         ),
         templates.createRadioButtonGroup(
             "",
@@ -166,7 +191,11 @@ template = {
             [""],
             0,
             button=templates.createButton(text="Donate", width=90, height=25),
-            tooltip="{HEADER}Support development{/HEADER}{BODY}If the calculator's been useful, a donation helps cover the time spent maintaining and improving it.{/BODY}",
+            tooltip=(
+                "{HEADER}Support development{/HEADER}"
+                "{BODY}If the calculator's been useful, a donation helps cover the "
+                "time spent maintaining and improving it.{/BODY}"
+            ),
         ),
     ],
 }

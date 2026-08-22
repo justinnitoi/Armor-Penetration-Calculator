@@ -1,6 +1,6 @@
 from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, is_jailbreak
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 
 def safe_get_setting(category, attribute):

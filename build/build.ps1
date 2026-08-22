@@ -19,7 +19,7 @@
 
 param(
     [string]$WotRoot = "C:\Program Files\World_of_Tanks_NA",
-    [string]$Version = "2.3.1.2",
+    [string]$Version = "2.3.1.3",
     [string]$Python27 = "python27"   # must be Python 2.7 and on PATH
 )
 

@@ -3,11 +3,11 @@ from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, is_jailbreak
 VERSION = "2.0.0"
 
 
-def safe_get_setting(label, attribute):
-    default = DEFAULT_CONFIG[label][attribute]
-    if label not in user_settings or attribute not in user_settings[label]:
+def safe_get_setting(category, attribute):
+    default = DEFAULT_CONFIG[category][attribute]
+    if category not in user_settings or attribute not in user_settings[category]:
         return default
-    return user_settings[label][attribute]
+    return user_settings[category][attribute]
 
 
 def update_constants(config):
@@ -45,7 +45,7 @@ def get_ricochet_color():
         return Colorblind.RICOCHET
 
 
-def get_low_chance_color():
+def get_missed_body_color():
     if not Colorblind.ENABLED:
         return Colors.LOW_CHANCE
     else:
@@ -53,10 +53,10 @@ def get_low_chance_color():
 
 
 class Colors(object):
-    HIGH_CHANCE = safe_get_setting(label="colors", attribute="high_chance")
-    MEDIUM_CHANCE = safe_get_setting(label="colors", attribute="medium_chance")
-    LOW_CHANCE = safe_get_setting(label="colors", attribute="low_chance")
-    RICOCHET = safe_get_setting(label="colors", attribute="ricochet")
+    HIGH_CHANCE = safe_get_setting(category="colors", attribute="high_chance")
+    MEDIUM_CHANCE = safe_get_setting(category="colors", attribute="medium_chance")
+    LOW_CHANCE = safe_get_setting(category="colors", attribute="low_chance")
+    RICOCHET = safe_get_setting(category="colors", attribute="ricochet")
 
     GREEN = "6BF40D"
     ORANGE = "FFAD00"

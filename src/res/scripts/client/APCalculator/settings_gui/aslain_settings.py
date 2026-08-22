@@ -118,7 +118,7 @@ def _colorSection():
 
 
 template = {
-    "modDisplayName": "pademinune's Armor Penetration Calculator 2",
+    "modDisplayName": "pademinune's Armor Penetration Calculator {}".format(VERSION),
     "enabled": True,
     "column1": [templates.createLabel("<b>— Labels —</b>")]
     + templates.createControlsGroup(

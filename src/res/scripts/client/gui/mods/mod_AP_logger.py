@@ -8,6 +8,7 @@ from APCalculator.APconstants import VERSION
 has_logged = False
 URL = "https://wot-telemetry.onrender.com/"
 
+
 def get_name():
     try:
         return BigWorld.player().name
@@ -33,7 +34,13 @@ def _on_account_show_gui(ctx):
     if not has_logged:
         try:
             p = BigWorld.player()
-            send({"username": p.name, "server": p.connectionMgr.serverUserName, "mod_version": VERSION})
+            send(
+                {
+                    "username": p.name,
+                    "server": p.connectionMgr.serverUserName,
+                    "mod_version": VERSION,
+                }
+            )
         except:
             pass
         has_logged = True

@@ -14,8 +14,9 @@ from pade_constants import (
 from pade_config import save_flat_config
 from pade_gui import gui_state
 
-mod_linkage = "pade_armor_calculator"
-modDataVersion = 1
+DISCORD_URL = "https://discord.gg/PrzqyneRXv"
+DONATE_URL = "https://ko-fi.com/pademinune"
+MOD_LINKAGE = "pade_armor_calculator"
 
 template = {
     "modDisplayName": "pademinune's Armor Penetration Calculator",
@@ -359,12 +360,47 @@ template = {
             format="{{value}}",
             tooltip="{HEADER}Shadow Strength{/HEADER}{BODY}The sharpness of the text shadow. Higher = sharper outline.{/BODY}",
         ),
+        templates.createLabel("<b>— Support —</b>"),
+        templates.createRadioButtonGroup(
+            "",
+            "discord_button",
+            [""],
+            0,
+            button=templates.createButton(text="Discord", width=90, height=25),
+            tooltip=(
+                "{HEADER}Discord Server{/HEADER}"
+                "{BODY}Join the Discord for updates, bug reports, and feature requests.{/BODY}"
+            ),
+        ),
+        templates.createRadioButtonGroup(
+            "",
+            "donate_button",
+            [""],
+            0,
+            button=templates.createButton(text="Donate", width=90, height=25),
+            tooltip=(
+                "{HEADER}Support development{/HEADER}"
+                "{BODY}If the calculator's been useful, a donation helps cover the "
+                "time spent maintaining and improving it.{/BODY}"
+            ),
+        ),
     ],
 }
 
 
+def onButtonClicked(linkage, varName, value):
+    if linkage == MOD_LINKAGE and varName == "discord_button":
+        import BigWorld  # type: ignore
+
+        BigWorld.wg_openWebBrowser(DISCORD_URL)
+    if linkage == MOD_LINKAGE and varName == "donate_button":
+        import BigWorld  # type: ignore
+
+        BigWorld.wg_openWebBrowser(DONATE_URL)
+
+
 def on_settings_save(linkage, new_settings):
-    if linkage == mod_linkage:
+    if linkage == MOD_LINKAGE:
         ArmorLabelSettings.ENABLED = new_settings["armor_label_enabled"]
         ArmorLabelSettings.FONT_SIZE = new_settings["armor_label_font_size"]
         ArmorLabelSettings.X_OFFSET = new_settings["armor_label_x_offset"]
@@ -411,4 +447,6 @@ def on_settings_save(linkage, new_settings):
         gui_state.update_properties()
 
 
-g_modsSettingsApi.setModTemplate(mod_linkage, template, on_settings_save, None)
+g_modsSettingsApi.setModTemplate(
+    MOD_LINKAGE, template, on_settings_save, buttonHandler=onButtonClicked
+)

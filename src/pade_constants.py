@@ -1,30 +1,23 @@
 from pade_config import user_settings, DEFAULT_CONFIG, is_jailbreak
 
 
-def safe_get_color(color):
-    default = DEFAULT_CONFIG.get("colors", "808080").get(color, "808080")
-    if "colors" not in user_settings or color not in user_settings["colors"]:
+def safe_get_setting(category, attribute):
+    default = DEFAULT_CONFIG[category][attribute]
+    if category not in user_settings or attribute not in user_settings[category]:
         return default
-    return user_settings["colors"][color]
+    return user_settings[category][attribute]
 
 
-def safe_get_setting(label, attribute):
-    default = DEFAULT_CONFIG[label][attribute]
-    if label not in user_settings or attribute not in user_settings[label]:
-        return default
-    return user_settings[label][attribute]
-
-
-VERSION = "1.8.2"
+VERSION = "1.8.3"
 
 
 class Colors(object):
-    RED = safe_get_color("red_chance")
+    RED = safe_get_setting("colors", "red_chance")
     YELLOW = "FFFF00"
-    ORANGE = safe_get_color("orange_chance")
-    GREEN = safe_get_color("green_chance")
+    ORANGE = safe_get_setting("colors", "orange_chance")
+    GREEN = safe_get_setting("colors", "green_chance")
     GREY = "808080"
-    PURPLE = safe_get_color("ricochet")
+    PURPLE = safe_get_setting("colors", "ricochet")
 
     @classmethod
     def get_color_from_prob(cls, prob):

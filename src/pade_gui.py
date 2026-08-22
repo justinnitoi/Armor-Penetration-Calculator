@@ -185,7 +185,7 @@ class GunLabel(Label):
     def __init__(self, alias, settings):
         super(GunLabel, self).__init__(alias, settings)
 
-    def update_gui(self, hit_gun, color):
+    def update_gui(self, hit_gun, color):  # type: ignore
         if not hit_gun and self.visible:
             self.hide()
             return
@@ -214,7 +214,7 @@ class ImageLabel(object):
 
     def hide(self):
         if self.visible:
-            current_alias = self.state_aliases[self.current_state]
+            current_alias = self.state_aliases[self.current_state]  # type: ignore
             g_guiFlash.updateComponent(current_alias, {"visible": False})
             self.visible = False
             self.current_state = None
@@ -224,7 +224,7 @@ class ImageLabel(object):
             return
 
         if self.visible:
-            old_alias = self.state_aliases[self.current_state]
+            old_alias = self.state_aliases[self.current_state]  # type: ignore
             g_guiFlash.updateComponent(old_alias, {"visible": False})
         next_alias = self.state_aliases[next_state]
         self.current_state = next_state
@@ -239,7 +239,7 @@ class TrackLabel(ImageLabel):
     def __init__(self, settings):
         super(TrackLabel, self).__init__(settings)
 
-    def update_gui(self, color):
+    def update_gui(self, color):  # type: ignore
         if color == Colors.GREEN:
             next_state = 0
         elif color == Colors.ORANGE:

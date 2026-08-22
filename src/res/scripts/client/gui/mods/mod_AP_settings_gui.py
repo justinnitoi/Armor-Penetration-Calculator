@@ -8,7 +8,6 @@ try:
     log("Using aslain's settings api.")
 except ImportError:
     # There is no aslain settings library so we try legacy
-    log("There is no aslains settings api so we try the legacy one.")
 
     try:
         from gui.modsSettingsApi import g_modsSettingsApi, templates  # type: ignore

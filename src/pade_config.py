@@ -83,6 +83,67 @@ def read_config():
     return user_config
 
 
+def nested(flat_config):
+    nested_config = {
+        "armor_label": {
+            "enabled": flat_config["armor_label_enabled"],
+            "x_offset": flat_config["armor_label_x_offset"],
+            "y_offset": flat_config["armor_label_y_offset"],
+            "font_size": flat_config["armor_label_font_size"],
+            "label_format": flat_config["armor_label_format"],
+        },
+        "pen_label": {
+            "enabled": flat_config["pen_label_enabled"],
+            "x_offset": flat_config["pen_label_x_offset"],
+            "y_offset": flat_config["pen_label_y_offset"],
+            "font_size": flat_config["pen_label_font_size"],
+            "label_format": flat_config["pen_label_format"],
+        },
+        "angle_label": {
+            "enabled": flat_config["angle_label_enabled"],
+            "x_offset": flat_config["angle_label_x_offset"],
+            "y_offset": flat_config["angle_label_y_offset"],
+            "font_size": flat_config["angle_label_font_size"],
+            "label_format": flat_config["angle_label_format"],
+            "display_threshold": flat_config["angle_label_display_threshold"],
+        },
+        "eff_pen_label": {
+            "enabled": flat_config["eff_pen_label_enabled"],
+            "x_offset": flat_config["eff_pen_label_x_offset"],
+            "y_offset": flat_config["eff_pen_label_y_offset"],
+            "font_size": flat_config["eff_pen_label_font_size"],
+            "label_format": flat_config["eff_pen_label_format"],
+        },
+        "kill_label": {
+            "enabled": flat_config["kill_label_enabled"],
+            "x_offset": flat_config["kill_label_x_offset"],
+            "y_offset": flat_config["kill_label_y_offset"],
+            "font_size": flat_config["kill_label_font_size"],
+            "label_format": flat_config["kill_label_format"],
+        },
+        "gun_label": {
+            "enabled": flat_config["gun_label_enabled"],
+            "x_offset": flat_config["gun_label_x_offset"],
+            "y_offset": flat_config["gun_label_y_offset"],
+            "font_size": flat_config["gun_label_font_size"],
+            "label_format": flat_config["gun_label_format"],
+        },
+        "colors": {
+            "green_chance": flat_config["color_green"],
+            "orange_chance": flat_config["color_orange"],
+            "red_chance": flat_config["color_red"],
+            "ricochet": flat_config["color_ricochet"],
+        },
+        "shadow": {
+            "shadow_color": flat_config["shadow_color"],
+            "shadow_alpha": flat_config["shadow_alpha"],
+            "shadow_length": flat_config["shadow_length"],
+            "shadow_strength": flat_config["shadow_strength"],
+        },
+    }
+    return nested_config
+
+
 LEGACY_LABEL_FORMAT_FIELDS = {
     "armor_label": "armor",
     "pen_label": "prob",
@@ -126,67 +187,11 @@ def migrate_config(user_config):
     return user_config
 
 
-def save_flat_config(settings):
-    config = {
-        "armor_label": {
-            "enabled": settings["armor_label_enabled"],
-            "x_offset": settings["armor_label_x_offset"],
-            "y_offset": settings["armor_label_y_offset"],
-            "font_size": settings["armor_label_font_size"],
-            "label_format": settings["armor_label_format"],
-        },
-        "pen_label": {
-            "enabled": settings["pen_label_enabled"],
-            "x_offset": settings["pen_label_x_offset"],
-            "y_offset": settings["pen_label_y_offset"],
-            "font_size": settings["pen_label_font_size"],
-            "label_format": settings["pen_label_format"],
-        },
-        "angle_label": {
-            "enabled": settings["angle_label_enabled"],
-            "x_offset": settings["angle_label_x_offset"],
-            "y_offset": settings["angle_label_y_offset"],
-            "font_size": settings["angle_label_font_size"],
-            "label_format": settings["angle_label_format"],
-            "display_threshold": settings["angle_label_display_threshold"],
-        },
-        "eff_pen_label": {
-            "enabled": settings["eff_pen_label_enabled"],
-            "x_offset": settings["eff_pen_label_x_offset"],
-            "y_offset": settings["eff_pen_label_y_offset"],
-            "font_size": settings["eff_pen_label_font_size"],
-            "label_format": settings["eff_pen_label_format"],
-        },
-        "kill_label": {
-            "enabled": settings["kill_label_enabled"],
-            "x_offset": settings["kill_label_x_offset"],
-            "y_offset": settings["kill_label_y_offset"],
-            "font_size": settings["kill_label_font_size"],
-            "label_format": settings["kill_label_format"],
-        },
-        "gun_label": {
-            "enabled": settings["gun_label_enabled"],
-            "x_offset": settings["gun_label_x_offset"],
-            "y_offset": settings["gun_label_y_offset"],
-            "font_size": settings["gun_label_font_size"],
-            "label_format": settings["gun_label_format"],
-        },
-        "colors": {
-            "green_chance": settings["color_green"],
-            "orange_chance": settings["color_orange"],
-            "red_chance": settings["color_red"],
-            "ricochet": settings["color_ricochet"],
-        },
-        "shadow": {
-            "shadow_color": settings["shadow_color"],
-            "shadow_alpha": settings["shadow_alpha"],
-            "shadow_length": settings["shadow_length"],
-            "shadow_strength": settings["shadow_strength"],
-        },
-    }
+def save_flat_config(flat_config):
+    nested_config = nested(flat_config)
 
     with open(CONFIG_PATH, "w") as f:
-        json.dump(config, f, indent=4)
+        json.dump(nested_config, f, indent=4)
 
 
 if not os.path.isfile(CONFIG_PATH):

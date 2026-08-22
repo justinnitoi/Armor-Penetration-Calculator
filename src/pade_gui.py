@@ -8,13 +8,10 @@ from pade_constants import (
     ShadowSettings,
     GunLabelSettings,
     TrackLabelSettings,
+    log,
 )
 from gambiter import g_guiFlash  # type: ignore
 from gambiter.flash import COMPONENT_TYPE, COMPONENT_ALIGN  # type: ignore
-
-
-def log(message):
-    print("pademinune's Gui: " + str(message))
 
 
 ARMOR_ALIAS = "pademinune_ArmorLabel"
@@ -260,7 +257,7 @@ def _build_glowfilter():
     }
 
 
-log("Starting creation of armor and penetration gui components")
+log("Starting creation of gui components")
 
 
 gui_state = GuiState()

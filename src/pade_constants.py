@@ -53,6 +53,10 @@ def safe_get_setting(category, attribute):
 VERSION = "1.8.3"
 
 
+def log(message):
+    print("[AP Calculator {}] {}".format(VERSION, message))
+
+
 class Colors(object):
     RED = safe_get_setting("colors", "red_chance")
     YELLOW = "FFFF00"

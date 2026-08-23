@@ -7,11 +7,12 @@ from APCalculator.APconstants import (
     get_missed_body_color,
     get_ricochet_color,
 )
-from APCalculator.APBattleView import update_gameface
+from APCalculator.APBattleView import update_gameface, open_window, close_window
 
 
 class GuiState(object):
     def __init__(self):
+        self.enabled = True
         self.armor_label = ArmorLabel(ArmorLabelSettings)
         self.prob_label = ProbLabel(ProbLabelSettings)
         self.angle_label = AngleLabel(AngleLabelSettings)
@@ -32,6 +33,17 @@ class GuiState(object):
             if label.visible:
                 label.hide()
 
+    def destroy_window(self):
+        """Clears cache, stops cache updates, and destroys the gameface window."""
+        self.hide_all()
+        self.enabled = False
+        close_window()
+
+    def create_window(self):
+        """Creates a new gameface window and resumes cache updates"""
+        open_window()
+        self.enabled = True
+
     def update_gui(
         self,
         armor_value,
@@ -41,6 +53,10 @@ class GuiState(object):
         angle,
     ):
         """Assumes all arguments passed are booleans or integers"""
+        if not self.enabled:
+            # Don't make any updates to gui or cache
+            return
+        
         if ricochet:
             # shell ricochet
             color = get_ricochet_color()

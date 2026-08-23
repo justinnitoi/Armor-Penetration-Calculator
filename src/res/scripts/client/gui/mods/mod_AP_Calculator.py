@@ -6,13 +6,13 @@ from AvatarInputHandler import AvatarInputHandler  # type: ignore
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
+from gui.shared import EVENT_BUS_SCOPE, events, g_eventBus  # type: ignore
 from APCalculator.debug import log
 
 log("Mod core has started loading.")
 
 from APCalculator.APconstants import VERSION
 from APCalculator.APgui import gui_state
-
 
 def get_gaussian_probability(avg_pen, armor_val):
     min_pen = avg_pen * 0.75
@@ -444,9 +444,28 @@ def my_get_shot_result(cls, gunMarker, excludeTeam=0, piercingMultiplier=1):
     return result
 
 
+def on_tab_menu_event(event):
+    """Debug logging for the TAB stats screen appearing/disappearing."""
+    ctx = event.ctx or {}
+    is_shown = ctx.get("isDown", None)
+
+    if is_shown is True:
+        # log("Tab menu appeared. ctx=%s" % ctx)
+        gui_state.destroy_window()
+    elif is_shown is False:
+        # log("Tab menu disappeared. ctx=%s" % ctx)
+        gui_state.create_window()
+    else:
+        log("Tab menu event fired. ctx=%s" % ctx)
+
+
 def on_load_match():
     """Called when the player spawns into a map."""
     gui_state.hide_all()
+
+    g_eventBus.addListener(
+        events.GameEvent.FULL_STATS, on_tab_menu_event, scope=EVENT_BUS_SCOPE.BATTLE
+    )
 
     # log("New match detected: Resetting GUI.")
 
@@ -454,6 +473,10 @@ def on_load_match():
 def on_leave_match():
     """Called when the player leaves a match"""
     gui_state.hide_all()
+
+    g_eventBus.removeListener(
+        events.GameEvent.FULL_STATS, on_tab_menu_event, scope=EVENT_BUS_SCOPE.BATTLE
+    )
 
     # log('Player has left the match. Resetting GUI.')
 

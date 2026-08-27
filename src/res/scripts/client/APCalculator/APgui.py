@@ -12,7 +12,7 @@ from APCalculator.APBattleView import update_gameface, open_window, close_window
 
 class GuiState(object):
     def __init__(self):
-        self.enabled = True
+        self.enabled = False
         self.armor_label = ArmorLabel(ArmorLabelSettings)
         self.prob_label = ProbLabel(ProbLabelSettings)
         self.angle_label = AngleLabel(AngleLabelSettings)
@@ -56,7 +56,7 @@ class GuiState(object):
         if not self.enabled:
             # Don't make any updates to gui or cache
             return
-        
+
         if ricochet:
             # shell ricochet
             color = get_ricochet_color()

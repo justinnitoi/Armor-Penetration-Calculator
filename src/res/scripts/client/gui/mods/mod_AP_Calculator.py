@@ -6,13 +6,13 @@ from AvatarInputHandler import AvatarInputHandler  # type: ignore
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
-from gui.shared import EVENT_BUS_SCOPE, events, g_eventBus  # type: ignore
 from APCalculator.debug import log
 
 log("Mod core has started loading.")
 
 from APCalculator.APconstants import VERSION
 from APCalculator.APgui import gui_state
+
 
 def get_gaussian_probability(avg_pen, armor_val):
     min_pen = avg_pen * 0.75
@@ -444,41 +444,14 @@ def my_get_shot_result(cls, gunMarker, excludeTeam=0, piercingMultiplier=1):
     return result
 
 
-def on_tab_menu_event(event):
-    """Debug logging for the TAB stats screen appearing/disappearing."""
-    ctx = event.ctx or {}
-    is_shown = ctx.get("isDown", None)
-
-    if is_shown is True:
-        # log("Tab menu appeared. ctx=%s" % ctx)
-        gui_state.destroy_window()
-    elif is_shown is False:
-        # log("Tab menu disappeared. ctx=%s" % ctx)
-        gui_state.create_window()
-    else:
-        log("Tab menu event fired. ctx=%s" % ctx)
+def on_load_match(*args, **kwargs):
+    """Called when tank is created"""
+    gui_state.create_window()
 
 
-def on_load_match():
-    """Called when the player spawns into a map."""
-    gui_state.hide_all()
-
-    g_eventBus.addListener(
-        events.GameEvent.FULL_STATS, on_tab_menu_event, scope=EVENT_BUS_SCOPE.BATTLE
-    )
-
-    # log("New match detected: Resetting GUI.")
-
-
-def on_leave_match():
+def on_leave_match(*args, **kwargs):
     """Called when the player leaves a match"""
-    gui_state.hide_all()
-
-    g_eventBus.removeListener(
-        events.GameEvent.FULL_STATS, on_tab_menu_event, scope=EVENT_BUS_SCOPE.BATTLE
-    )
-
-    # log('Player has left the match. Resetting GUI.')
+    gui_state.destroy_window()
 
 
 original_activate_postmortem = AvatarInputHandler.activatePostmortem
@@ -487,9 +460,7 @@ original_activate_postmortem = AvatarInputHandler.activatePostmortem
 def my_activate_postmortem(self, *args, **kwargs):
     """Called when your vehicle is destroyed"""
     original_activate_postmortem(self, *args, **kwargs)
-
     gui_state.hide_all()
-    # log('Player is dead. Hiding GUI.')
 
 
 # overriding source code functions
@@ -507,8 +478,8 @@ gun_marker_ctrl._CrosshairShotResults._CrosshairShotResults__shotResultModernHE 
     classmethod(my_shot_result_modern_he)
 )
 
-# Called only once at the start of every match when loading in
-g_playerEvents.onAvatarBecomePlayer += on_load_match
+# Called when tank is created
+g_playerEvents.onAvatarReady += on_load_match
 
 # Called once when the player leaves a match
 g_playerEvents.onAvatarBecomeNonPlayer += on_leave_match

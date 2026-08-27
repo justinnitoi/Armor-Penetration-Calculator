@@ -130,7 +130,7 @@ class APBattleWindow(WindowImpl):
 
     def __init__(self, content, x=0, y=0):
         super(APBattleWindow, self).__init__(
-            WindowFlags.WINDOW, content=content, layer=WindowLayer.WINDOW
+            WindowFlags.WINDOW, content=content, layer=WindowLayer.HIDDEN_SERVICE_LAYOUT
         )
         self._x = x
         self._y = y
@@ -268,18 +268,3 @@ def _on_avatar_teardown(*args, **kwargs):
         close_window()
     except Exception:
         LOG_CURRENT_EXCEPTION()
-
-
-def _install():
-    import openwg_gameface  # type: ignore
-    from PlayerEvents import g_playerEvents  # type: ignore
-
-    # Global arena hooks: persist across battles, unlike per-battle controllers.
-    g_playerEvents.onAvatarReady += _on_avatar_ready
-    g_playerEvents.onAvatarBecomeNonPlayer += _on_avatar_teardown
-
-
-try:
-    _install()
-except Exception:
-    LOG_CURRENT_EXCEPTION()

@@ -25,8 +25,8 @@ def _colorSection():
             "colors_high_chance",
             Colors.HIGH_CHANCE,
             tooltip=(
-                "{HEADER}High Pen Chance Color{/HEADER}",
-                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}",
+                "{HEADER}High Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}"
             ),
         ),
         templates.createColorChoice(
@@ -34,8 +34,8 @@ def _colorSection():
             "colors_medium_chance",
             Colors.MEDIUM_CHANCE,
             tooltip=(
-                "{HEADER}Medium Pen Chance Color{/HEADER}",
-                "{BODY}Color shown when penetration probability is medium.{/BODY}",
+                "{HEADER}Medium Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is medium.{/BODY}"
             ),
         ),
         templates.createColorChoice(
@@ -43,8 +43,8 @@ def _colorSection():
             "colors_low_chance",
             Colors.LOW_CHANCE,
             tooltip=(
-                "{HEADER}Low Pen Chance Color{/HEADER}",
-                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}",
+                "{HEADER}Low Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}"
             ),
         ),
         templates.createColorChoice(
@@ -52,8 +52,8 @@ def _colorSection():
             "colors_ricochet",
             Colors.RICOCHET,
             tooltip=(
-                "{HEADER}Ricochet Color{/HEADER}",
-                "{BODY}Color shown when the shell will ricochet.{/BODY}",
+                "{HEADER}Ricochet Color{/HEADER}"
+                "{BODY}Color shown when the shell will ricochet.{/BODY}"
             ),
         ),
     ]
@@ -63,8 +63,8 @@ def _colorSection():
             "colorblind_high_chance",
             Colorblind.HIGH_CHANCE,
             tooltip=(
-                "{HEADER}High Pen Chance Color{/HEADER}",
-                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}",
+                "{HEADER}High Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}"
             ),
         ),
         templates.createColorChoice(
@@ -72,8 +72,8 @@ def _colorSection():
             "colorblind_medium_chance",
             Colorblind.MEDIUM_CHANCE,
             tooltip=(
-                "{HEADER}Medium Pen Chance Color{/HEADER}",
-                "{BODY}Color shown when penetration probability is medium.{/BODY}",
+                "{HEADER}Medium Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is medium.{/BODY}"
             ),
         ),
         templates.createColorChoice(
@@ -81,8 +81,8 @@ def _colorSection():
             "colorblind_low_chance",
             Colorblind.LOW_CHANCE,
             tooltip=(
-                "{HEADER}Low Pen Chance Color{/HEADER}",
-                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}",
+                "{HEADER}Low Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}"
             ),
         ),
         templates.createColorChoice(
@@ -90,8 +90,8 @@ def _colorSection():
             "colorblind_ricochet",
             Colorblind.RICOCHET,
             tooltip=(
-                "{HEADER}Ricochet Color{/HEADER}",
-                "{BODY}Color shown when the shell will ricochet.{/BODY}",
+                "{HEADER}Ricochet Color{/HEADER}"
+                "{BODY}Color shown when the shell will ricochet.{/BODY}"
             ),
         ),
     ]
@@ -101,8 +101,8 @@ def _colorSection():
         "colorblind_enabled",
         Colorblind.ENABLED,
         tooltip=(
-            "{HEADER}Colorblind-friendly palette{/HEADER}",
-            "{BODY}Swap to a colorblind-safe color scheme, editable below.{/BODY}",
+            "{HEADER}Colorblind-friendly palette{/HEADER}"
+            "{BODY}Swap to a colorblind-safe color scheme, editable below.{/BODY}"
         ),
     )
 
@@ -172,9 +172,9 @@ template = {
                 1,
                 manual=True,
                 tooltip=(
-                    "{HEADER}Angle Display Threshold{/HEADER}",
-                    "{BODY}The minimum impact angle (in degrees) at which the angle label is shown.",
-                    " Set to 0 to always show it.{/BODY}",
+                    "{HEADER}Angle Display Threshold{/HEADER}"
+                    "{BODY}The minimum impact angle (in degrees) at which the angle label is shown."
+                    " Set to 0 to always show it.{/BODY}"
                 ),
             ),
             templates.createCheckbox(
@@ -183,11 +183,11 @@ template = {
                 AngleLabelSettings.WHITE,
                 tooltip=(
                     "{HEADER}Angle Color is always White{/HEADER}"
-                    "{BODY}Toggle between having the angle label color always be White,",
-                    " or to mimic the penetration chance color.<br><br>",
+                    "{BODY}Toggle between having the angle label color always be White,"
+                    " or to mimic the penetration chance color.<br><br>"
                     "<img src='img://gui/maps/icons/APCalculator2/full-angle-cropped.png' width='220' height='120'>"
                     "<img src='img://gui/maps/icons/APCalculator2/angle-colored-cropped.png' width='220' height='120'>"
-                    "{/BODY}",
+                    "{/BODY}"
                 ),
             ),
         ],

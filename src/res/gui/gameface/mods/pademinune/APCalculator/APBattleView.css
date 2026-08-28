@@ -55,6 +55,34 @@ html, body {
     font-size: 16px;
 }
 
+/* design-time reference mark for the screen center -- not part of the shipped mod */
+#design-guide-dot {
+    position: absolute;
+    top: 128px;   /* body's vertical center for a 256x256 box */
+    left: 128px;  /* body's horizontal center */
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
+    z-index: 2;
+}
+
+/* real indicator: appears over the crosshair while a weak-spot track is targeted */
+#track-indicator {
+    position: absolute;
+    top: 128px;
+    left: 128px;
+    transform: translate(-50%, -50%);
+    width: 10px;   /* leaves a 4px gap on each side of the 4px design-guide-dot */
+    height: 10px;
+    border: 2px solid #6BF40D;
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+    z-index: 2;
+}
+
 #label-bg {
     position: absolute;
     top: 167px;   /* body's vertical center for a 256x256 box */

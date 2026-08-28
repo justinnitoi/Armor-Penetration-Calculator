@@ -13,6 +13,10 @@ log("Mod core has started loading.")
 from APCalculator.APconstants import VERSION
 from APCalculator.APgui import gui_state
 
+# 12 / sqrt(2) rationalized to 6 * sqrt(2) -- folds the z-score's "* 12"
+# with the erf normalization's "/ sqrt(2)"
+_SIX_SQRT_2 = 6.0 * math.sqrt(2.0)
+
 
 def get_gaussian_probability(avg_pen, armor_val):
     min_pen = avg_pen * 0.75
@@ -23,17 +27,13 @@ def get_gaussian_probability(avg_pen, armor_val):
     if armor_val >= max_pen:
         return 0.0
 
-    # 12 * (armor_val - avg_pen) / (avg_pen)
-    # If 25% is the 3-sigma point:
-    # avg_pen * 0.25 = 3 SD.
-    standard_deviation = avg_pen / 12
-
-    # z-score
-    z = (armor_val - avg_pen) / standard_deviation
+    # z-score / sqrt(2), i.e. 12 * (armor_val - avg_pen) / (avg_pen * sqrt(2))
+    # If 25% is the 3-sigma point: avg_pen * 0.25 = 3 SD, so SD = avg_pen / 12.
+    z_arg = _SIX_SQRT_2 * (armor_val - avg_pen) / avg_pen
 
     # Cumulative Distribution Function (CDF)
     # P(pen < armor)
-    phi = 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
+    phi = 0.5 * (1.0 + math.erf(z_arg))
 
     # get area to the right P(pen > armor)
     prob = (1.0 - phi) * 100

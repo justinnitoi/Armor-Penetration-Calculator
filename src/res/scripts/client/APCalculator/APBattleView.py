@@ -37,7 +37,7 @@ class APBattleVM(ViewModel):
     this stack -- see setVisible for the bool->string encoding."""
 
     def __init__(self):
-        super(APBattleVM, self).__init__(properties=9, commands=0)
+        super(APBattleVM, self).__init__(properties=10, commands=0)
 
     def _initialize(self):
         super(APBattleVM, self)._initialize()
@@ -52,6 +52,8 @@ class APBattleVM(ViewModel):
         self._addStringProperty("angleText", "")  # index 6
         self._addBoolProperty("angleVisible", False)  # 7
         self._addStringProperty("angleColor", "000000")  # 8
+
+        self._addBoolProperty("trackVisible", False)  # 9
 
     def setArmor(self, text, visible, color):
         self._setString(0, text)
@@ -94,6 +96,9 @@ class APBattleVM(ViewModel):
 
     def setAngleColor(self, color):
         self._setString(8, color)
+
+    def setTrackVisible(self, visible):
+        self._setBool(9, visible)
 
 
 # --- the page + the window it lives in -----------------------------------------
@@ -168,6 +173,7 @@ def update_gameface(
     angle_text=None,
     angle_visible=None,
     angle_color=None,
+    track_visible=None,
 ):
     """Public API: call from anywhere (e.g. the armor-pen calc mod) to redraw
     the label with fresh values. No-op if the window isn't open."""
@@ -185,6 +191,7 @@ def update_gameface(
         angle_text,
         angle_visible,
         angle_color,
+        track_visible,
     )
 
 
@@ -199,6 +206,7 @@ def push(
     angle_text=None,
     angle_visible=None,
     angle_color=None,
+    track_visible=None,
 ):
     """Write the label's fields into view_model."""
     if view_model is None:
@@ -224,6 +232,9 @@ def push(
             tx.setAngleVisible(angle_visible)
         if angle_color is not None:
             tx.setAngleColor(angle_color)
+
+        if track_visible is not None:
+            tx.setTrackVisible(track_visible)
 
 
 # --- open/close, tied to the battle lifecycle ------------------------------------

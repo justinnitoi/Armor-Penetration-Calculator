@@ -65,6 +65,7 @@ def call_update_gui(
         ricochet,
         hit_body,
         int(angle),
+        hit_track,
     )
 
 

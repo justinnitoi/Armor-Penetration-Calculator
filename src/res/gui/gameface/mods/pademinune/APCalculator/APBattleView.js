@@ -13,6 +13,7 @@ const armorEl = document.getElementById("armor-label");
 const probEl = document.getElementById("prob-label");
 const angleEl = document.getElementById("angle-label");
 const bgEl = document.getElementById("label-bg");
+const trackEl = document.getElementById("track-indicator");
 
 
 // display:"" defers to the CSS default (shown), "none" drops it from layout
@@ -32,6 +33,7 @@ function render(model) {
         armorEl.style.display = "none";
         probEl.style.display = "none";
         angleEl.style.display = "none";
+        trackEl.style.display = "none";
         return;
     }
 
@@ -42,6 +44,8 @@ function render(model) {
     renderRow(armorEl, model.armorText, armorVisible, model.armorColor);
     renderRow(probEl, model.probText, probVisible, model.probColor);
     renderRow(angleEl, model.angleText, angleVisible, model.angleColor);
+
+    trackEl.style.display = model.trackVisible ? "" : "none";
 
     // Background box tracks whichever row is visible; borrows armor's color
     // (falling back through prob/angle) since it no longer has its own.

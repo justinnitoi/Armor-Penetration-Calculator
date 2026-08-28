@@ -16,6 +16,7 @@ class GuiState(object):
         self.armor_label = ArmorLabel(ArmorLabelSettings)
         self.prob_label = ProbLabel(ProbLabelSettings)
         self.angle_label = AngleLabel(AngleLabelSettings)
+        self.track_indicator = TrackIndicator()
         self.labels = [
             self.armor_label,
             self.prob_label,
@@ -26,12 +27,16 @@ class GuiState(object):
         for label in self.labels:
             if label.visible:
                 return True
-        return False
+        return self.track_indicator.visible
 
-    def hide_all(self):
+    def hide_labels(self):
         for label in self.labels:
             if label.visible:
                 label.hide()
+
+    def hide_all(self):
+        self.hide_labels()
+        self.track_indicator.hide()
 
     def destroy_window(self):
         """Clears cache, stops cache updates, and destroys the gameface window."""
@@ -51,11 +56,17 @@ class GuiState(object):
         ricochet,
         hit_body,
         angle,
+        hit_track,
     ):
         """Assumes all arguments passed are booleans or integers"""
         if not self.enabled:
             # Don't make any updates to gui or cache
             return
+
+        if hit_track:
+            self.track_indicator.show()
+        else:
+            self.track_indicator.hide()
 
         if ricochet:
             # shell ricochet
@@ -68,7 +79,7 @@ class GuiState(object):
                 self.angle_label.update_gui(angle, color)
         elif not hit_body:
             # shell only hits spaced armor or tracks
-            self.hide_all()
+            self.hide_labels()
         else:
             color = get_color_from_prob(prob)
             if self.armor_label.settings.ENABLED:
@@ -159,6 +170,21 @@ class AngleLabel(object):
         interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
         update_gameface(angle_text=interior_text, angle_visible=True, angle_color=color)
+
+
+class TrackIndicator(object):
+    def __init__(self):
+        self.visible = False
+
+    def show(self):
+        if not self.visible:
+            self.visible = True
+            update_gameface(track_visible=True)
+
+    def hide(self):
+        if self.visible:
+            self.visible = False
+            update_gameface(track_visible=False)
 
 
 gui_state = GuiState()

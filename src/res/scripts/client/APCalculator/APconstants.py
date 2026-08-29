@@ -109,3 +109,7 @@ class AngleLabelSettings:
     FORMAT = "{value}°"
     DISPLAY_THRESHOLD = safe_get_setting("angle_label", "display_threshold")
     WHITE = safe_get_setting("angle_label", "white")
+
+
+class TrackIndicatorSettings:
+    ENABLED = True

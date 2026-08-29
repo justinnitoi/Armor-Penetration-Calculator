@@ -3,6 +3,7 @@ from APCalculator.APconstants import (
     ArmorLabelSettings,
     ProbLabelSettings,
     AngleLabelSettings,
+    TrackIndicatorSettings,
     get_color_from_prob,
     get_missed_body_color,
     get_ricochet_color,
@@ -63,11 +64,6 @@ class GuiState(object):
             # Don't make any updates to gui or cache
             return
 
-        if hit_track:
-            self.track_indicator.show()
-        else:
-            self.track_indicator.hide()
-
         if ricochet:
             # shell ricochet
             color = get_ricochet_color()
@@ -88,6 +84,13 @@ class GuiState(object):
                 self.prob_label.update_gui(prob, color)
             if self.angle_label.settings.ENABLED:
                 self.angle_label.update_gui(angle, color)
+
+            if TrackIndicatorSettings.ENABLED:
+                if hit_track and color == Colors.HIGH_CHANCE:
+                    # hit track and green pen chance
+                    self.track_indicator.show()
+                else:
+                    self.track_indicator.hide()
 
 
 class ArmorLabel(object):

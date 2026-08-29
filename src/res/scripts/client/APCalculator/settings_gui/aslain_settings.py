@@ -10,6 +10,7 @@ from APCalculator.APconstants import (
 )
 from APCalculator.APconfig import (
     save_config,
+    update_global_settings,
     DEFAULT_CONFIG,
 )
 from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE, VERSION
@@ -224,9 +225,9 @@ def onButtonClicked(linkage, varName, value):
 
 def on_settings_save(linkage, new_settings):
     if linkage == MOD_LINKAGE:
-        update_constants(new_settings)
-        save_config(new_settings)
-
+        update_global_settings(new_settings)
+        update_constants()
+        save_config()
 
 
 if hasattr(g_modsSettingsApi, "setModDefaults"):

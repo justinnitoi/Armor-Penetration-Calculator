@@ -8,9 +8,7 @@ from APCalculator.APconstants import (
     Colorblind,
     update_constants,
 )
-from APCalculator.APconfig import (
-    save_config,
-)
+from APCalculator.APconfig import save_config, update_global_settings
 from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE, VERSION
 
 
@@ -228,8 +226,9 @@ def onButtonClicked(linkage, varName, value):
 
 def on_settings_save(linkage, new_settings):
     if linkage == MOD_LINKAGE:
-        update_constants(new_settings)
-        save_config(new_settings)
+        update_global_settings(new_settings)
+        update_constants()
+        save_config()
 
 
 g_modsSettingsApi.setModTemplate(

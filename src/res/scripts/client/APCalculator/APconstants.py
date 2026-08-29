@@ -10,7 +10,9 @@ def safe_get_setting(config, category, attribute):
     return setting
 
 
-def update_constants(config):
+def update_constants():
+    """Updates constants from g_user_settings"""
+    config = g_user_settings
     ArmorLabelSettings.ENABLED = safe_get_setting(config, "armor_label", "enabled")
 
     ProbLabelSettings.ENABLED = safe_get_setting(config, "prob_label", "enabled")
@@ -116,4 +118,6 @@ class AngleLabelSettings:
 
 
 class TrackIndicatorSettings:
-    ENABLED = JAILBROKEN
+    ENABLED = JAILBROKEN or safe_get_setting(
+        g_user_settings, "track_indicator", "enabled"
+    )

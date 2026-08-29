@@ -9,8 +9,6 @@ from APCalculator.APconstants import (
     update_constants,
 )
 from APCalculator.APconfig import (
-    nested,
-    flattened,
     save_config,
     DEFAULT_CONFIG,
 )
@@ -21,7 +19,7 @@ def _colorSection():
     normal = [
         templates.createColorChoice(
             "High Pen Chance",
-            "colors_high_chance",
+            "colors.high_chance",
             Colors.HIGH_CHANCE,
             tooltip=(
                 "{HEADER}High Pen Chance Color{/HEADER}"
@@ -30,7 +28,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Medium Pen Chance",
-            "colors_medium_chance",
+            "colors.medium_chance",
             Colors.MEDIUM_CHANCE,
             tooltip=(
                 "{HEADER}Medium Pen Chance Color{/HEADER}"
@@ -39,7 +37,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Low Pen Chance",
-            "colors_low_chance",
+            "colors.low_chance",
             Colors.LOW_CHANCE,
             tooltip=(
                 "{HEADER}Low Pen Chance Color{/HEADER}"
@@ -48,7 +46,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Ricochet",
-            "colors_ricochet",
+            "colors.ricochet",
             Colors.RICOCHET,
             tooltip=(
                 "{HEADER}Ricochet Color{/HEADER}"
@@ -59,7 +57,7 @@ def _colorSection():
     colorblind = [
         templates.createColorChoice(
             "High Pen Chance",
-            "colorblind_high_chance",
+            "colorblind.high_chance",
             Colorblind.HIGH_CHANCE,
             tooltip=(
                 "{HEADER}High Pen Chance Color{/HEADER}"
@@ -68,7 +66,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Medium Pen Chance",
-            "colorblind_medium_chance",
+            "colorblind.medium_chance",
             Colorblind.MEDIUM_CHANCE,
             tooltip=(
                 "{HEADER}Medium Pen Chance Color{/HEADER}"
@@ -77,7 +75,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Low Pen Chance",
-            "colorblind_low_chance",
+            "colorblind.low_chance",
             Colorblind.LOW_CHANCE,
             tooltip=(
                 "{HEADER}Low Pen Chance Color{/HEADER}"
@@ -86,7 +84,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Ricochet",
-            "colorblind_ricochet",
+            "colorblind.ricochet",
             Colorblind.RICOCHET,
             tooltip=(
                 "{HEADER}Ricochet Color{/HEADER}"
@@ -97,7 +95,7 @@ def _colorSection():
 
     toggle = templates.createCheckbox(
         "Use colorblind colors",
-        "colorblind_enabled",
+        "colorblind.enabled",
         Colorblind.ENABLED,
         tooltip=(
             "{HEADER}Colorblind-friendly palette{/HEADER}"
@@ -106,9 +104,9 @@ def _colorSection():
     )
 
     if hasattr(templates, "visibleWhen"):
-        normal = [templates.visibleWhen(c, "colorblind_enabled", False) for c in normal]
+        normal = [templates.visibleWhen(c, "colorblind.enabled", False) for c in normal]
         colorblind = [
-            templates.visibleWhen(c, "colorblind_enabled", True) for c in colorblind
+            templates.visibleWhen(c, "colorblind.enabled", True) for c in colorblind
         ]
     # On older API builds without visibleWhen, both sets just show plainly
     # (no gating) — still functional, just not tidy. Acceptable fallback.
@@ -123,7 +121,7 @@ template = {
     + templates.createControlsGroup(
         templates.createCheckbox(
             "Enable Armor Label",
-            "armor_label_enabled",
+            "armor_label.enabled",
             ArmorLabelSettings.ENABLED,
             tooltip=(
                 "{HEADER}Enable Armor Label{/HEADER}"
@@ -138,7 +136,7 @@ template = {
     + templates.createControlsGroup(
         templates.createCheckbox(
             "Enable Probability Label",
-            "prob_label_enabled",
+            "prob_label.enabled",
             ProbLabelSettings.ENABLED,
             tooltip=(
                 "{HEADER}Enable Probability Label{/HEADER}{BODY}Show or hide the penetration probability label.<br><br>"
@@ -152,7 +150,7 @@ template = {
     + templates.createControlsGroup(
         templates.createCheckbox(
             "Enable Angle Label",
-            "angle_label_enabled",
+            "angle_label.enabled",
             AngleLabelSettings.ENABLED,
             tooltip=(
                 "{HEADER}Enable Angle Label{/HEADER}{BODY}Show or hide the impact angle label.<br><br>"
@@ -164,7 +162,7 @@ template = {
         [
             templates.createNumericStepper(
                 "Angle Display Threshold",
-                "angle_label_display_threshold",
+                "angle_label.display_threshold",
                 AngleLabelSettings.DISPLAY_THRESHOLD,
                 0,
                 90,
@@ -178,7 +176,7 @@ template = {
             ),
             templates.createCheckbox(
                 "Angle Color is always White",
-                "angle_label_white",
+                "angle_label.always_white",
                 AngleLabelSettings.WHITE,
                 tooltip=(
                     "{HEADER}Angle Color is always White{/HEADER}"
@@ -226,14 +224,13 @@ def onButtonClicked(linkage, varName, value):
 
 def on_settings_save(linkage, new_settings):
     if linkage == MOD_LINKAGE:
-        nested_config = nested(new_settings)
-        update_constants(nested_config)
-        save_config(nested_config)
+        update_constants(new_settings)
+        save_config(new_settings)
+
 
 
 if hasattr(g_modsSettingsApi, "setModDefaults"):
-    flattened_default = flattened(DEFAULT_CONFIG)
-    g_modsSettingsApi.setModDefaults(MOD_LINKAGE, flattened_default)
+    g_modsSettingsApi.setModDefaults(MOD_LINKAGE, DEFAULT_CONFIG)
 
 g_modsSettingsApi.setModTemplate(
     MOD_LINKAGE, template, on_settings_save, buttonHandler=onButtonClicked

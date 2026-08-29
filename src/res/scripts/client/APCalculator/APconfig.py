@@ -2,38 +2,29 @@ import json
 import os
 from APCalculator.debug import log
 
-
 DEFAULT_CONFIG = {
-    "armor_label": {
-        "enabled": True,
-    },
-    "prob_label": {
-        "enabled": True,
-    },
-    "angle_label": {
-        "enabled": True,
-        "display_threshold": 70,
-        "white": True,
-    },
-    "colors": {
-        "high_chance": "6BF40D",
-        "medium_chance": "FFAD00",
-        "low_chance": "E90000",
-        "ricochet": "800080",
-    },
-    "colorblind": {
-        "enabled": False,
-        "high_chance": "EFEB05",
-        "medium_chance": "FF8AFF",
-        "low_chance": "9D00FF",
-        "ricochet": "9D00FF",
-    },
+    "armor_label.enabled": True,
+    "prob_label.enabled": True,
+    "angle_label.enabled": True,  # angle label
+    "angle_label.display_threshold": 70,
+    "angle_label.always_white": True,
+    "colors.high_chance": "6BF40D",  # colors
+    "colors.medium_chance": "FFAD00",
+    "colors.low_chance": "E90000",
+    "colors.ricochet": "800080",
+    "colorblind.enabled": False,  # colorblind
+    "colorblind.high_chance": "EFEB05",
+    "colorblind.medium_chance": "FF8AFF",
+    "colorblind.low_chance": "9D00FF",
+    "colorblind.ricochet": "9D00FF",
+    "track_indicator.enabled": False,
 }
+
 
 CONFIG_FOLDER = os.path.join(
     "mods", "configs", "pademinune", "Armor Penetration Calculator 2"
 )
-CONFIG_PATH = os.path.join(CONFIG_FOLDER, "AP-Calculator-2.json")
+CONFIG_PATH = os.path.join(CONFIG_FOLDER, "AP_Calculator-2.1.0+.json")
 JAILBREAK_FLAG_PATH = os.path.join(CONFIG_FOLDER, ".jailbreak")
 
 
@@ -43,79 +34,39 @@ def is_jailbreak():
 
 
 def save_config(config):
+    """Saves only the non-default settings"""
+    non_defaults = {}
+    for key, value in config.items():
+        if key in DEFAULT_CONFIG and DEFAULT_CONFIG[key] != value:  # check that its not default
+            non_defaults[key] = value
+
     if not os.path.exists(CONFIG_FOLDER):
         os.makedirs(CONFIG_FOLDER)
 
     with open(CONFIG_PATH, "w") as fp:
-        json.dump(config, fp, indent=4)
+        json.dump(non_defaults, fp, indent=4)
 
 
 def load_config():
     with open(CONFIG_PATH) as file:
-        user_config = json.load(file)
+        non_defaults = json.load(file)
+
+    user_config = DEFAULT_CONFIG
+
+    for key, value in non_defaults.items():
+        if type(DEFAULT_CONFIG[key]) != type(value):
+            raise TypeError("Key: {} does not have the expected type.".format(key))
+        user_config[key] = value
 
     return user_config
-
-
-def flattened(config):
-    """Takes a nested config and returns the flattened version of it."""
-    flattened = {}
-    for key, val in config.items():
-        for subkey, subval in val.items():
-            flattened["{}_{}".format(key, subkey)] = subval
-    return flattened
-
-
-def nested(flat_config):
-    """Takes a flat config and returns the nested version of it"""
-    config = {
-        "armor_label": {
-            "enabled": flat_config["armor_label_enabled"],
-        },
-        "prob_label": {
-            "enabled": flat_config["prob_label_enabled"],
-        },
-        "angle_label": {
-            "enabled": flat_config["angle_label_enabled"],
-            "display_threshold": flat_config["angle_label_display_threshold"],
-            "white": flat_config["angle_label_white"],
-        },
-        "colors": {
-            "high_chance": flat_config["colors_high_chance"],
-            "medium_chance": flat_config["colors_medium_chance"],
-            "low_chance": flat_config["colors_low_chance"],
-            "ricochet": flat_config["colors_ricochet"],
-        },
-        "colorblind": {
-            "enabled": flat_config["colorblind_enabled"],
-            "high_chance": flat_config["colorblind_high_chance"],
-            "medium_chance": flat_config["colorblind_medium_chance"],
-            "low_chance": flat_config["colorblind_low_chance"],
-            "ricochet": flat_config["colorblind_ricochet"],
-        },
-    }
-    return config
-
-
-def save_flat_config(flat_config):
-    """Takes a flat config and saves it as a nested config to the drive"""
-    config = nested(flat_config)
-    save_config(config)
-
-
-if not os.path.isfile(CONFIG_PATH):
-    save_config(DEFAULT_CONFIG)
 
 
 JAILBROKEN = is_jailbreak()
 if JAILBROKEN:
     log("Mod is jailbroken.")
 try:
-    user_settings = load_config()
+    g_user_settings = load_config()
 except:
     # if the config is invalid, reset it
     save_config(DEFAULT_CONFIG)
-    user_settings = load_config()
-
-if __name__ == "__main__":
-    print(json.dumps(flattened(DEFAULT_CONFIG), indent=4))
+    g_user_settings = load_config()

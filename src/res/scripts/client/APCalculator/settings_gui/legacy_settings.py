@@ -9,7 +9,6 @@ from APCalculator.APconstants import (
     update_constants,
 )
 from APCalculator.APconfig import (
-    nested,
     save_config,
 )
 from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE, VERSION
@@ -19,7 +18,7 @@ def _colorSection():
     normal = [
         templates.createColorChoice(
             "High Pen Chance",
-            "colors_high_chance",
+            "colors.high_chance",
             Colors.HIGH_CHANCE,
             tooltip=(
                 "{HEADER}High Pen Chance Color{/HEADER}"
@@ -28,7 +27,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Medium Pen Chance",
-            "colors_medium_chance",
+            "colors.medium_chance",
             Colors.MEDIUM_CHANCE,
             tooltip=(
                 "{HEADER}Medium Pen Chance Color{/HEADER}"
@@ -37,7 +36,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Low Pen Chance",
-            "colors_low_chance",
+            "colors.low_chance",
             Colors.LOW_CHANCE,
             tooltip=(
                 "{HEADER}Low Pen Chance Color{/HEADER}"
@@ -46,7 +45,7 @@ def _colorSection():
         ),
         templates.createColorChoice(
             "Ricochet",
-            "colors_ricochet",
+            "colors.ricochet",
             Colors.RICOCHET,
             tooltip=(
                 "{HEADER}Ricochet Color{/HEADER}"
@@ -56,30 +55,46 @@ def _colorSection():
     ]
     colorblind = [
         templates.createColorChoice(
-            "Colorblind High Pen Chance",
-            "colorblind_high_chance",
+            "High Pen Chance",
+            "colorblind.high_chance",
             Colorblind.HIGH_CHANCE,
+            tooltip=(
+                "{HEADER}High Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}"
+            ),
         ),
         templates.createColorChoice(
-            "Colorblind Medium Pen Chance",
-            "colorblind_medium_chance",
+            "Medium Pen Chance",
+            "colorblind.medium_chance",
             Colorblind.MEDIUM_CHANCE,
+            tooltip=(
+                "{HEADER}Medium Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is medium.{/BODY}"
+            ),
         ),
         templates.createColorChoice(
-            "Colorblind Low Pen Chance",
-            "colorblind_low_chance",
+            "Low Pen Chance",
+            "colorblind.low_chance",
             Colorblind.LOW_CHANCE,
+            tooltip=(
+                "{HEADER}Low Pen Chance Color{/HEADER}"
+                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}"
+            ),
         ),
         templates.createColorChoice(
-            "Colorblind Ricochet",
-            "colorblind_ricochet",
+            "Ricochet",
+            "colorblind.ricochet",
             Colorblind.RICOCHET,
+            tooltip=(
+                "{HEADER}Ricochet Color{/HEADER}"
+                "{BODY}Color shown when the shell will ricochet.{/BODY}"
+            ),
         ),
     ]
 
     toggle = templates.createCheckbox(
         "Use colorblind colors",
-        "colorblind_enabled",
+        "colorblind.enabled",
         Colorblind.ENABLED,
         tooltip=(
             "{HEADER}Colorblind-friendly palette{/HEADER}"
@@ -88,9 +103,9 @@ def _colorSection():
     )
 
     if hasattr(templates, "visibleWhen"):
-        normal = [templates.visibleWhen(c, "colorblind_enabled", False) for c in normal]
+        normal = [templates.visibleWhen(c, "colorblind.enabled", False) for c in normal]
         colorblind = [
-            templates.visibleWhen(c, "colorblind_enabled", True) for c in colorblind
+            templates.visibleWhen(c, "colorblind.enabled", True) for c in colorblind
         ]
     # On older API builds without visibleWhen, both sets just show plainly
     # (no gating) — still functional, just not tidy. Acceptable fallback.
@@ -213,9 +228,8 @@ def onButtonClicked(linkage, varName, value):
 
 def on_settings_save(linkage, new_settings):
     if linkage == MOD_LINKAGE:
-        nested_config = nested(new_settings)
-        update_constants(nested_config)
-        save_config(nested_config)
+        update_constants(new_settings)
+        save_config(new_settings)
 
 
 g_modsSettingsApi.setModTemplate(

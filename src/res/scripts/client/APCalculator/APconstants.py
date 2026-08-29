@@ -1,32 +1,36 @@
-from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, JAILBROKEN
+from APCalculator.APconfig import g_user_settings, DEFAULT_CONFIG, JAILBROKEN
 
 
-def safe_get_setting(category, attribute):
-    default = DEFAULT_CONFIG[category][attribute]
-    if category not in user_settings or attribute not in user_settings[category]:
-        return default
-    return user_settings[category][attribute]
+def safe_get_setting(config, category, attribute):
+    key = "{}.{}".format(category, attribute)
+    try:
+        setting = config[key]
+    except KeyError:  # take the default
+        setting = DEFAULT_CONFIG[key]
+    return setting
 
 
 def update_constants(config):
-    ArmorLabelSettings.ENABLED = config["armor_label"]["enabled"]
+    ArmorLabelSettings.ENABLED = safe_get_setting(config, "armor_label", "enabled")
 
-    ProbLabelSettings.ENABLED = config["prob_label"]["enabled"]
+    ProbLabelSettings.ENABLED = safe_get_setting(config, "prob_label", "enabled")
 
-    AngleLabelSettings.ENABLED = config["angle_label"]["enabled"]
-    AngleLabelSettings.DISPLAY_THRESHOLD = config["angle_label"]["display_threshold"]
-    AngleLabelSettings.WHITE = config["angle_label"]["white"]
+    AngleLabelSettings.ENABLED = safe_get_setting(config, "angle_label", "enabled")
+    AngleLabelSettings.DISPLAY_THRESHOLD = safe_get_setting(
+        config, "angle_label", "display_threshold"
+    )
+    AngleLabelSettings.WHITE = safe_get_setting(config, "angle_label", "always_white")
 
-    Colors.HIGH_CHANCE = config["colors"]["high_chance"]
-    Colors.MEDIUM_CHANCE = config["colors"]["medium_chance"]
-    Colors.LOW_CHANCE = config["colors"]["low_chance"]
-    Colors.RICOCHET = config["colors"]["ricochet"]
+    Colors.HIGH_CHANCE = safe_get_setting(config, "colors", "high_chance")
+    Colors.MEDIUM_CHANCE = safe_get_setting(config, "colors", "medium_chance")
+    Colors.LOW_CHANCE = safe_get_setting(config, "colors", "low_chance")
+    Colors.RICOCHET = safe_get_setting(config, "colors", "ricochet")
 
-    Colorblind.ENABLED = config["colorblind"]["enabled"]
-    Colorblind.HIGH_CHANCE = config["colorblind"]["high_chance"]
-    Colorblind.MEDIUM_CHANCE = config["colorblind"]["medium_chance"]
-    Colorblind.LOW_CHANCE = config["colorblind"]["low_chance"]
-    Colorblind.RICOCHET = config["colorblind"]["ricochet"]
+    Colorblind.ENABLED = safe_get_setting(config, "colorblind", "enabled")
+    Colorblind.HIGH_CHANCE = safe_get_setting(config, "colorblind", "high_chance")
+    Colorblind.MEDIUM_CHANCE = safe_get_setting(config, "colorblind", "medium_chance")
+    Colorblind.LOW_CHANCE = safe_get_setting(config, "colorblind", "low_chance")
+    Colorblind.RICOCHET = safe_get_setting(config, "colorblind", "ricochet")
 
 
 def get_color_from_prob(prob):
@@ -51,10 +55,10 @@ def get_missed_body_color():
 
 
 class Colors(object):
-    HIGH_CHANCE = safe_get_setting(category="colors", attribute="high_chance")
-    MEDIUM_CHANCE = safe_get_setting(category="colors", attribute="medium_chance")
-    LOW_CHANCE = safe_get_setting(category="colors", attribute="low_chance")
-    RICOCHET = safe_get_setting(category="colors", attribute="ricochet")
+    HIGH_CHANCE = safe_get_setting(g_user_settings, "colors", "high_chance")
+    MEDIUM_CHANCE = safe_get_setting(g_user_settings, "colors", "medium_chance")
+    LOW_CHANCE = safe_get_setting(g_user_settings, "colors", "low_chance")
+    RICOCHET = safe_get_setting(g_user_settings, "colors", "ricochet")
 
     GREEN = "6BF40D"
     ORANGE = "FFAD00"
@@ -76,11 +80,11 @@ class Colors(object):
 
 
 class Colorblind(object):
-    ENABLED = safe_get_setting("colorblind", "enabled")
-    HIGH_CHANCE = safe_get_setting("colorblind", "high_chance")
-    MEDIUM_CHANCE = safe_get_setting("colorblind", "medium_chance")
-    LOW_CHANCE = safe_get_setting("colorblind", "low_chance")
-    RICOCHET = safe_get_setting("colorblind", "ricochet")
+    ENABLED = safe_get_setting(g_user_settings, "colorblind", "enabled")
+    HIGH_CHANCE = safe_get_setting(g_user_settings, "colorblind", "high_chance")
+    MEDIUM_CHANCE = safe_get_setting(g_user_settings, "colorblind", "medium_chance")
+    LOW_CHANCE = safe_get_setting(g_user_settings, "colorblind", "low_chance")
+    RICOCHET = safe_get_setting(g_user_settings, "colorblind", "ricochet")
 
     @classmethod
     def get_color_from_prob(cls, prob):
@@ -93,20 +97,22 @@ class Colorblind(object):
 
 
 class ArmorLabelSettings:
-    ENABLED = safe_get_setting("armor_label", "enabled")
+    ENABLED = safe_get_setting(g_user_settings, "armor_label", "enabled")
     FORMAT = "{value}"
 
 
 class ProbLabelSettings:
-    ENABLED = safe_get_setting("prob_label", "enabled")
+    ENABLED = safe_get_setting(g_user_settings, "prob_label", "enabled")
     FORMAT = "{value}%"
 
 
 class AngleLabelSettings:
-    ENABLED = safe_get_setting("angle_label", "enabled")
+    ENABLED = safe_get_setting(g_user_settings, "angle_label", "enabled")
     FORMAT = "{value}°"
-    DISPLAY_THRESHOLD = safe_get_setting("angle_label", "display_threshold")
-    WHITE = safe_get_setting("angle_label", "white")
+    DISPLAY_THRESHOLD = safe_get_setting(
+        g_user_settings, "angle_label", "display_threshold"
+    )
+    WHITE = safe_get_setting(g_user_settings, "angle_label", "always_white")
 
 
 class TrackIndicatorSettings:

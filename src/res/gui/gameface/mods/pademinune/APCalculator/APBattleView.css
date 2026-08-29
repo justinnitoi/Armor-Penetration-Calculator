@@ -69,16 +69,16 @@ html, body {
     z-index: 2;
 }
 
-/* real indicator: appears over the crosshair while a weak-spot track is targeted */
+/* real indicator: appears near the crosshair while a weak-spot track is targeted */
 #track-indicator {
     position: absolute;
-    top: 128px;
-    left: 128px;
+    top: 165px;   /* 128px center + 10px down */
+    left: 100px;  /* 128px center + 10px right */
     transform: translate(-50%, -50%);
-    width: 16px;   /* leaves a 4px gap on each side of the 4px design-guide-dot */
-    height: 16px;
-    border: 2px solid #CCFF66;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
+    background: #6BF40D;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
     z-index: 2;
 }

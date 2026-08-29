@@ -75,6 +75,7 @@ class GuiState(object):
                 self.angle_label.update_gui(angle, color)
         elif not hit_body:
             # shell only hits spaced armor or tracks
+            color = Colors.LOW_CHANCE
             self.hide_labels()
         else:
             color = get_color_from_prob(prob)
@@ -85,12 +86,12 @@ class GuiState(object):
             if self.angle_label.settings.ENABLED:
                 self.angle_label.update_gui(angle, color)
 
-            if TrackIndicatorSettings.ENABLED:
-                if hit_track and color == Colors.HIGH_CHANCE:
-                    # hit track and green pen chance
-                    self.track_indicator.show()
-                else:
-                    self.track_indicator.hide()
+        if TrackIndicatorSettings.ENABLED:
+            if hit_track and color == Colors.HIGH_CHANCE:
+                # hit track and green pen chance
+                self.track_indicator.show()
+            else:
+                self.track_indicator.hide()
 
 
 class ArmorLabel(object):

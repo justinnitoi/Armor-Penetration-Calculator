@@ -6,14 +6,13 @@ from APCalculator.APconstants import (
     AngleLabelSettings,
     Colors,
     Colorblind,
-    VERSION,
     update_constants,
 )
 from APCalculator.APconfig import (
     nested,
     save_config,
 )
-from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE
+from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE, VERSION
 
 
 def _colorSection():

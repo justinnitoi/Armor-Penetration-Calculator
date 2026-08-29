@@ -1,5 +1,7 @@
 import json
 import os
+from APCalculator.debug import log
+
 
 DEFAULT_CONFIG = {
     "armor_label": {
@@ -36,6 +38,7 @@ JAILBREAK_FLAG_PATH = os.path.join(CONFIG_FOLDER, ".jailbreak")
 
 
 def is_jailbreak():
+    """Returns true iff a `.jailbreak` file is in the config location"""
     return os.path.isfile(JAILBREAK_FLAG_PATH)
 
 
@@ -103,6 +106,10 @@ def save_flat_config(flat_config):
 if not os.path.isfile(CONFIG_PATH):
     save_config(DEFAULT_CONFIG)
 
+
+JAILBROKEN = is_jailbreak()
+if JAILBROKEN:
+    log("Mod is jailbroken.")
 try:
     user_settings = load_config()
 except:

@@ -1,6 +1,4 @@
-from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, is_jailbreak
-
-VERSION = "2.1.0"
+from APCalculator.APconfig import user_settings, DEFAULT_CONFIG, JAILBROKEN
 
 
 def safe_get_setting(category, attribute):
@@ -112,4 +110,4 @@ class AngleLabelSettings:
 
 
 class TrackIndicatorSettings:
-    ENABLED = True
+    ENABLED = JAILBROKEN

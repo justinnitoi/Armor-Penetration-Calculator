@@ -1,9 +1,8 @@
-# type: ignore
-import urllib2
+import urllib2 # type: ignore
 import json
-import BigWorld
-from PlayerEvents import g_playerEvents
-from APCalculator.APconstants import VERSION
+import BigWorld # type: ignore
+from PlayerEvents import g_playerEvents # type: ignore
+from APCalculator.debug import VERSION
 
 has_logged = False
 URL = "https://wot-telemetry.onrender.com/"

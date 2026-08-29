@@ -6,11 +6,10 @@ from AvatarInputHandler import AvatarInputHandler  # type: ignore
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
-from APCalculator.debug import log
+from APCalculator.debug import log, VERSION
 
 log("Mod core has started loading.")
 
-from APCalculator.APconstants import VERSION
 from APCalculator.APgui import gui_state
 
 # 12 / sqrt(2) rationalized to 6 * sqrt(2) -- folds the z-score's "* 12"

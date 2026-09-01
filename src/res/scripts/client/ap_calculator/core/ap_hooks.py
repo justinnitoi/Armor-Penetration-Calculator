@@ -100,7 +100,6 @@ def my_shot_result_default(
                     0, piercingPower * (1 - lossByDist)
                 )  # max ensures no negative penetration dropoffs (when models overlap)
                 total_armor_val += lost_pen
-                # log("heat dropoff: {}mm".format(lost_pen))
 
                 piercingPower *= lossByDist
                 minPiercingPower = round(minPiercingPower * lossByDist)

@@ -1,6 +1,7 @@
 import json
 import os
-from APCalculator.debug import log
+
+from ap_calculator.debug import log
 
 DEFAULT_CONFIG = {
     "armor_label.enabled": True,

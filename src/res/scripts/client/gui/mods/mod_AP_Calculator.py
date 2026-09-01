@@ -1,16 +1,19 @@
 import math
-from AvatarInputHandler import gun_marker_ctrl  # type: ignore
+
 from aih_constants import SHOT_RESULT as _SHOT_RESULT  # type: ignore
-from PlayerEvents import g_playerEvents  # type: ignore
-from AvatarInputHandler import AvatarInputHandler  # type: ignore
+from ap_calculator.debug import VERSION, log
+from AvatarInputHandler import (  # type: ignore
+    AvatarInputHandler,
+    gun_marker_ctrl,
+)
 from items.components.component_constants import (  # type: ignore
     MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
 )
-from APCalculator.debug import log, VERSION
+from PlayerEvents import g_playerEvents  # type: ignore
 
 log("Mod core has started loading.")
 
-from APCalculator.APgui import gui_state
+from ap_calculator.ap_gui import gui_state
 
 # 12 / sqrt(2) rationalized to 6 * sqrt(2) -- folds the z-score's "* 12"
 # with the erf normalization's "/ sqrt(2)"
@@ -465,26 +468,33 @@ def my_activate_postmortem(self, *args, **kwargs):
 
 # overriding source code functions
 
-# Called whenever reticle is visible
-gun_marker_ctrl._CrosshairShotResults.getShotResult = classmethod(my_get_shot_result)
 
-# Called only when looking at an enemy tank with non HE shell
-gun_marker_ctrl._CrosshairShotResults._CrosshairShotResults__shotResultDefault = (
-    classmethod(my_shot_result_default)
-)
+def init():
+    # Called whenever reticle is visible
+    gun_marker_ctrl._CrosshairShotResults.getShotResult = classmethod(
+        my_get_shot_result
+    )
 
-# Called only when looking at an enemy tank with modern HE shell
-gun_marker_ctrl._CrosshairShotResults._CrosshairShotResults__shotResultModernHE = (
-    classmethod(my_shot_result_modern_he)
-)
+    # Called only when looking at an enemy tank with non HE shell
+    gun_marker_ctrl._CrosshairShotResults._CrosshairShotResults__shotResultDefault = (
+        classmethod(my_shot_result_default)
+    )
 
-# Called when tank is created
-g_playerEvents.onAvatarReady += on_load_match
+    # Called only when looking at an enemy tank with modern HE shell
+    gun_marker_ctrl._CrosshairShotResults._CrosshairShotResults__shotResultModernHE = (
+        classmethod(my_shot_result_modern_he)
+    )
 
-# Called once when the player leaves a match
-g_playerEvents.onAvatarBecomeNonPlayer += on_leave_match
+    # Called when tank is created
+    g_playerEvents.onAvatarReady += on_load_match
 
-# Called when your tank is destroyed
-AvatarInputHandler.activatePostmortem = my_activate_postmortem
+    # Called once when the player leaves a match
+    g_playerEvents.onAvatarBecomeNonPlayer += on_leave_match
 
-log("Mod core has finished loading.")
+    # Called when your tank is destroyed
+    AvatarInputHandler.activatePostmortem = my_activate_postmortem
+
+    log("Mod core has finished loading.")
+
+
+init()

@@ -27,12 +27,12 @@ $ErrorActionPreference = "Stop"
 $SourceRoot = Join-Path $PSScriptRoot "..\src"
 
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
-$PyAPCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\APCalculator"
+$PyApCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\ap_calculator"
 $WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
 $IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
 
 $PyDestDir             = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
-$PyAPCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\APCalculator"
+$PyApCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\ap_calculator"
 $WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
 $IconsDestDir          = Join-Path $WotRoot "res_mods\$Version\gui\maps\icons\APCalculator2"
 $ResMapDestDir         = Join-Path $WotRoot "mods\configs\res_map"
@@ -98,8 +98,8 @@ foreach ($module in $PyModules) {
     Remove-IfExists (Join-Path $PyDestDir $pycName) $pycName
 }
 
-Write-Host "Removing compiled APCalculator package ..."
-Remove-CompiledPyDir $PyAPCalculatorSrcDir $PyAPCalculatorDestDir
+Write-Host "Removing compiled ap_calculator package ..."
+Remove-CompiledPyDir $PyApCalculatorSrcDir $PyApCalculatorDestDir
 
 # --- 2. remove the Gameface web assets ------------------------------------------------
 Write-Host "Removing gameface assets ..."

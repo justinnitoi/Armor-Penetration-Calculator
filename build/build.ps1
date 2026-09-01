@@ -2,7 +2,7 @@
   build.ps1
 
   Compiles every *.py under res\scripts\client\gui\mods and
-  res\scripts\client\APCalculator with Python 2.7 (bytecode is version-locked
+  res\scripts\client\ap_calculator with Python 2.7 (bytecode is version-locked
   -- the WoT client cannot load Python 3 bytecode) and deploys pademinune's
   Armor Penetration Calculator as LOOSE res_mods override files, plus the
   Gameface web assets, settings-tooltip icons, and res_map registration.
@@ -29,13 +29,13 @@ $ErrorActionPreference = "Stop"
 $SourceRoot = Join-Path $PSScriptRoot "..\src"
 
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
-$PyAPCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\APCalculator"
+$PyApCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\ap_calculator"
 $WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
 $IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
 $ResMapSrc            = Join-Path $SourceRoot "res\mods\configs\res_map\APBattleView.json"
 
 $PyDestDir             = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
-$PyAPCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\APCalculator"
+$PyApCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\ap_calculator"
 $WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
 $IconsDestDir          = Join-Path $WotRoot "res_mods\$Version\gui\maps\icons\APCalculator2"
 $ResMapDestDir         = Join-Path $WotRoot "mods\configs\res_map"
@@ -120,7 +120,7 @@ if (-not $isAdmin) {
 
 # --- 1. compile every Python module -------------------------------------------------
 Invoke-PyCompile $PyModsSrcDir $PyDestDir
-Invoke-PyCompile $PyAPCalculatorSrcDir $PyAPCalculatorDestDir
+Invoke-PyCompile $PyApCalculatorSrcDir $PyApCalculatorDestDir
 
 # --- 2. copy the Gameface web assets ------------------------------------------------
 Write-Host "Copying gameface assets ..."

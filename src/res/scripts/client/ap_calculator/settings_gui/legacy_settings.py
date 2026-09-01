@@ -1,14 +1,15 @@
 from gui.modsSettingsApi import g_modsSettingsApi, templates  # type: ignore
 
-from APCalculator.APconstants import (
-    ArmorLabelSettings,
-    ProbLabelSettings,
+from ap_calculator.ap_config import save_config, update_global_settings
+from ap_calculator.ap_constants import (
     AngleLabelSettings,
-    Colors,
+    ArmorLabelSettings,
     Colorblind,
+    Colors,
+    ProbLabelSettings,
     update_constants,
 )
-from APCalculator.APconfig import save_config, update_global_settings
+
 from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE, VERSION
 
 

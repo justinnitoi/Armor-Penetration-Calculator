@@ -1,18 +1,12 @@
-import urllib2  # type: ignore
 import json
+
 import BigWorld  # type: ignore
+import urllib2  # type: ignore
+from ap_calculator.debug import VERSION
 from PlayerEvents import g_playerEvents  # type: ignore
-from APCalculator.debug import VERSION
 
 has_logged = False
 URL = "https://wot-telemetry.onrender.com/"
-
-
-def get_name():
-    try:
-        return BigWorld.player().name
-    except:
-        return "Name Error"
 
 
 def send(payload):
@@ -24,8 +18,8 @@ def send(payload):
             headers={"Content-Type": "application/json"},
         )
         urllib2.urlopen(req, timeout=5).read()
-    except Exception:
-        pass
+    except:
+        print("Ran into exception when trying to send payload.")
 
 
 def _on_account_show_gui(ctx):
@@ -40,9 +34,9 @@ def _on_account_show_gui(ctx):
                     "mod_version": VERSION,
                 }
             )
+            has_logged = True
         except:
-            pass
-        has_logged = True
+            print("Ran into exception when trying to get payload information.")
 
 
 def init():

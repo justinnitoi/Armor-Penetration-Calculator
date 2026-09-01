@@ -9,14 +9,13 @@ Python 2.7 (BigWorld) runtime. OpenWG GameFace is a hard dependency.
 """
 
 from debug_utils import LOG_CURRENT_EXCEPTION  # type: ignore
-
 from frameworks.wulf import (  # type: ignore
+    PositionAnchor,
+    ViewFlags,
     ViewModel,
     ViewSettings,
-    ViewFlags,
     WindowFlags,
     WindowLayer,
-    PositionAnchor,
 )
 from gui.impl.pub import ViewImpl, WindowImpl  # type: ignore
 from openwg_gameface import ModDynAccessor  # type: ignore

@@ -1,14 +1,14 @@
-from APCalculator.APconstants import (
-    Colors,
-    ArmorLabelSettings,
-    ProbLabelSettings,
+from ap_calculator.ap_constants import (
     AngleLabelSettings,
+    ArmorLabelSettings,
+    Colors,
+    ProbLabelSettings,
     TrackIndicatorSettings,
     get_color_from_prob,
     get_missed_body_color,
     get_ricochet_color,
 )
-from APCalculator.APBattleView import update_gameface, open_window, close_window
+from ap_calculator.ap_gameface_api import close_window, open_window, update_gameface
 
 
 class GuiState(object):
@@ -75,7 +75,7 @@ class GuiState(object):
                 self.angle_label.update_gui(angle, color)
         elif not hit_body:
             # shell only hits spaced armor or tracks
-            color = Colors.LOW_CHANCE
+            color = get_missed_body_color()
             self.hide_labels()
         else:
             color = get_color_from_prob(prob)

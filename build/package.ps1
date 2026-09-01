@@ -2,7 +2,7 @@
   package.ps1
 
   Compiles every *.py under src\res\scripts\client\gui\mods and
-  src\res\scripts\client\APCalculator with Python 2.7 -- the same compile step
+  src\res\scripts\client\ap_calculator with Python 2.7 -- the same compile step
   build.ps1 uses -- then stages the result plus the Gameface web assets, the
   settings-tooltip icons, the res_map registration, and meta.xml under bin\,
   and zips it all into a .wotmod package (ZIP_STORED, meta.xml at the archive
@@ -35,14 +35,14 @@ $ResDir     = Join-Path $StageDir "res"
 $OutDir     = Join-Path $BinDir "wotmods"
 
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
-$PyAPCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\APCalculator"
+$PyApCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\ap_calculator"
 $WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
 $IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
 $ResMapSrc            = Join-Path $SourceRoot "res\mods\configs\res_map\APBattleView.json"
 $MetaSrc              = Join-Path $SourceRoot "meta.xml"
 
 $PyModsDestDir         = Join-Path $ResDir "scripts\client\gui\mods"
-$PyAPCalculatorDestDir = Join-Path $ResDir "scripts\client\APCalculator"
+$PyApCalculatorDestDir = Join-Path $ResDir "scripts\client\ap_calculator"
 $WebDestDir            = Join-Path $ResDir "gui\gameface\mods\pademinune\APCalculator"
 $IconsDestDir          = Join-Path $ResDir "gui\maps\icons\APCalculator2"
 $ResMapDestDir         = Join-Path $ResDir "mods\configs\res_map"
@@ -100,7 +100,7 @@ Ensure-Dir $OutDir
 
 # --- 1. compile every Python module -------------------------------------------------
 Invoke-PyCompile $PyModsSrcDir $PyModsDestDir
-Invoke-PyCompile $PyAPCalculatorSrcDir $PyAPCalculatorDestDir
+Invoke-PyCompile $PyApCalculatorSrcDir $PyApCalculatorDestDir
 
 # --- 2. copy the Gameface web assets ------------------------------------------------
 Write-Host "Copying gameface assets ..."

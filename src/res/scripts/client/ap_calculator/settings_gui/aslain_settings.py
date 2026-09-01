@@ -1,18 +1,19 @@
 from gui.aslainMenu import g_modsSettingsApi, templates  # type: ignore
 
-from APCalculator.APconstants import (
-    ArmorLabelSettings,
-    ProbLabelSettings,
-    AngleLabelSettings,
-    Colors,
-    Colorblind,
-    update_constants,
-)
-from APCalculator.APconfig import (
+from ap_calculator.ap_config import (
+    DEFAULT_CONFIG,
     save_config,
     update_global_settings,
-    DEFAULT_CONFIG,
 )
+from ap_calculator.ap_constants import (
+    AngleLabelSettings,
+    ArmorLabelSettings,
+    Colorblind,
+    Colors,
+    ProbLabelSettings,
+    update_constants,
+)
+
 from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE, VERSION
 
 

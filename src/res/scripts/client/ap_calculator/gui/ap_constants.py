@@ -1,4 +1,4 @@
-from ap_calculator.ap_config import DEFAULT_CONFIG, JAILBROKEN, g_user_settings
+from ap_calculator.gui.ap_config import DEFAULT_CONFIG, JAILBROKEN, g_user_settings
 
 
 def safe_get_setting(config, category, attribute):

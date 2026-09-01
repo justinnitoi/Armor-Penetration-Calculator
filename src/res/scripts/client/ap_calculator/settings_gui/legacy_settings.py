@@ -1,7 +1,7 @@
 from gui.modsSettingsApi import g_modsSettingsApi, templates  # type: ignore
 
-from ap_calculator.ap_config import save_config, update_global_settings
-from ap_calculator.ap_constants import (
+from ap_calculator.gui.ap_config import save_config, update_global_settings
+from ap_calculator.gui.ap_constants import (
     AngleLabelSettings,
     ArmorLabelSettings,
     Colorblind,

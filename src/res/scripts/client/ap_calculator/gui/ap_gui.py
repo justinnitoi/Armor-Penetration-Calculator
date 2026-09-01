@@ -1,4 +1,4 @@
-from ap_calculator.ap_constants import (
+from ap_calculator.gui.ap_constants import (
     AngleLabelSettings,
     ArmorLabelSettings,
     Colors,
@@ -8,7 +8,11 @@ from ap_calculator.ap_constants import (
     get_missed_body_color,
     get_ricochet_color,
 )
-from ap_calculator.ap_gameface_api import close_window, open_window, update_gameface
+from ap_calculator.gui.ap_gameface_api import (
+    close_window,
+    open_window,
+    update_gameface,
+)
 
 
 class GuiState(object):

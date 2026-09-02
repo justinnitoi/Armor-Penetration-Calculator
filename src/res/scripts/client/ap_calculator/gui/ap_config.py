@@ -4,6 +4,7 @@ import os
 from ap_calculator.debug import log
 
 DEFAULT_CONFIG = {
+    "enabled": True,
     "armor_label.enabled": True,
     "prob_label.enabled": True,
     "angle_label.enabled": True,  # angle label

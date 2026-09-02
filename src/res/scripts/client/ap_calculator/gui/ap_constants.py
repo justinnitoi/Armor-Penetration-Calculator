@@ -13,6 +13,9 @@ def safe_get_setting(config, category, attribute):
 def update_constants():
     """Updates constants from g_user_settings"""
     config = g_user_settings
+
+    GlobalSettings.MOD_ENABLED = config.get("enabled", True)
+
     ArmorLabelSettings.ENABLED = safe_get_setting(config, "armor_label", "enabled")
 
     ProbLabelSettings.ENABLED = safe_get_setting(config, "prob_label", "enabled")
@@ -33,6 +36,10 @@ def update_constants():
     Colorblind.MEDIUM_CHANCE = safe_get_setting(config, "colorblind", "medium_chance")
     Colorblind.LOW_CHANCE = safe_get_setting(config, "colorblind", "low_chance")
     Colorblind.RICOCHET = safe_get_setting(config, "colorblind", "ricochet")
+
+
+class GlobalSettings:
+    MOD_ENABLED = g_user_settings.get("enabled", True)
 
 
 def get_color_from_prob(prob):

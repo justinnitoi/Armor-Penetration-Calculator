@@ -1,4 +1,5 @@
 from ap_calculator.gui.ap_constants import (
+    GlobalSettings,
     AngleLabelSettings,
     ArmorLabelSettings,
     Colors,
@@ -64,7 +65,7 @@ class GuiState(object):
         hit_track,
     ):
         """Assumes all arguments passed are booleans or integers"""
-        if not self.enabled:
+        if not self.enabled or not GlobalSettings.MOD_ENABLED:
             # Don't make any updates to gui or cache
             return
 

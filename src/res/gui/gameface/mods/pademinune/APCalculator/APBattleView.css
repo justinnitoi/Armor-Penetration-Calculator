@@ -69,19 +69,34 @@ html, body {
     z-index: 2;
 }
 
-/* real indicator: appears near the crosshair while a weak-spot track is targeted */
+/* real indicator: a square bracket (just its 4 corner dots) around the crosshair
+   while a weak-spot track is targeted */
 #track-indicator {
     position: absolute;
-    top: 165px;   /* 128px center + 10px down */
-    left: 100px;  /* 128px center + 10px right */
+    top: 128px;   /* body's vertical center for a 256x256 box */
+    left: 128px;  /* body's horizontal center */
     transform: translate(-50%, -50%);
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #6BF40D;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+    width: 20px;
+    height: 20px;
     z-index: 2;
 }
+
+/* four independent dots -- kept as plain elements (not ::before/box-shadow
+   clones) since this engine's CSS support is limited and dropped the
+   pseudo-element approach's real dot instead of just its shadow clones */
+.track-dot {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #CCFF66;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+.track-dot-tl { top: 0; left: 0; }
+.track-dot-tr { top: 0; right: 0; }
+.track-dot-bl { bottom: 0; left: 0; }
+.track-dot-br { bottom: 0; right: 0; }
 
 #label-bg {
     position: absolute;

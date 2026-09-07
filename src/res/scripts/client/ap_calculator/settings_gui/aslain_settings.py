@@ -112,7 +112,11 @@ def _colorSection():
         tooltip=(
             "{HEADER}Gradient penetration colors{/HEADER}"
             "{BODY}Smoothly fade the penetration chance color between the low, "
-            "medium, and high colors instead of switching between them abruptly.{/BODY}"
+            "medium, and high colors instead of switching between them abruptly.<br><br>"
+            "<img src='img://gui/maps/icons/APCalculator2/gradient-high.png' width='220' height='120'>"
+            "<img src='img://gui/maps/icons/APCalculator2/gradient-medium.png' width='220' height='120'>"
+            "<img src='img://gui/maps/icons/APCalculator2/gradient-low.png' width='220' height='120'>"
+            "{/BODY}"
         ),
     )
 

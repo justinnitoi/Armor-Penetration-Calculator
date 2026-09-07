@@ -1,4 +1,3 @@
-
 from aih_constants import SHOT_RESULT as _SHOT_RESULT  # type: ignore
 from ap_calculator.debug import VERSION, log
 from AvatarInputHandler import (  # type: ignore

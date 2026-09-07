@@ -101,6 +101,17 @@ def _colorSection():
         ),
     )
 
+    gradient = templates.createCheckbox(
+        "Use gradient colors",
+        "colors.gradient",
+        Colors.GRADIENT,
+        tooltip=(
+            "{HEADER}Gradient penetration colors{/HEADER}"
+            "{BODY}Smoothly fade the penetration chance color between the low, "
+            "medium, and high colors instead of switching between them abruptly.{/BODY}"
+        ),
+    )
+
     if hasattr(templates, "visibleWhen"):
         normal = [templates.visibleWhen(c, "colorblind.enabled", False) for c in normal]
         colorblind = [
@@ -109,7 +120,7 @@ def _colorSection():
     # On older API builds without visibleWhen, both sets just show plainly
     # (no gating) — still functional, just not tidy. Acceptable fallback.
 
-    return [toggle] + normal + colorblind
+    return [toggle, gradient] + normal + colorblind
 
 
 template = {

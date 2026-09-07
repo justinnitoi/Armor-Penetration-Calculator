@@ -30,6 +30,7 @@ def update_constants():
     Colors.MEDIUM_CHANCE = safe_get_setting(config, "colors", "medium_chance")
     Colors.LOW_CHANCE = safe_get_setting(config, "colors", "low_chance")
     Colors.RICOCHET = safe_get_setting(config, "colors", "ricochet")
+    Colors.GRADIENT = safe_get_setting(config, "colors", "gradient")
 
     Colorblind.ENABLED = safe_get_setting(config, "colorblind", "enabled")
     Colorblind.HIGH_CHANCE = safe_get_setting(config, "colorblind", "high_chance")
@@ -63,11 +64,54 @@ def get_missed_body_color():
         return Colorblind.LOW_CHANCE
 
 
+def _hex_to_rgb(hex_color):
+    return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+
+
+def _rgb_to_hex(rgb):
+    return "".join(
+        "{:02X}".format(max(0, min(255, int(round(channel))))) for channel in rgb
+    )
+
+
+def _lerp_color(color_a, color_b, t):
+    t = max(0.0, min(1.0, t))
+    rgb_a = _hex_to_rgb(color_a)
+    rgb_b = _hex_to_rgb(color_b)
+    rgb = tuple(a + (b - a) * t for a, b in zip(rgb_a, rgb_b))
+    return _rgb_to_hex(rgb)
+
+
+def _get_color_from_prob_gradient(cls, prob):
+    if prob <= 7:
+        return cls.LOW_CHANCE
+    elif prob >= 93:
+        return cls.HIGH_CHANCE
+    elif prob < 50:
+        # red-orange: fades from the low chance color into orange
+        t = (prob - 7) / float(50 - 7)
+        return _lerp_color(cls.LOW_CHANCE, cls.MEDIUM_CHANCE, t)
+    else:
+        # orange-green: fades from orange into the high chance color
+        t = (prob - 50) / float(93 - 50)
+        return _lerp_color(cls.MEDIUM_CHANCE, cls.HIGH_CHANCE, t)
+
+
+def _get_color_from_prob_legacy(cls, prob):
+    if prob <= 7:
+        return cls.LOW_CHANCE
+    elif prob >= 93:
+        return cls.HIGH_CHANCE
+    else:
+        return cls.MEDIUM_CHANCE
+
+
 class Colors(object):
     HIGH_CHANCE = safe_get_setting(g_user_settings, "colors", "high_chance")
     MEDIUM_CHANCE = safe_get_setting(g_user_settings, "colors", "medium_chance")
     LOW_CHANCE = safe_get_setting(g_user_settings, "colors", "low_chance")
     RICOCHET = safe_get_setting(g_user_settings, "colors", "ricochet")
+    GRADIENT = safe_get_setting(g_user_settings, "colors", "gradient")
 
     GREEN = "6BF40D"
     ORANGE = "FFAD00"
@@ -80,12 +124,10 @@ class Colors(object):
 
     @classmethod
     def get_color_from_prob(cls, prob):
-        if prob <= 7:
-            return cls.LOW_CHANCE
-        elif prob >= 93:
-            return cls.HIGH_CHANCE
+        if cls.GRADIENT:
+            return _get_color_from_prob_gradient(cls, prob)
         else:
-            return cls.MEDIUM_CHANCE
+            return _get_color_from_prob_legacy(cls, prob)
 
 
 class Colorblind(object):
@@ -97,12 +139,10 @@ class Colorblind(object):
 
     @classmethod
     def get_color_from_prob(cls, prob):
-        if prob <= 7:
-            return cls.LOW_CHANCE
-        elif prob >= 93:
-            return cls.HIGH_CHANCE
+        if Colors.GRADIENT:
+            return _get_color_from_prob_gradient(cls, prob)
         else:
-            return cls.MEDIUM_CHANCE
+            return _get_color_from_prob_legacy(cls, prob)
 
 
 class ArmorLabelSettings:

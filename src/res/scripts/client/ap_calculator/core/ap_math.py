@@ -26,5 +26,6 @@ def gaussian_probability(avg_pen, armor_val):
 
     return prob
 
+
 def arccos(cosine_value):
     return math.degrees(math.acos(cosine_value))

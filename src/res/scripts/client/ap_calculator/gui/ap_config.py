@@ -14,6 +14,7 @@ DEFAULT_CONFIG = {
     "colors.medium_chance": "FFAD00",
     "colors.low_chance": "E90000",
     "colors.ricochet": "800080",
+    "colors.gradient": True,
     "colorblind.enabled": False,  # colorblind
     "colorblind.high_chance": "EFEB05",
     "colorblind.medium_chance": "FF8AFF",

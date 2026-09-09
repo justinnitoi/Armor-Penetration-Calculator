@@ -24,6 +24,7 @@ SUPPORTED_LANGUAGES = (
     "lt",
     "lv",
     "sr",
+    "zh_cn",
 )
 ALIASES = {
     "ua": "uk",

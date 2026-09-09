@@ -106,8 +106,8 @@ class GuiState(object):
                 self.gun_label.update_gui(hit_gun, color)
 
         if self.track_label.settings.ENABLED:
-            if hit_track and (color == Colors.GREEN or color == Colors.ORANGE):
-                self.track_label.update_gui(color)
+            if hit_track and hit_body and not ricochet and prob > 7:
+                self.track_label.update_gui(prob)
             elif self.track_label.visible:
                 self.track_label.hide()
 
@@ -236,13 +236,8 @@ class TrackLabel(ImageLabel):
     def __init__(self, settings):
         super(TrackLabel, self).__init__(settings)
 
-    def update_gui(self, color):  # type: ignore
-        if color == Colors.GREEN:
-            next_state = 0
-        elif color == Colors.ORANGE:
-            next_state = 1
-        else:
-            raise ValueError("Next track state is not green or orange.")
+    def update_gui(self, prob):  # type: ignore
+        next_state = 0 if prob >= 93 else 1
         return super(TrackLabel, self).update_gui(next_state)
 
 

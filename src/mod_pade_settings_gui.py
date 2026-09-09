@@ -311,6 +311,12 @@ if create_settings_gui:
             ),
             templates.createEmpty(10),
             templates.createLabel("<b>— Colors —</b>"),
+            templates.createCheckbox(
+                "Use gradient colors",
+                "color_gradient",
+                Colors.GRADIENT,
+                tooltip="{HEADER}Gradient penetration colors{/HEADER}{BODY}Smoothly fade the penetration chance color between the low, medium, and high colors instead of switching between them abruptly.{/BODY}",
+            ),
             templates.createColorChoice(
                 "High Pen Chance",
                 "color_green",

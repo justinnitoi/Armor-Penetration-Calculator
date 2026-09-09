@@ -46,6 +46,7 @@ DEFAULT_CONFIG = {
         "label_format": "‡",
     },
     "colors": {
+        "gradient": True,
         "green_chance": "6BF40D",
         "orange_chance": "FFAD00",
         "red_chance": "E90000",
@@ -129,6 +130,7 @@ def nested(flat_config):
             "label_format": flat_config["gun_label_format"],
         },
         "colors": {
+            "gradient": flat_config["color_gradient"],
             "green_chance": flat_config["color_green"],
             "orange_chance": flat_config["color_orange"],
             "red_chance": flat_config["color_red"],

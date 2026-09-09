@@ -1,0 +1,58 @@
+{
+    "armor_label": {
+        "enabled": true,
+        "x_offset": 0,
+        "y_offset": 30,
+        "font_size": 20,
+        "label_format": "{value}"
+    },
+    "pen_label": {
+        "enabled": true,
+        "x_offset": 0,
+        "y_offset": 50,
+        "font_size": 16,
+        "label_format": "{value}%"
+    },
+    "angle_label": {
+        "enabled": true,
+        "x_offset": 30,
+        "y_offset": 35,
+        "font_size": 16,
+        "label_format": "{value}\u00b0",
+        "display_threshold": 70
+    },
+    "eff_pen_label": {
+        "enabled": false,
+        "x_offset": -50,
+        "y_offset": 35,
+        "font_size": 16,
+        "label_format": "{value}"
+    },
+    "kill_label": {
+        "enabled": false,
+        "x_offset": 0,
+        "y_offset": 66,
+        "font_size": 14,
+        "label_format": "\u2020 {value}%"
+    },
+    "gun_label": {
+        "enabled": true,
+        "x_offset": -26,
+        "y_offset": 35,
+        "font_size": 16,
+        "label_format": "\u2021"
+    },
+    "colors": {
+        "gradient": true,
+        "green_chance": "6BF40D",
+        "orange_chance": "FFAD00",
+        "red_chance": "E90000",
+        "ricochet": "800080"
+    },
+    "shadow": {
+        "shadow_color": "000000",
+        "shadow_alpha": 8,
+        "shadow_length": 3,
+        "shadow_strength": 7
+    }
+}

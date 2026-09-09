@@ -33,6 +33,7 @@ def update_constants_flat(flat_config):
     GunLabelSettings.X_OFFSET = flat_config["gun_label_x_offset"]
     GunLabelSettings.Y_OFFSET = flat_config["gun_label_y_offset"]
     GunLabelSettings.LABEL_FORMAT = flat_config["gun_label_format"]
+    Colors.GRADIENT = flat_config["color_gradient"]
     Colors.GREEN = flat_config["color_green"]
     Colors.ORANGE = flat_config["color_orange"]
     Colors.RED = flat_config["color_red"]
@@ -50,14 +51,57 @@ def safe_get_setting(category, attribute):
     return user_settings[category][attribute]
 
 
-VERSION = "1.8.3"
+VERSION = "1.9.0"
 
 
 def log(message):
     print("[AP Calculator {}] {}".format(VERSION, message))
 
 
+def _hex_to_rgb(hex_color):
+    return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+
+
+def _rgb_to_hex(rgb):
+    return "".join(
+        "{:02X}".format(max(0, min(255, int(round(channel))))) for channel in rgb
+    )
+
+
+def _lerp_color(color_a, color_b, t):
+    t = max(0.0, min(1.0, t))
+    rgb_a = _hex_to_rgb(color_a)
+    rgb_b = _hex_to_rgb(color_b)
+    rgb = tuple(a + (b - a) * t for a, b in zip(rgb_a, rgb_b))
+    return _rgb_to_hex(rgb)
+
+
+def _get_color_from_prob_gradient(cls, prob):
+    if prob <= 7:
+        return cls.RED
+    elif prob >= 93:
+        return cls.GREEN
+    elif prob < 50:
+        # red-orange: fades from the low chance color into orange
+        t = (prob - 7) / float(50 - 7)
+        return _lerp_color(cls.RED, cls.ORANGE, t)
+    else:
+        # orange-green: fades from orange into the high chance color
+        t = (prob - 50) / float(93 - 50)
+        return _lerp_color(cls.ORANGE, cls.GREEN, t)
+
+
+def _get_color_from_prob_legacy(cls, prob):
+    if prob <= 7:
+        return cls.RED
+    elif prob >= 93:
+        return cls.GREEN
+    else:
+        return cls.ORANGE
+
+
 class Colors(object):
+    GRADIENT = safe_get_setting("colors", "gradient")
     RED = safe_get_setting("colors", "red_chance")
     YELLOW = "FFFF00"
     ORANGE = safe_get_setting("colors", "orange_chance")
@@ -67,12 +111,10 @@ class Colors(object):
 
     @classmethod
     def get_color_from_prob(cls, prob):
-        if prob <= 7:
-            return cls.RED
-        elif prob >= 93:
-            return cls.GREEN
+        if cls.GRADIENT:
+            return _get_color_from_prob_gradient(cls, prob)
         else:
-            return cls.ORANGE
+            return _get_color_from_prob_legacy(cls, prob)
 
 
 class ArmorLabelSettings:

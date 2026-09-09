@@ -5,7 +5,8 @@
   res\scripts\client\ap_calculator with Python 2.7 (bytecode is version-locked
   -- the WoT client cannot load Python 3 bytecode) and deploys pademinune's
   Armor Penetration Calculator as LOOSE res_mods override files, plus the
-  Gameface web assets, settings-tooltip icons, and res_map registration.
+  Gameface web assets, settings-tooltip icons, translation files, and res_map
+  registration.
   Does NOT package a .wotmod -- see package.ps1 for that.
 
   Run this from anywhere -- paths are resolved relative to this script, not the
@@ -30,14 +31,16 @@ $SourceRoot = Join-Path $PSScriptRoot "..\src"
 
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
 $PyApCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\ap_calculator"
-$WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
-$IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
+$WebSrcDir            = Join-Path $SourceRoot "res\gui\AP_Calculator_2\gameface"
+$IconsSrcDir          = Join-Path $SourceRoot "res\gui\AP_Calculator_2\tooltips"
+$TranslationsSrcDir   = Join-Path $SourceRoot "res\gui\AP_Calculator_2\translations"
 $ResMapSrc            = Join-Path $SourceRoot "res\mods\configs\res_map\APBattleView.json"
 
 $PyDestDir             = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
 $PyApCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\ap_calculator"
-$WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
-$IconsDestDir          = Join-Path $WotRoot "res_mods\$Version\gui\maps\icons\APCalculator2"
+$WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\AP_Calculator_2\gameface"
+$IconsDestDir          = Join-Path $WotRoot "res_mods\$Version\gui\AP_Calculator_2\tooltips"
+$TranslationsDestDir   = Join-Path $WotRoot "res_mods\$Version\gui\AP_Calculator_2\translations"
 $ResMapDestDir         = Join-Path $WotRoot "mods\configs\res_map"
 
 # --- helpers -----------------------------------------------------------------------
@@ -134,7 +137,13 @@ Get-ChildItem -Path $IconsSrcDir -File | ForEach-Object {
     Copy-One $_.FullName $IconsDestDir $_.Name
 }
 
-# --- 4. copy the res_map registration -----------------------------------------------
+# --- 4. copy the localization files ---------------------------------------------------
+Write-Host "Copying translation files ..."
+Get-ChildItem -Path $TranslationsSrcDir -File | ForEach-Object {
+    Copy-One $_.FullName $TranslationsDestDir $_.Name
+}
+
+# --- 5. copy the res_map registration -----------------------------------------------
 Write-Host "Copying res_map entry ..."
 Copy-One $ResMapSrc $ResMapDestDir "APBattleView.json"
 

@@ -2,10 +2,10 @@
   uninstall.ps1
 
   Removes the loose res_mods override files that build.ps1 deploys: compiled
-  .pyc modules, the Gameface web assets, the settings-tooltip icons, and the
-  res_map registration. Derives the same paths from the same source tree as
-  build.ps1, so it always matches whatever build.ps1 last put there instead of
-  a hardcoded file list going stale.
+  .pyc modules, the Gameface web assets, the settings-tooltip icons, the
+  translation files, and the res_map registration. Derives the same paths from
+  the same source tree as build.ps1, so it always matches whatever build.ps1
+  last put there instead of a hardcoded file list going stale.
 
   Run this from anywhere -- paths are resolved relative to this script, not the
   working directory. Close World of Tanks first -- a running client locks files
@@ -28,13 +28,15 @@ $SourceRoot = Join-Path $PSScriptRoot "..\src"
 
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
 $PyApCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\ap_calculator"
-$WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
-$IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
+$WebSrcDir            = Join-Path $SourceRoot "res\gui\AP_Calculator_2\gameface"
+$IconsSrcDir          = Join-Path $SourceRoot "res\gui\AP_Calculator_2\tooltips"
+$TranslationsSrcDir   = Join-Path $SourceRoot "res\gui\AP_Calculator_2\translations"
 
 $PyDestDir             = Join-Path $WotRoot "res_mods\$Version\scripts\client\gui\mods"
 $PyApCalculatorDestDir = Join-Path $WotRoot "res_mods\$Version\scripts\client\ap_calculator"
-$WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\gameface\mods\pademinune\APCalculator"
-$IconsDestDir          = Join-Path $WotRoot "res_mods\$Version\gui\maps\icons\APCalculator2"
+$WebDestDir            = Join-Path $WotRoot "res_mods\$Version\gui\AP_Calculator_2\gameface"
+$IconsDestDir          = Join-Path $WotRoot "res_mods\$Version\gui\AP_Calculator_2\tooltips"
+$TranslationsDestDir   = Join-Path $WotRoot "res_mods\$Version\gui\AP_Calculator_2\translations"
 $ResMapDestDir         = Join-Path $WotRoot "mods\configs\res_map"
 
 # --- helper -----------------------------------------------------------------------
@@ -121,7 +123,17 @@ if ((Test-Path $IconsDestDir) -and ((Get-ChildItem $IconsDestDir -Force | Measur
     Write-Host "  removed empty directory: $IconsDestDir"
 }
 
-# --- 4. remove the res_map registration -----------------------------------------------
+# --- 4. remove the translation files ---------------------------------------------------
+Write-Host "Removing translation files ..."
+Get-ChildItem -Path $TranslationsSrcDir -File -ErrorAction SilentlyContinue | ForEach-Object {
+    Remove-IfExists (Join-Path $TranslationsDestDir $_.Name) $_.Name
+}
+if ((Test-Path $TranslationsDestDir) -and ((Get-ChildItem $TranslationsDestDir -Force | Measure-Object).Count -eq 0)) {
+    Remove-Item $TranslationsDestDir -Force
+    Write-Host "  removed empty directory: $TranslationsDestDir"
+}
+
+# --- 5. remove the res_map registration -----------------------------------------------
 Write-Host "Removing res_map entry ..."
 Remove-IfExists (Join-Path $ResMapDestDir "APBattleView.json") "APBattleView.json"
 

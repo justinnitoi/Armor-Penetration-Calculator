@@ -1,0 +1,61 @@
+{
+    "title": "pademinune's Armor Penetration Calculator",
+    "section.labels": "Labels",
+    "section.armor_label": "Armor Label",
+    "section.probability_label": "Probability Label",
+    "section.angle_label": "Angle Label",
+    "section.colors": "Colors",
+    "section.support": "Support",
+
+    "armor_label.title": "Enable Armor Label",
+    "armor_label.tooltip_header": "Enable Armor Label",
+    "armor_label.tooltip_body": "Show or hide the effective armor value label.",
+
+    "prob_label.title": "Enable Probability Label",
+    "prob_label.tooltip_header": "Enable Probability Label",
+    "prob_label.tooltip_body": "Show or hide the penetration probability label.",
+
+    "angle_label.title": "Enable Angle Label",
+    "angle_label.tooltip_header": "Enable Angle Label",
+    "angle_label.tooltip_body": "Show or hide the impact angle label.",
+
+    "angle_label.display_threshold.title": "Angle Display Threshold",
+    "angle_label.display_threshold.tooltip_header": "Angle Display Threshold",
+    "angle_label.display_threshold.tooltip_body": "The minimum impact angle (in degrees) at which the angle label is shown. Set to 0 to always show it.",
+
+    "angle_label.always_white.title": "Angle Color is always White",
+    "angle_label.always_white.tooltip_header": "Angle Color is always White",
+    "angle_label.always_white.tooltip_body": "Toggle between having the angle label color always be White, or to mimic the penetration chance color.",
+
+    "colors.high_chance.title": "High Pen Chance",
+    "colors.high_chance.tooltip_header": "High Pen Chance Color",
+    "colors.high_chance.tooltip_body": "Color shown when penetration probability is high (>93%).",
+
+    "colors.medium_chance.title": "Medium Pen Chance",
+    "colors.medium_chance.tooltip_header": "Medium Pen Chance Color",
+    "colors.medium_chance.tooltip_body": "Color shown when penetration probability is medium.",
+
+    "colors.low_chance.title": "Low Pen Chance",
+    "colors.low_chance.tooltip_header": "Low Pen Chance Color",
+    "colors.low_chance.tooltip_body": "Color shown when penetration probability is low (<7%).",
+
+    "colors.ricochet.title": "Ricochet",
+    "colors.ricochet.tooltip_header": "Ricochet Color",
+    "colors.ricochet.tooltip_body": "Color shown when the shell will ricochet.",
+
+    "colorblind.enabled.title": "Use colorblind colors",
+    "colorblind.enabled.tooltip_header": "Colorblind-friendly palette",
+    "colorblind.enabled.tooltip_body": "Swap to a colorblind-safe color scheme, editable below.",
+
+    "colors.gradient.title": "Use gradient colors",
+    "colors.gradient.tooltip_header": "Gradient penetration colors",
+    "colors.gradient.tooltip_body": "Smoothly fade the penetration chance color between the low, medium, and high colors instead of switching between them abruptly.",
+
+    "discord_button.title": "Discord",
+    "discord_button.tooltip_header": "Discord Server",
+    "discord_button.tooltip_body": "Join the Discord for updates, bug reports, and feature requests.",
+
+    "donate_button.title": "Donate",
+    "donate_button.tooltip_header": "Support development",
+    "donate_button.tooltip_body": "If the calculator's been useful, a donation helps cover the time spent maintaining and improving it."
+}

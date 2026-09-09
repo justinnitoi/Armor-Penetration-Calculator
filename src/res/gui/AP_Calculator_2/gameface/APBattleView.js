@@ -4,8 +4,12 @@
 // in the HTML, each shown/hidden independently. No feature name in
 // ModelObserver(): this page IS the view's root model (a standalone registered
 // window), not a submodel injected into someone else's document.
-// Two folder segments under mods/ (pademinune/APCalculator/) -> two "../" to libs/model.js.
-import { ModelObserver } from "../../libs/model.js";
+// libs/model.js is a SHARED file OpenWG ships at a fixed location:
+// gui/gameface/mods/libs/model.js. This view now lives at gui/AP_Calculator_2/gameface/,
+// a sibling branch of gui/gameface/ -- not nested under gui/gameface/mods/ anymore --
+// so the path back to that fixed shared lib is "up to gui/, then down into
+// gameface/mods/libs/model.js", not a plain "../../libs/model.js".
+import { ModelObserver } from "../../gameface/mods/libs/model.js";
 
 const observer = ModelObserver();
 

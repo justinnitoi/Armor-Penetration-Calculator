@@ -1,7 +1,7 @@
 [
     {
         "type": "Layout",
-        "path": "coui://gui/gameface/mods/pademinune/APCalculator/APBattleView.html",
+        "path": "coui://gui/AP_Calculator_2/gameface/APBattleView.html",
         "parameters": {
             "extension": "",
             "entrance": "APBattleView",

@@ -11,107 +11,102 @@ from ap_calculator.gui.ap_constants import (
 )
 
 from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE, VERSION
+from ap_calculator.settings_gui.language import tooltip, tr
 
 
 def _colorSection():
     normal = [
         templates.createColorChoice(
-            "High Pen Chance",
+            tr("colors.high_chance.title"),
             "colors.high_chance",
             Colors.HIGH_CHANCE,
-            tooltip=(
-                "{HEADER}High Pen Chance Color{/HEADER}"
-                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}"
+            tooltip=tooltip(
+                "colors.high_chance.tooltip_header", "colors.high_chance.tooltip_body"
             ),
         ),
         templates.createColorChoice(
-            "Medium Pen Chance",
+            tr("colors.medium_chance.title"),
             "colors.medium_chance",
             Colors.MEDIUM_CHANCE,
-            tooltip=(
-                "{HEADER}Medium Pen Chance Color{/HEADER}"
-                "{BODY}Color shown when penetration probability is medium.{/BODY}"
+            tooltip=tooltip(
+                "colors.medium_chance.tooltip_header",
+                "colors.medium_chance.tooltip_body",
             ),
         ),
         templates.createColorChoice(
-            "Low Pen Chance",
+            tr("colors.low_chance.title"),
             "colors.low_chance",
             Colors.LOW_CHANCE,
-            tooltip=(
-                "{HEADER}Low Pen Chance Color{/HEADER}"
-                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}"
+            tooltip=tooltip(
+                "colors.low_chance.tooltip_header", "colors.low_chance.tooltip_body"
             ),
         ),
         templates.createColorChoice(
-            "Ricochet",
+            tr("colors.ricochet.title"),
             "colors.ricochet",
             Colors.RICOCHET,
-            tooltip=(
-                "{HEADER}Ricochet Color{/HEADER}"
-                "{BODY}Color shown when the shell will ricochet.{/BODY}"
+            tooltip=tooltip(
+                "colors.ricochet.tooltip_header", "colors.ricochet.tooltip_body"
             ),
         ),
     ]
     colorblind = [
         templates.createColorChoice(
-            "High Pen Chance",
+            tr("colors.high_chance.title"),
             "colorblind.high_chance",
             Colorblind.HIGH_CHANCE,
-            tooltip=(
-                "{HEADER}High Pen Chance Color{/HEADER}"
-                "{BODY}Color shown when penetration probability is high (>93%).{/BODY}"
+            tooltip=tooltip(
+                "colors.high_chance.tooltip_header", "colors.high_chance.tooltip_body"
             ),
         ),
         templates.createColorChoice(
-            "Medium Pen Chance",
+            tr("colors.medium_chance.title"),
             "colorblind.medium_chance",
             Colorblind.MEDIUM_CHANCE,
-            tooltip=(
-                "{HEADER}Medium Pen Chance Color{/HEADER}"
-                "{BODY}Color shown when penetration probability is medium.{/BODY}"
+            tooltip=tooltip(
+                "colors.medium_chance.tooltip_header",
+                "colors.medium_chance.tooltip_body",
             ),
         ),
         templates.createColorChoice(
-            "Low Pen Chance",
+            tr("colors.low_chance.title"),
             "colorblind.low_chance",
             Colorblind.LOW_CHANCE,
-            tooltip=(
-                "{HEADER}Low Pen Chance Color{/HEADER}"
-                "{BODY}Color shown when penetration probability is low (<7%).{/BODY}"
+            tooltip=tooltip(
+                "colors.low_chance.tooltip_header", "colors.low_chance.tooltip_body"
             ),
         ),
         templates.createColorChoice(
-            "Ricochet",
+            tr("colors.ricochet.title"),
             "colorblind.ricochet",
             Colorblind.RICOCHET,
-            tooltip=(
-                "{HEADER}Ricochet Color{/HEADER}"
-                "{BODY}Color shown when the shell will ricochet.{/BODY}"
+            tooltip=tooltip(
+                "colors.ricochet.tooltip_header", "colors.ricochet.tooltip_body"
             ),
         ),
     ]
 
     toggle = templates.createCheckbox(
-        "Use colorblind colors",
+        tr("colorblind.enabled.title"),
         "colorblind.enabled",
         Colorblind.ENABLED,
-        tooltip=(
-            "{HEADER}Colorblind-friendly palette{/HEADER}"
-            "{BODY}Swap to a colorblind-safe color scheme, editable below.{/BODY}"
+        tooltip=tooltip(
+            "colorblind.enabled.tooltip_header", "colorblind.enabled.tooltip_body"
         ),
     )
 
     gradient = templates.createCheckbox(
-        "Use gradient colors",
+        tr("colors.gradient.title"),
         "colors.gradient",
         Colors.GRADIENT,
         tooltip=(
-            "{HEADER}Gradient penetration colors{/HEADER}"
-            "{BODY}Smoothly fade the penetration chance color between the low, "
-            "medium, and high colors instead of switching between them abruptly.<br><br>"
-            "<img src='img://gui/maps/icons/APCalculator2/gradient-high.png' width='220' height='120'>"
-            "<img src='img://gui/maps/icons/APCalculator2/gradient-medium.png' width='220' height='120'>"
-            "<img src='img://gui/maps/icons/APCalculator2/gradient-low.png' width='220' height='120'>"
+            "{{HEADER}}{header}{{/HEADER}}".format(
+                header=tr("colors.gradient.tooltip_header")
+            )
+            + "{{BODY}}{body}<br><br>".format(body=tr("colors.gradient.tooltip_body"))
+            + "<img src='img://gui/AP_Calculator_2/tooltips/gradient-high.png' width='220' height='120'>"
+            "<img src='img://gui/AP_Calculator_2/tooltips/gradient-medium.png' width='220' height='120'>"
+            "<img src='img://gui/AP_Calculator_2/tooltips/gradient-low.png' width='220' height='120'>"
             "{/BODY}"
         ),
     )
@@ -128,89 +123,98 @@ def _colorSection():
 
 
 template = {
-    "modDisplayName": "pademinune's Armor Penetration Calculator {}".format(VERSION),
+    "modDisplayName": "{title} {version}".format(title=tr("title"), version=VERSION),
     "enabled": True,
     "column1": [
-        templates.createLabel("<b>— Armor Label —</b>"),
+        templates.createLabel("<b>— {} —</b>".format(tr("section.armor_label"))),
         templates.createCheckbox(
-            "Enable Armor Label",
+            tr("armor_label.title"),
             "armor_label_enabled",
             ArmorLabelSettings.ENABLED,
             tooltip=(
-                "{HEADER}Enable Armor Label{/HEADER}"
-                "{BODY}Show or hide the effective armor value label.<br><br>"
-                "<img src='img://gui/maps/icons/APCalculator2/full-cropped.png' width='220' height='120'>"
-                "<img src='img://gui/maps/icons/APCalculator2/no-armor-cropped.png' width='220' height='120'>"
+                "{{HEADER}}{header}{{/HEADER}}".format(
+                    header=tr("armor_label.tooltip_header")
+                )
+                + "{{BODY}}{body}<br><br>".format(body=tr("armor_label.tooltip_body"))
+                + "<img src='img://gui/AP_Calculator_2/tooltips/full-cropped.png' width='220' height='120'>"
+                "<img src='img://gui/AP_Calculator_2/tooltips/no-armor-cropped.png' width='220' height='120'>"
                 "{/BODY}"
             ),
         ),
-        templates.createLabel("<b>— Probability Label —</b>"),
+        templates.createLabel("<b>— {} —</b>".format(tr("section.probability_label"))),
         templates.createCheckbox(
-            "Enable Probability Label",
+            tr("prob_label.title"),
             "prob_label_enabled",
             ProbLabelSettings.ENABLED,
             tooltip=(
-                "{HEADER}Enable Probability Label{/HEADER}"
-                "{BODY}Show or hide the penetration probability label.<br><br>"
-                "<img src='img://gui/maps/icons/APCalculator2/full-cropped.png' width='220' height='120'>"
-                "<img src='img://gui/maps/icons/APCalculator2/no-prob-cropped.png' width='220' height='120'>"
+                "{{HEADER}}{header}{{/HEADER}}".format(
+                    header=tr("prob_label.tooltip_header")
+                )
+                + "{{BODY}}{body}<br><br>".format(body=tr("prob_label.tooltip_body"))
+                + "<img src='img://gui/AP_Calculator_2/tooltips/full-cropped.png' width='220' height='120'>"
+                "<img src='img://gui/AP_Calculator_2/tooltips/no-prob-cropped.png' width='220' height='120'>"
                 "{/BODY}"
             ),
         ),
-        templates.createLabel("<b>— Angle Label —</b>"),
+        templates.createLabel("<b>— {} —</b>".format(tr("section.angle_label"))),
         templates.createCheckbox(
-            "Enable Angle Label",
+            tr("angle_label.title"),
             "angle_label_enabled",
             AngleLabelSettings.ENABLED,
             tooltip=(
-                "{HEADER}Enable Angle Label{/HEADER}"
-                "{BODY}Show or hide the impact angle label.<br><br>"
-                "<img src='img://gui/maps/icons/APCalculator2/full-angle-cropped.png' width='220' height='120'>"
-                "<img src='img://gui/maps/icons/APCalculator2/no-angle-cropped.png' width='220' height='120'>"
+                "{{HEADER}}{header}{{/HEADER}}".format(
+                    header=tr("angle_label.tooltip_header")
+                )
+                + "{{BODY}}{body}<br><br>".format(body=tr("angle_label.tooltip_body"))
+                + "<img src='img://gui/AP_Calculator_2/tooltips/full-angle-cropped.png' width='220' height='120'>"
+                "<img src='img://gui/AP_Calculator_2/tooltips/no-angle-cropped.png' width='220' height='120'>"
                 "{/BODY}"
             ),
         ),
         templates.createNumericStepper(
-            "Angle Display Threshold",
+            tr("angle_label.display_threshold.title"),
             "angle_label_display_threshold",
             AngleLabelSettings.DISPLAY_THRESHOLD,
             0,
             90,
             1,
             manual=True,
-            tooltip=(
-                "{HEADER}Angle Display Threshold{/HEADER}"
-                "{BODY}The minimum impact angle (in degrees) at which the angle "
-                "label is shown. Set to 0 to always show it.{/BODY}"
+            tooltip=tooltip(
+                "angle_label.display_threshold.tooltip_header",
+                "angle_label.display_threshold.tooltip_body",
             ),
         ),
         templates.createCheckbox(
-            "Angle Color is always White",
+            tr("angle_label.always_white.title"),
             "angle_label_white",
             AngleLabelSettings.WHITE,
             tooltip=(
-                "{HEADER}Angle Color is always White{/HEADER}"
-                "{BODY}Toggle between having the angle label color always be White, "
-                "or to mimic the penetration chance color.<br><br>"
-                "<img src='img://gui/maps/icons/APCalculator2/full-angle-cropped.png' width='220' height='120'>"
-                "<img src='img://gui/maps/icons/APCalculator2/angle-colored-cropped.png' width='220' height='120'>"
+                "{{HEADER}}{header}{{/HEADER}}".format(
+                    header=tr("angle_label.always_white.tooltip_header")
+                )
+                + "{{BODY}}{body}<br><br>".format(
+                    body=tr("angle_label.always_white.tooltip_body")
+                )
+                + "<img src='img://gui/AP_Calculator_2/tooltips/full-angle-cropped.png' width='220' height='120'>"
+                "<img src='img://gui/AP_Calculator_2/tooltips/angle-colored-cropped.png' width='220' height='120'>"
                 "{/BODY}"
             ),
         ),
     ],
-    "column2": [templates.createLabel("<b>— Colors —</b>")]
+    "column2": [templates.createLabel("<b>— {} —</b>".format(tr("section.colors")))]
     + _colorSection()
     + [
-        templates.createLabel("<b>— Support —</b>"),
+        templates.createLabel("<b>— {} —</b>".format(tr("section.support"))),
         templates.createRadioButtonGroup(
             "",
             "discord_button",
             [""],
             0,
-            button=templates.createButton(text="Discord", width=90, height=25),
-            tooltip=(
-                "{HEADER}Discord Server{/HEADER}"
-                "{BODY}Join the Discord for updates, bug reports, and feature requests.{/BODY}"
+            button=templates.createButton(
+                text=tr("discord_button.title"), width=90, height=25
+            ),
+            tooltip=tooltip(
+                "discord_button.tooltip_header", "discord_button.tooltip_body"
             ),
         ),
         templates.createRadioButtonGroup(
@@ -218,11 +222,11 @@ template = {
             "donate_button",
             [""],
             0,
-            button=templates.createButton(text="Donate", width=90, height=25),
-            tooltip=(
-                "{HEADER}Support development{/HEADER}"
-                "{BODY}If the calculator's been useful, a donation helps cover the "
-                "time spent maintaining and improving it.{/BODY}"
+            button=templates.createButton(
+                text=tr("donate_button.title"), width=90, height=25
+            ),
+            tooltip=tooltip(
+                "donate_button.tooltip_header", "donate_button.tooltip_body"
             ),
         ),
     ],

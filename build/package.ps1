@@ -4,10 +4,10 @@
   Compiles every *.py under src\res\scripts\client\gui\mods and
   src\res\scripts\client\ap_calculator with Python 2.7 -- the same compile step
   build.ps1 uses -- then stages the result plus the Gameface web assets, the
-  settings-tooltip icons, the res_map registration, and meta.xml under bin\,
-  and zips it all into a .wotmod package (ZIP_STORED, meta.xml at the archive
-  root, everything else under res\). Unlike build.ps1 this does NOT touch a
-  WoT install -- it only produces bin\wotmods\<name>.wotmod.
+  settings-tooltip icons, the translation files, the res_map registration, and
+  meta.xml under bin\, and zips it all into a .wotmod package (ZIP_STORED,
+  meta.xml at the archive root, everything else under res\). Unlike build.ps1
+  this does NOT touch a WoT install -- it only produces bin\wotmods\<name>.wotmod.
 
   The staging directory is wiped before every run so a package never mixes
   freshly compiled output with leftovers from a previous src layout.
@@ -36,15 +36,17 @@ $OutDir     = Join-Path $BinDir "wotmods"
 
 $PyModsSrcDir         = Join-Path $SourceRoot "res\scripts\client\gui\mods"
 $PyApCalculatorSrcDir = Join-Path $SourceRoot "res\scripts\client\ap_calculator"
-$WebSrcDir            = Join-Path $SourceRoot "res\gui\gameface\mods\pademinune\APCalculator"
-$IconsSrcDir          = Join-Path $SourceRoot "res\gui\maps\icons\APCalculator2"
+$WebSrcDir            = Join-Path $SourceRoot "res\gui\AP_Calculator_2\gameface"
+$IconsSrcDir          = Join-Path $SourceRoot "res\gui\AP_Calculator_2\tooltips"
+$TranslationsSrcDir   = Join-Path $SourceRoot "res\gui\AP_Calculator_2\translations"
 $ResMapSrc            = Join-Path $SourceRoot "res\mods\configs\res_map\APBattleView.json"
 $MetaSrc              = Join-Path $SourceRoot "meta.xml"
 
 $PyModsDestDir         = Join-Path $ResDir "scripts\client\gui\mods"
 $PyApCalculatorDestDir = Join-Path $ResDir "scripts\client\ap_calculator"
-$WebDestDir            = Join-Path $ResDir "gui\gameface\mods\pademinune\APCalculator"
-$IconsDestDir          = Join-Path $ResDir "gui\maps\icons\APCalculator2"
+$WebDestDir            = Join-Path $ResDir "gui\AP_Calculator_2\gameface"
+$IconsDestDir          = Join-Path $ResDir "gui\AP_Calculator_2\tooltips"
+$TranslationsDestDir   = Join-Path $ResDir "gui\AP_Calculator_2\translations"
 $ResMapDestDir         = Join-Path $ResDir "mods\configs\res_map"
 
 # Mod version comes from meta.xml so the package name can't drift out of sync
@@ -116,15 +118,22 @@ Get-ChildItem -Path $IconsSrcDir -File | ForEach-Object {
     Copy-Item $_.FullName -Destination $IconsDestDir -Force
 }
 
-# --- 4. copy the res_map registration -----------------------------------------------
+# --- 4. copy the localization files ---------------------------------------------------
+Write-Host "Copying translation files ..."
+Ensure-Dir $TranslationsDestDir
+Get-ChildItem -Path $TranslationsSrcDir -File | ForEach-Object {
+    Copy-Item $_.FullName -Destination $TranslationsDestDir -Force
+}
+
+# --- 5. copy the res_map registration -----------------------------------------------
 Write-Host "Copying res_map entry ..."
 Ensure-Dir $ResMapDestDir
 Copy-Item $ResMapSrc -Destination $ResMapDestDir -Force
 
-# --- 5. copy meta.xml (archive root, alongside res\, not inside it) -----------------
+# --- 6. copy meta.xml (archive root, alongside res\, not inside it) -----------------
 Copy-Item $MetaSrc -Destination $StageDir -Force
 
-# --- 6. zip the staging dir into the .wotmod package ---------------------------------
+# --- 7. zip the staging dir into the .wotmod package ---------------------------------
 if (Test-Path $OutFile) { Remove-Item $OutFile -Force }
 
 # includeBaseDirectory=false: entries come out as "res\..." and "meta.xml" at the

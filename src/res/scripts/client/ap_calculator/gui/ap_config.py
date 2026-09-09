@@ -38,20 +38,15 @@ def is_jailbreak():
 
 def update_global_settings(new_settings):
     """Updates g_user_settings variable"""
+    relevant_settings = {k: v for k, v in new_settings.items() if k in DEFAULT_CONFIG}
     global g_user_settings
-    for key, value in new_settings.items():
-        if key in DEFAULT_CONFIG:
-            g_user_settings[key] = value
+    g_user_settings.update(relevant_settings)
 
 
 def save_config():
     """Saves g_user_settings to disk"""
     global g_user_settings
-    non_defaults = {}
-    for key, value in g_user_settings.items():
-        if key in DEFAULT_CONFIG and DEFAULT_CONFIG[key] != value:
-            # check that its not default
-            non_defaults[key] = value
+    non_defaults = {k: v for k, v in g_user_settings.items() if v != DEFAULT_CONFIG[k]}
 
     if not os.path.exists(CONFIG_FOLDER):
         os.makedirs(CONFIG_FOLDER)
@@ -67,7 +62,7 @@ def load_config():
     user_config = dict(DEFAULT_CONFIG)
 
     for key, value in non_defaults.items():
-        if type(DEFAULT_CONFIG[key]) != type(value):
+        if type(value) != type(DEFAULT_CONFIG[key]):
             raise TypeError("Key: {} does not have the expected type.".format(key))
         user_config[key] = value
 

@@ -129,7 +129,7 @@ template = {
         templates.createLabel("<b>— {} —</b>".format(tr("section.armor_label"))),
         templates.createCheckbox(
             tr("armor_label.title"),
-            "armor_label_enabled",
+            "armor_label.enabled",
             ArmorLabelSettings.ENABLED,
             tooltip=(
                 "{{HEADER}}{header}{{/HEADER}}".format(
@@ -144,7 +144,7 @@ template = {
         templates.createLabel("<b>— {} —</b>".format(tr("section.probability_label"))),
         templates.createCheckbox(
             tr("prob_label.title"),
-            "prob_label_enabled",
+            "prob_label.enabled",
             ProbLabelSettings.ENABLED,
             tooltip=(
                 "{{HEADER}}{header}{{/HEADER}}".format(
@@ -159,7 +159,7 @@ template = {
         templates.createLabel("<b>— {} —</b>".format(tr("section.angle_label"))),
         templates.createCheckbox(
             tr("angle_label.title"),
-            "angle_label_enabled",
+            "angle_label.enabled",
             AngleLabelSettings.ENABLED,
             tooltip=(
                 "{{HEADER}}{header}{{/HEADER}}".format(
@@ -173,7 +173,7 @@ template = {
         ),
         templates.createNumericStepper(
             tr("angle_label.display_threshold.title"),
-            "angle_label_display_threshold",
+            "angle_label.display_threshold",
             AngleLabelSettings.DISPLAY_THRESHOLD,
             0,
             90,
@@ -186,7 +186,7 @@ template = {
         ),
         templates.createCheckbox(
             tr("angle_label.always_white.title"),
-            "angle_label_white",
+            "angle_label.always_white",
             AngleLabelSettings.WHITE,
             tooltip=(
                 "{{HEADER}}{header}{{/HEADER}}".format(

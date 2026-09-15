@@ -1,5 +1,4 @@
 from aih_constants import SHOT_RESULT as _SHOT_RESULT  # type: ignore
-from ap_calculator.debug import VERSION, log
 from AvatarInputHandler import (  # type: ignore
     AvatarInputHandler,
     gun_marker_ctrl,
@@ -9,7 +8,7 @@ from items.components.component_constants import (  # type: ignore
 )
 from PlayerEvents import g_playerEvents  # type: ignore
 
-
+from ap_calculator.debug import VERSION, log
 from ap_calculator.gui.ap_gui import gui_state
 from ap_calculator.core.ap_math import gaussian_probability, arccos
 

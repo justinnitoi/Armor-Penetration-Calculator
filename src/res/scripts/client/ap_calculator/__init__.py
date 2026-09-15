@@ -1,3 +1,3 @@
-import ap_calculator.core
-import ap_calculator.settings_gui
-import ap_calculator.ap_logger
+from . import core
+from . import settings_gui
+from . import ap_logger

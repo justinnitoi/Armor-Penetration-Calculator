@@ -60,8 +60,8 @@ DEFAULT_CONFIG = {
     },
 }
 
-CONFIG_FOLDER = os.path.join("mods", "configs", "pademinune")
-CONFIG_PATH = os.path.join(CONFIG_FOLDER, "armor-calculator.json")
+CONFIG_FOLDER = os.path.join("mods", "configs", "pademinune", "Armor Penetration Calculator")
+CONFIG_PATH = os.path.join(CONFIG_FOLDER, "config.json")
 JAILBREAK_FLAG_PATH = os.path.join(CONFIG_FOLDER, ".jailbreak")
 
 

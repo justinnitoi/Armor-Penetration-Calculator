@@ -30,7 +30,7 @@ ALIASES = {
     "ua": "uk",
 }
 
-_RESOURCE_TEMPLATE = "gui/AP_Calculator_2/translations/translations_%s.json"
+_RESOURCE_TEMPLATE = "gui/AP_Calculator_2/translations/translations_{}.json"
 
 
 def _normalize_language(lang):
@@ -73,7 +73,7 @@ def _decode_json(raw):
 
 
 def _load_json(lang):
-    path = _RESOURCE_TEMPLATE % lang
+    path = _RESOURCE_TEMPLATE.format(lang)
 
     try:
         section = ResMgr.openSection(path)

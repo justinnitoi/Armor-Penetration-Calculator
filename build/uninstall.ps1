@@ -18,7 +18,7 @@
 
 param(
     [string]$WotRoot = "C:\Program Files\World_of_Tanks_NA",
-    [string]$Version = "2.4.0.0"
+    [string]$Version = "2.4.0.1"
 )
 
 $ErrorActionPreference = "Stop"

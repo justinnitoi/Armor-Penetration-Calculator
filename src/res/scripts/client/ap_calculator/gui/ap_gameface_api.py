@@ -2,10 +2,12 @@
 
 Shows armor/prob/angle text over the battle HUD, for the length of the battle.
 Deliberately skips everything a real mod would want (settings, positioning,
-re-entrancy guards) to keep the res_map -> ViewModel -> View -> Window ->
+re-entrancy guards) to keep the gen_resources -> ViewModel -> View -> Window ->
 battle-lifecycle -> JS pipeline visible with nothing else in the way.
 
-Python 2.7 (BigWorld) runtime. OpenWG GameFace is a hard dependency.
+Python 2.7 (BigWorld) runtime, WoT 2.4.1+. The view is registered natively by
+the client from gui/gen_resources/ap_calculator_2.json -- OpenWG GameFace is
+only needed on the JS side (APBattleView.js imports its libs/model.js).
 """
 
 from debug_utils import LOG_CURRENT_EXCEPTION  # type: ignore
@@ -17,13 +19,30 @@ from frameworks.wulf import (  # type: ignore
     WindowFlags,
     WindowLayer,
 )
+from gui.impl.gen import R  # type: ignore
 from gui.impl.pub import ViewImpl, WindowImpl  # type: ignore
-from openwg_gameface import ModDynAccessor  # type: ignore
 
 _FAR = 1 << 20  # sentinel outside any real screen -- move() clamps to the true edge
 
-# Must match the "itemID" in mods/configs/res_map/SimpleLabelView.json.
-RES_MAP_ITEM_ID = "APBattleView"
+# Must match the "R.mods.<RES_MOD_ID>.views.APBattleView" id declared in
+# gui/gen_resources/ap_calculator_2.json.
+RES_MOD_ID = "ap_calculator_2"
+INVALID_RES_ID = -1
+
+
+def _layout_id():
+    """Numeric layoutID of our view, or INVALID_RES_ID if the client didn't load
+    the gen_resources declaration (pre-2.4.1 client, or the file isn't deployed).
+    Looked up at open time, never cached across runs -- numeric IDs can change
+    between client launches."""
+    # dyn() at every step: plain attribute access raises AttributeError when a
+    # node is missing (possibly even R.mods, if no mod declared anything).
+    node = R
+    for name in ("mods", RES_MOD_ID, "views", "APBattleView"):
+        node = node.dyn(name)
+        if not node:
+            return INVALID_RES_ID
+    return node()
 
 
 # --- the data channel ---------------------------------------------------------
@@ -107,11 +126,9 @@ class APBattleView(ViewImpl):
     """The registered Gameface view. Its root ViewModel IS our APBattleView --
     the JS reads it with a bare ModelObserver(), no nested submodel."""
 
-    _layoutID = ModDynAccessor(RES_MAP_ITEM_ID)  # deferred: -1 until OpenWG resolves it
-
-    def __init__(self):
+    def __init__(self, layout_id):
         super(APBattleView, self).__init__(
-            ViewSettings(self._layoutID(), ViewFlags.VIEW, APBattleVM())
+            ViewSettings(layout_id, ViewFlags.VIEW, APBattleVM())
         )
 
     @property
@@ -246,12 +263,11 @@ def open_window(x=0, y=0):
     global _active
     if _active is not None:
         return
-    layout = APBattleView._layoutID()
-    if layout is None or layout < 0:
-        # res_map not registered yet -- ships fine, just needs the one-time
-        # client restart OpenWG triggers the first time it rebuilds res_map.json.
+    layout = _layout_id()
+    if layout < 0:
+        # gen_resources declaration not loaded -- nothing to open.
         return
-    view = APBattleView()
+    view = APBattleView(layout)
     window = APBattleWindow(view, x=x, y=y)
     _active = (window, view)
     window.load()

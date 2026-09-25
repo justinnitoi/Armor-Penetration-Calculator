@@ -36,7 +36,7 @@ underneath mods every content patch.
 
 ```
 <WoT install>\mods\<version>\<author>.<name>_<ver>.wotmod   <- packaged, real ZIP
-<WoT install>\mods\configs\...                              <- NOT version-scoped; shared config trees (res_map, per-mod settings)
+<WoT install>\mods\configs\...                              <- NOT version-scoped; shared config trees (per-mod settings; pre-2.4.1 res_map)
 <WoT install>\res_mods\<version>\...                         <- loose, unpacked files
 ```
 
@@ -50,8 +50,10 @@ underneath mods every content patch.
   behavior just runs as if the mod weren't installed. This is the single most common
   "my mod doesn't do anything" bug report in this ecosystem.
 - Some paths are NOT version-scoped even though they look like they should be —
-  `mods\configs\res_map\` (Gameface view registration) and other `mods\configs\...`
-  trees live directly under the install root, one level up from any `<version>` folder.
+  `mods\configs\...` trees (per-mod settings, and the pre-2.4.1 OpenWG `res_map\`
+  view registration) live directly under the install root, one level up from any
+  `<version>` folder. The 2.4.1+ view registration (`gui\gen_resources\`) is an
+  ordinary resource path and IS version-scoped under `res_mods\<version>\`.
 
 ## The `.wotmod` package format
 
@@ -64,7 +66,7 @@ or `zipfile.ZIP_STORED` in Python). Layout, confirmed from an actual shipped pac
 meta.xml                                   <- at the ZIP ROOT, not inside res/
 res/scripts/client/gui/mods/mod_x.pyc
 res/gui/...
-res/mods/configs/res_map/...
+res/gui/gen_resources/<mod>.json          <- Gameface view registration (2.4.1+)
 ```
 
 `meta.xml`:
@@ -148,9 +150,11 @@ libraries that many independent mods depend on. None of these are guaranteed to 
 installed — a mod should degrade gracefully (or clearly declare the dependency) rather
 than assume presence:
 
-- **OpenWG Gameface** (`openwg_gameface`) — patches the client to let third-party mods
-  register their own Gameface views (`res_map`, `ModDynAccessor`). See
-  `gameface-wulf-primer` for the full mechanics.
+- **OpenWG Gameface** (`openwg_gameface`) — before WoT 2.4.1, patched the client to let
+  third-party mods register their own Gameface views (`res_map`, `ModDynAccessor`).
+  Since 2.4.1 WG registers mod views natively from `gui/gen_resources/*.json`, and on
+  WG OpenWG only provides `gf_mod_inject` and shared JS helpers (e.g. `libs/model.js`).
+  See `gameface-wulf-primer` for the full mechanics.
 - **ModsSettingsApi** (`gui.modsSettingsApi`, by izeberg) — a shared in-game settings
   panel other mods plug into instead of building their own settings UI:
 

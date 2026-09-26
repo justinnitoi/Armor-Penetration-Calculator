@@ -47,6 +47,7 @@ OUT_DIR = os.path.join(BIN_DIR, "wotmods")
 DEFAULT_CLIENT_VERSION = "2.4.1.0"
 DEFAULT_WOT_ROOT = r"C:\Program Files\World_of_Tanks_NA" if os.name == "nt" else None
 PYTHON27_CANDIDATES = ("python27", "python2.7", "python2")
+DEFAULT_PYTHON27 = r"C:\Program Files\Python27\python.exe" if os.name == "nt" else None
 
 # --- what ships ------------------------------------------------------------------
 # Every entry is relative to src/res/ and lands at the same relative path under
@@ -138,9 +139,11 @@ def find_python27(explicit):
         path = shutil.which(name)
         if path:
             return path
+    if DEFAULT_PYTHON27 and os.path.isfile(DEFAULT_PYTHON27):
+        return DEFAULT_PYTHON27
     raise BuildError(
-        "No Python 2.7 found on PATH (tried {}). Pass --python27 /path/to/python2.7.".format(
-            ", ".join(PYTHON27_CANDIDATES)
+        "No Python 2.7 found on PATH (tried {}) or at {}. Pass --python27 /path/to/python2.7.".format(
+            ", ".join(PYTHON27_CANDIDATES), DEFAULT_PYTHON27
         )
     )
 
@@ -346,9 +349,8 @@ def main(argv=None):
     def add_python27_arg(p):
         p.add_argument(
             "--python27",
-            help="Python 2.7 interpreter used to compile (default: first of {} on PATH)".format(
-                ", ".join(PYTHON27_CANDIDATES)
-            ),
+            help="Python 2.7 interpreter used to compile (default: first of {} on PATH, "
+            "else {})".format(", ".join(PYTHON27_CANDIDATES), DEFAULT_PYTHON27),
         )
 
     p = sub.add_parser("deploy", help="compile + copy loose files into a WoT install")

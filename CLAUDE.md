@@ -26,7 +26,7 @@ python build/build.py deploy --wot-root "C:/Program Files/World_of_Tanks_NA" --v
 ```
 python build/build.py package
 ```
-Output is `bin/wotmods/pademinune-armor-pen-calc-<version>.wotmod`. The version comes from `src/meta.xml`'s `<version>` — that file is the single source of truth for the package version (`src/res/scripts/client/ap_calculator/debug.py`'s `VERSION` is a separate, manually-kept-in-sync constant used only for the in-client log prefix and the settings-panel title).
+Output is `bin/wotmods/pademinune-AP_Calculator-<version>.wotmod`. The version comes from `src/meta.xml`'s `<version>` — that file is the single source of truth for the package version (`src/res/scripts/client/ap_calculator/debug.py`'s `VERSION` is a separate, manually-kept-in-sync constant used only for the in-client log prefix and the settings-panel title).
 
 ## Architecture
 

@@ -11,7 +11,7 @@ Subcommands:
              loose override files, for fast local iteration. Close the client
              first -- a running client locks files under its install dir.
   package    Compile and stage into bin/package/, then zip (ZIP_STORED) into
-             bin/wotmods/pademinune-armor-pen-calc-<version>.wotmod, with the
+             bin/wotmods/pademinune-AP_Calculator-<version>.wotmod, with the
              version read from src/meta.xml. Does not touch a WoT install.
   uninstall  Remove whatever `deploy` put into res_mods/<version>/, derived from
              the same source tree so the file list never goes stale.
@@ -290,7 +290,7 @@ def cmd_deploy(args):
 def cmd_package(args):
     python27 = find_python27(args.python27)
     version = mod_version()
-    out_file = os.path.join(OUT_DIR, "pademinune-armor-pen-calc-{}.wotmod".format(version))
+    out_file = os.path.join(OUT_DIR, "pademinune-AP_Calculator-{}.wotmod".format(version))
 
     # Wiped every run so a package never mixes fresh output with leftovers from
     # a previous src layout.

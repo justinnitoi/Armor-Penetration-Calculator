@@ -3,7 +3,7 @@
          are treated as versions/parts of the same modification. -->
     <id>AP-Calculator-2</id>
     <!-- Compared character-by-character (ASCII). Use zero-padded segments. -->
-    <version>2.2.0</version>
+    <version>2.2.0A</version>
     <name>pademinune's Armor Penetration Calculator 2</name>
     <description>pademinune's Armor Penetration Calculator 2
 

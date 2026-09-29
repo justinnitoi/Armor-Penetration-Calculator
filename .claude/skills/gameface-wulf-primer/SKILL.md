@@ -209,7 +209,10 @@ def _place(window):
 
 **Size — NOT Python's job at all**, despite intuition. There is no Python-side size
 setter (`windowSize` writes from Python land silently in `__dict__` and do nothing).
-The PAGE pushes its own size via a JS global:
+The decompiled client (izeberg/wot-src, `frameworks/wulf/windows_system/window.py`)
+confirms it: `Window.size` only reads `proxy.windowSize` from the native window, and
+size changes arrive FROM native via `Window._cResized(width, height)`, which fires
+`onSizeChanged(uniqueID, width, height)`. The PAGE pushes its own size via a JS global:
 
 ```js
 viewEnv.resizeViewRem(width, height);   // logical px ("rem"), same units as window.move
@@ -218,10 +221,13 @@ viewEnv.resizeViewRem(width, height);   // logical px ("rem"), same units as win
 A view that never calls this gets the engine's fallback: a flat **256×256** logical-px
 default after a "Size calculation timeout."
 
-**The timing trap** (confirmed live-measured in this project's `MoEBarTransient.js`):
-pushing the size once is NOT enough — the engine's own fallback fires AFTER your resize
-and clobbers it back to 256×256, because the fallback runs last and wins. Fix: push at
-mount, then push AGAIN after the fallback's deadline has passed:
+**The timing trap** (confirmed live-measured in the MoE Calculator's `MoEBarTransient.js`,
+and again in this mod's `APBattleView.js` on client 2.4.0.x): pushing the size once is NOT
+enough. The surface stays 256×256 at first, the engine still logs `Size calculation
+timeout. Set the default view size.` even though the page called `resizeViewRem` at
+mount, and only the delayed second push actually lands — the window visibly switches
+to the requested size a few seconds in. Fix: push at mount, then push AGAIN after the
+fallback's deadline has passed:
 
 ```js
 const SURFACE_REASSERT_MS = 4000;   // shipped value; comfortably past the observed ~2.2s deadline
@@ -238,7 +244,9 @@ engine.whenReady.then(() => {
 Only bother with this if you actually need a surface bigger than 256×256 — a short
 label doesn't. Once JS resizes, Python finds out via `onSizeChanged` (subscribe with
 `self.onSizeChanged += handler`, WG's `+=` idiom for a Wulf window Event) — useful if
-your position math depends on the real size.
+your position math depends on the real size. The handler receives `(uniqueID, width,
+height)`, so logging it is the reliable way to see what size actually took effect:
+`self.onSizeChanged += lambda _uid, w, h: LOG_NOTE("[mod] window size ->", w, h)`.
 
 **Content exceeding the surface is CLIPPED**, not truncated with an ellipsis or
 auto-shrunk — the window is a fixed-size render surface (like a texture), not a

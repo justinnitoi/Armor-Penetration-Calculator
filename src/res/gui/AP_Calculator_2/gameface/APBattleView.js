@@ -54,7 +54,7 @@ function render(model) {
     // Background box tracks whichever row is visible; borrows armor's color
     // (falling back through prob/angle) since it no longer has its own.
     const anyVisible = armorVisible || probVisible || angleVisible;
-    bgEl.style.display = anyVisible ? "" : "none";
+    bgEl.style.display = (anyVisible && model.backgroundEnabled) ? "" : "none";
 }
 
 // The window's surface size is set by the page, not Python -- a page that never

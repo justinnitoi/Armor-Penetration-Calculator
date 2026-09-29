@@ -39,64 +39,68 @@ class APBattleVM(ViewModel):
 
     def _initialize(self):
         super(APBattleVM, self)._initialize()
-        self._addStringProperty("armorText", "")  # index 0
-        self._addBoolProperty("armorVisible", False)  # 1
-        self._addStringProperty("armorColor", "000000")  # 2
+        params = [
+            ("armorText", ""),
+            ("armorVisible", False),
+            ("armorColor", "000000"),
+            ("probText", ""),
+            ("probVisible", False),
+            ("probColor", "000000"),
+            ("angleText", ""),
+            ("angleVisible", False),
+            ("angleColor", "000000"),
+            ("trackVisible", False),
+            ("backgroundEnabled", True),
+        ]
 
-        self._addStringProperty("probText", "")  # index 3
-        self._addBoolProperty("probVisible", False)  # 4
-        self._addStringProperty("probColor", "000000")  # 5
+        # we will now register these parameters
+        self.param_registry = {}
+        self.param_values = {}
+        for index, (param_name, default_value) in enumerate(params):
+            self.param_registry[param_name] = [
+                index,
+                type(default_value),
+                default_value,
+            ]
+            self.param_values[param_name] = default_value
 
-        self._addStringProperty("angleText", "")  # index 6
-        self._addBoolProperty("angleVisible", False)  # 7
-        self._addStringProperty("angleColor", "000000")  # 8
+            param_type = type(default_value)
+            if param_type == str:
+                self._addStringProperty(param_name, default_value)
+            elif param_type == bool:
+                self._addBoolProperty(param_name, default_value)
+            else:
+                raise TypeError(
+                    "Parameter type is expected to be str or bool. Got: {}".format(
+                        param_type
+                    )
+                )
 
-        self._addBoolProperty("trackVisible", False)  # 9
+    def set_param(self, name, value, use_cache=True):
+        """
+        Updates parameter named `name`. If use_cache is `True`,
+        then no change is sent if the parameter remains the same.
+        """
+        index = self.param_registry[name][0]
+        param_type = self.param_registry[name][1]
+        existing_value = self.param_values[name]
 
-    def setArmor(self, text, visible, color):
-        self._setString(0, text)
-        self._setBool(1, visible)
-        self._setString(2, color)
+        if type(value) != param_type:
+            raise TypeError(
+                "Type of value expected to be {}. Got: {}".format(param_type, value)
+            )
 
-    def setArmorText(self, text):
-        self._setString(0, text)
+        if use_cache and value == existing_value:
+            return
 
-    def setArmorVisible(self, visible):
-        self._setBool(1, visible)
+        if param_type == str:
+            self._setString(index, value)
+        elif param_type == bool:
+            self._setBool(index, value)
+        else:
+            raise TypeError("Parameter type is unrecognized: {}".format(param_type))
 
-    def setArmorColor(self, color):
-        self._setString(2, color)
-
-    def setProb(self, text, visible, color):
-        self._setString(3, text)
-        self._setBool(4, visible)
-        self._setString(5, color)
-
-    def setProbText(self, text):
-        self._setString(3, text)
-
-    def setProbVisible(self, visible):
-        self._setBool(4, visible)
-
-    def setProbColor(self, color):
-        self._setString(5, color)
-
-    def setAngle(self, text, visible, color):
-        self._setString(6, text)
-        self._setBool(7, visible)
-        self._setString(8, color)
-
-    def setAngleText(self, text):
-        self._setString(6, text)
-
-    def setAngleVisible(self, visible):
-        self._setBool(7, visible)
-
-    def setAngleColor(self, color):
-        self._setString(8, color)
-
-    def setTrackVisible(self, visible):
-        self._setBool(9, visible)
+        self.param_values[name] = value
 
 
 # --- the page + the window it lives in -----------------------------------------
@@ -119,9 +123,6 @@ class APBattleView(ViewImpl):
 
     def _onLoading(self, *args, **kwargs):
         super(APBattleView, self)._onLoading(*args, **kwargs)
-        # The page just finished loading -- push once so it paints immediately
-        # instead of sitting blank until something else triggers a refresh.
-        # push(self.viewModel, "", "", "")
 
 
 class APBattleWindow(WindowImpl):
@@ -163,78 +164,19 @@ class APBattleWindow(WindowImpl):
 # --- push -----------------------------------------------------------------------
 
 
-def update_gameface(
-    armor_text=None,
-    armor_visible=None,
-    armor_color=None,
-    prob_text=None,
-    prob_visible=None,
-    prob_color=None,
-    angle_text=None,
-    angle_visible=None,
-    angle_color=None,
-    track_visible=None,
-):
+def update_gameface(params):
     """Public API: call from anywhere (e.g. the armor-pen calc mod) to redraw
     the label with fresh values. No-op if the window isn't open."""
     if _active is None:
         return
     _window, view = _active
-    push(
-        view.viewModel,
-        armor_text,
-        armor_visible,
-        armor_color,
-        prob_text,
-        prob_visible,
-        prob_color,
-        angle_text,
-        angle_visible,
-        angle_color,
-        track_visible,
-    )
+    view_model = view.viewModel
 
-
-def push(
-    view_model,
-    armor_text=None,
-    armor_visible=None,
-    armor_color=None,
-    prob_text=None,
-    prob_visible=None,
-    prob_color=None,
-    angle_text=None,
-    angle_visible=None,
-    angle_color=None,
-    track_visible=None,
-):
-    """Write the label's fields into view_model."""
     if view_model is None:
         return
     with view_model.transaction() as tx:
-        if armor_text is not None:
-            tx.setArmorText(armor_text)
-        if armor_visible is not None:
-            tx.setArmorVisible(armor_visible)
-        if armor_color is not None:
-            tx.setArmorColor(armor_color)
-
-        if prob_text is not None:
-            tx.setProbText(prob_text)
-        if prob_visible is not None:
-            tx.setProbVisible(prob_visible)
-        if prob_color is not None:
-            tx.setProbColor(prob_color)
-
-        if angle_text is not None:
-            tx.setAngleText(angle_text)
-        if angle_visible is not None:
-            tx.setAngleVisible(angle_visible)
-        if angle_color is not None:
-            tx.setAngleColor(angle_color)
-
-        if track_visible is not None:
-            tx.setTrackVisible(track_visible)
+        for param_name, value in params:
+            tx.set_param(param_name, value)
 
 
 # --- open/close, tied to the battle lifecycle ------------------------------------

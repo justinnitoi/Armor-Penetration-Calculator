@@ -9,7 +9,7 @@ and in the state file described below.
 
 - **Upstream:** `https://github.com/izeberg/wot-src.git`, branch `NA`
   (read-only — never push there).
-- **Mod repo:** `justinnitoi/armor-penetration-calculator`, base branch `2.0`.
+- **Mod repo:** `justinnitoi/armor-penetration-calculator`, base branch `v2`.
 - **State:** branch `wot-src-watch` of the mod repo, file
   `.claude/wot-src-watch.json`:
   ```json
@@ -69,7 +69,7 @@ need a mod update:
    - Non-empty → continue.
 
 4. **Analyze.** For each changed watched file, read the actual diff. Then,
-   against the mod code on `2.0`:
+   against the mod code on `v2`:
    - For `gun_marker_ctrl.py`: extract the new stock bodies of
      `getShotResult`, `__shotResultDefault`, `__shotResultModernHE` and diff
      them against the old stock bodies. Map every stock change onto the
@@ -88,7 +88,7 @@ need a mod update:
    bodies can't be mechanically updated).
 
 5. **Port the fix** (only if action is needed).
-   - Branch from `origin/2.0`: `wot-src/NA-<first 8 chars of new sha>`.
+   - Branch from `origin/v2`: `wot-src/NA-<first 8 chars of new sha>`.
    - Make the minimal change that brings the mod in line with the new stock
      code. Preserve the mod's own additions (armor/angle/track bookkeeping
      and `call_update_gui()` funnel) — only mirror what stock changed.
@@ -99,7 +99,12 @@ need a mod update:
      PR — do **not** compile with Python 3 as a substitute for a real check
      (only use `python3 -m py_compile` as an extra sanity pass, noting its
      limits).
-   - Commit, push the branch, and open a **draft** PR into `2.0` titled
+   - Commit and push the branch. If a PR-creation tool (GitHub MCP
+     `create_pull_request`) is available, open a **draft** PR; if not, don't
+     try other ways — instead put this link in the report so the maintainer
+     can open it in one click, and paste the PR title/body below it:
+     `https://github.com/justinnitoi/Armor-Penetration-Calculator/compare/v2...wot-src/NA-<sha8>?expand=1`
+   - The PR (or the pasted body) targets `v2` and is titled
      `wot-src NA <subject>: <one-line summary>`. PR body: the report (step
      6) plus an in-client test checklist (deploy with `build.ps1`, enter a
      battle, aim at armor/tracks/gun, try AP/APCR/HEAT/HE incl. modern HE,
@@ -113,7 +118,7 @@ need a mod update:
    - upstream range checked: `<old sha> (<subject>) → <new sha> (<subject>)`
    - each changed watched file with a 1–3 line plain-English summary
    - the outcome classification
-   - the draft PR link, if one was opened
+   - the draft PR link, or the compare link + ready-to-paste PR text
    - anything that could not be verified (always: in-client testing)
 
 7. **Save state.** Update `.claude/wot-src-watch.json` on `wot-src-watch`
@@ -128,6 +133,7 @@ Push state updates to `wot-src-watch` and fixes to `wot-src/NA-<sha>`. If the
 session's git access only allows pushing to a session-designated branch,
 use the GitHub MCP tools instead: `create_or_update_file` for the state file
 on `wot-src-watch`, and for the fix either `push_files` to
-`wot-src/NA-<sha>` (after `create_branch` from `2.0`) or the designated
-branch. Never push to `2.0` directly, never force-push, never touch
+`wot-src/NA-<sha>` (after `create_branch` from `v2`) or the designated
+branch. (Verified 2026-09-29: plain `git push` to `wot-src-watch` works from
+a Routine session.) Never push to `v2` directly, never force-push, never touch
 `izeberg/wot-src`.

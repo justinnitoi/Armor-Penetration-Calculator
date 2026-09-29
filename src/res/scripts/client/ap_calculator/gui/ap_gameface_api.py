@@ -20,7 +20,6 @@ from frameworks.wulf import (  # type: ignore
 from gui.impl.pub import ViewImpl, WindowImpl  # type: ignore
 from openwg_gameface import ModDynAccessor  # type: ignore
 
-_FAR = 1 << 20  # sentinel outside any real screen -- move() clamps to the true edge
 
 # Must match the "itemID" in mods/configs/res_map/SimpleLabelView.json.
 RES_MAP_ITEM_ID = "APBattleView"
@@ -147,16 +146,18 @@ class APBattleWindow(WindowImpl):
         self._center()
 
     def _center(self, *args, **kwargs):
-        # Self-calibrate: move to a sentinel far off-screen, then read back the
-        # clamped position, which equals the movable extent (screenSpace - windowSize).
-        self.move(_FAR, _FAR, xAnchor=PositionAnchor.LEFT, yAnchor=PositionAnchor.TOP)
-        max_x, max_y = self.position
-        self.move(
-            max_x / 2 + self._x,
-            max_y / 2 + self._y,
-            xAnchor=PositionAnchor.LEFT,
-            yAnchor=PositionAnchor.TOP,
-        )
+        # Native centering (WindowImpl.center -> area.centerPyWindow), the same
+        # call WG's own windows use after show(). Then nudge by the offset from
+        # the centered top-left corner, if there is one.
+        self.center()
+        if self._x or self._y:
+            cx, cy = self.position
+            self.move(
+                cx + self._x,
+                cy + self._y,
+                xAnchor=PositionAnchor.LEFT,
+                yAnchor=PositionAnchor.TOP,
+            )
 
 
 # --- push -----------------------------------------------------------------------

@@ -54,10 +54,30 @@ function render(model) {
     // Background box tracks whichever row is visible; borrows armor's color
     // (falling back through prob/angle) since it no longer has its own.
     const anyVisible = armorVisible || probVisible || angleVisible;
-    bgEl.style.display = anyVisible ? "" : "none";
+    bgEl.style.display = (anyVisible && model.backgroundEnabled) ? "" : "none";
+}
+
+// The window's surface size is set by the page, not Python -- a page that never
+// asks gets the engine's 256x256 fallback after a "Size calculation timeout".
+// Declare it explicitly instead; must match html/body width/height in
+// APBattleView.css (logical px, same units as window.move on the Python side).
+const VIEW_WIDTH = 256;
+const VIEW_HEIGHT = 256;
+// The engine's fallback fires ~2.2s after load and clobbers any earlier resize,
+// so push once at mount and again once that deadline has safely passed.
+const SURFACE_REASSERT_MS = 4000;
+
+function pushSize() {
+    if (typeof viewEnv === "undefined" || !viewEnv) {
+        return;
+    }
+    viewEnv.resizeViewRem(VIEW_WIDTH, VIEW_HEIGHT);
 }
 
 engine.whenReady.then(() => {
+    pushSize();
+    setTimeout(pushSize, SURFACE_REASSERT_MS);
+
     observer.onUpdate(render);   // called every time Python pushes a change
     observer.subscribe();
     render(observer.model);      // paint immediately with whatever's there now

@@ -108,7 +108,7 @@ class ArmorLabel(object):
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
-            update_gameface(armor_visible=False)
+            update_gameface([("armorVisible", False)])
             self.visible = False
             self.last_state = None
 
@@ -121,7 +121,13 @@ class ArmorLabel(object):
         self.visible = True
         interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
-        update_gameface(armor_text=interior_text, armor_visible=True, armor_color=color)
+        update_gameface(
+            [
+                ("armorText", interior_text),
+                ("armorVisible", True),
+                ("armorColor", color),
+            ]
+        )
 
 
 class ProbLabel(object):
@@ -133,7 +139,7 @@ class ProbLabel(object):
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
-            update_gameface(prob_visible=False)
+            update_gameface([("probVisible", False)])
             self.visible = False
             self.last_state = None
 
@@ -146,7 +152,9 @@ class ProbLabel(object):
         self.visible = True
         interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
-        update_gameface(prob_text=interior_text, prob_visible=True, prob_color=color)
+        update_gameface(
+            [("probText", interior_text), ("probVisible", True), ("probColor", color)]
+        )
 
 
 class AngleLabel(object):
@@ -158,7 +166,7 @@ class AngleLabel(object):
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
-            update_gameface(angle_visible=False)
+            update_gameface([("angleVisible", False)])
             self.visible = False
             self.last_state = None
 
@@ -178,7 +186,13 @@ class AngleLabel(object):
         self.visible = True
         interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
-        update_gameface(angle_text=interior_text, angle_visible=True, angle_color=color)
+        update_gameface(
+            [
+                ("angleText", interior_text),
+                ("angleVisible", True),
+                ("angleColor", color),
+            ]
+        )
 
 
 class TrackIndicator(object):
@@ -188,12 +202,12 @@ class TrackIndicator(object):
     def show(self):
         if not self.visible:
             self.visible = True
-            update_gameface(track_visible=True)
+            update_gameface([("trackVisible", True)])
 
     def hide(self):
         if self.visible:
             self.visible = False
-            update_gameface(track_visible=False)
+            update_gameface([("trackVisible", False)])
 
 
 gui_state = GuiState()

@@ -10,9 +10,7 @@ from ap_calculator.gui.ap_constants import (
     get_ricochet_color,
 )
 from ap_calculator.gui.ap_gameface_api import (
-    close_window,
-    open_window,
-    update_gameface,
+    ap_window
 )
 
 
@@ -48,11 +46,11 @@ class GuiState(object):
         """Clears cache, stops cache updates, and destroys the gameface window."""
         self.hide_all()
         self.enabled = False
-        close_window()
+        ap_window.close_window()
 
     def create_window(self):
         """Creates a new gameface window and resumes cache updates"""
-        open_window()
+        ap_window.open_window()
         self.enabled = True
 
     def update_gui(
@@ -108,7 +106,7 @@ class ArmorLabel(object):
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
-            update_gameface([("armorVisible", False)])
+            ap_window.update_params([("armorVisible", False)])
             self.visible = False
             self.last_state = None
 
@@ -121,7 +119,7 @@ class ArmorLabel(object):
         self.visible = True
         interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
-        update_gameface(
+        ap_window.update_params(
             [
                 ("armorText", interior_text),
                 ("armorVisible", True),
@@ -139,7 +137,7 @@ class ProbLabel(object):
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
-            update_gameface([("probVisible", False)])
+            ap_window.update_params([("probVisible", False)])
             self.visible = False
             self.last_state = None
 
@@ -152,7 +150,7 @@ class ProbLabel(object):
         self.visible = True
         interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
-        update_gameface(
+        ap_window.update_params(
             [("probText", interior_text), ("probVisible", True), ("probColor", color)]
         )
 
@@ -166,7 +164,7 @@ class AngleLabel(object):
     def hide(self):
         if self.visible:
             # send update to gameface to hide label
-            update_gameface([("angleVisible", False)])
+            ap_window.update_params([("angleVisible", False)])
             self.visible = False
             self.last_state = None
 
@@ -186,7 +184,7 @@ class AngleLabel(object):
         self.visible = True
         interior_text = self.settings.FORMAT.format(value=value)
         # send update to gameface to update the label with interior_text and color
-        update_gameface(
+        ap_window.update_params(
             [
                 ("angleText", interior_text),
                 ("angleVisible", True),
@@ -202,12 +200,12 @@ class TrackIndicator(object):
     def show(self):
         if not self.visible:
             self.visible = True
-            update_gameface([("trackVisible", True)])
+            ap_window.update_params([("trackVisible", True)])
 
     def hide(self):
         if self.visible:
             self.visible = False
-            update_gameface([("trackVisible", False)])
+            ap_window.update_params([("trackVisible", False)])
 
 
 gui_state = GuiState()

@@ -1,9 +1,9 @@
-"""Simple Label -- the smallest possible in-battle Gameface overlay.
+"""Gameface plumbing for the in-battle armor/prob/angle overlay.
 
-Shows armor/prob/angle text over the battle HUD, for the length of the battle.
-Deliberately skips everything a real mod would want (settings, positioning,
-re-entrancy guards) to keep the res_map -> ViewModel -> View -> Window ->
-battle-lifecycle -> JS pipeline visible with nothing else in the way.
+GamefaceWindow owns one overlay window and the list of named parameters
+(name, default value) that form the whole Python -> JS contract. The rest of
+the mod only calls my_window.open_window() / update_params() / close_window();
+APBattleVM, APBattleView and APBattleWindow are the Wulf pieces underneath.
 
 Python 2.7 (BigWorld) runtime. OpenWG GameFace is a hard dependency.
 """
@@ -21,49 +21,114 @@ from gui.impl.pub import ViewImpl, WindowImpl  # type: ignore
 from openwg_gameface import ModDynAccessor  # type: ignore
 
 
-# Must match the "itemID" in mods/configs/res_map/SimpleLabelView.json.
+# Must match the "itemID" in mods/configs/res_map/APBattleView.json.
 RES_MAP_ITEM_ID = "APBattleView"
+
+
+class GamefaceWindow(object):
+    """One Gameface overlay window plus a cache of the values last sent to it.
+
+    params: list of (name, default_value) pairs. Each default's type (str or
+    bool) fixes that parameter's property type, and its position in the list
+    is its property index in APBattleVM. The JS reads them by name.
+    name: the res_map itemID the view is registered under."""
+
+    def __init__(self, params, name):
+        self.params = params
+        self.name = name
+
+        self.param_registry = {}
+        self.param_values = None # None for now because it hasnt been initialized yet
+
+        self._active = None
+        self._layoutID = ModDynAccessor(name)
+
+        for index, (param_name, default_value) in enumerate(self.params):
+            self.param_registry[param_name] = [
+                index,
+                type(default_value),
+                default_value,
+            ]
+
+    def open_window(self):
+        """Create and load the window, centered on screen, with every parameter
+        at its default. No-op if already open, or if OpenWG hasn't resolved
+        the res_map entry yet."""
+        if self._active is not None:
+            return
+        
+        layout = self._layoutID()
+        if layout is None or layout < 0:
+            # res_map not registered yet -- ships fine, just needs the one-time
+            # client restart OpenWG triggers the first time it rebuilds res_map.json.
+            return
+        view = APBattleView(
+            self.params,
+            self._layoutID()
+        )
+        window = APBattleWindow(view)
+        self._active = (window, view)
+        self.param_values = {param_name: default_value for param_name, default_value in self.params}
+        window.load()
+    
+    def update_params(self, updated_params):
+        """Push new values to the window in one transaction.
+
+        updated_params: list of (name, value) pairs. Values equal to the last
+        one sent are skipped. Raises TypeError if a value's type doesn't match
+        that parameter's default. No-op while the window is closed."""
+        if self._active is None:
+            return
+        _window, view = self._active
+        view_model = view.viewModel
+
+        if view_model is None or self.param_values is None:
+            return
+
+        payload = [] # list of (index, type, new_value)
+
+        for param_name, new_value in updated_params:
+            param_type = self.param_registry[param_name][1]
+            if type(new_value) != param_type:
+                raise TypeError(
+                    "Type of value expected to be {}. Got: {}".format(param_type, type(new_value))
+                )
+            elif new_value != self.param_values[param_name]:
+                self.param_values[param_name] = new_value
+                index = self.param_registry[param_name][0]
+                payload.append((index, param_type, new_value))
+
+        with view_model.transaction() as tx:
+            for index, param_type, value in payload:
+                tx.set_param(index, param_type, value)
+
+    def close_window(self):
+        """Destroy the window and drop the value cache. No-op if not open."""
+        if self._active is None:
+            return
+        window, _view = self._active
+        self._active = None
+        self.param_values = None
+        window.destroy()
 
 
 # --- the data channel ---------------------------------------------------------
 
 
 class APBattleVM(ViewModel):
-    """Five string properties: the label's text, its color, and its visibility.
-    Read-only (JS never writes back). visible is a string, not a bool property
-    type, to stay on the one property primitive already proven to work in
-    this stack -- see setVisible for the bool->string encoding."""
+    """Root ViewModel: one string or bool property per (name, default) pair in
+    params, added in list order so each property's index is its position in
+    the list. Read-only (JS never writes back)."""
 
-    def __init__(self):
-        super(APBattleVM, self).__init__(properties=10, commands=0)
+    def __init__(self, params):
+        self.params = params
+        super(APBattleVM, self).__init__(properties=len(params), commands=0)
 
     def _initialize(self):
         super(APBattleVM, self)._initialize()
-        params = [
-            ("armorText", ""),
-            ("armorVisible", False),
-            ("armorColor", "000000"),
-            ("probText", ""),
-            ("probVisible", False),
-            ("probColor", "000000"),
-            ("angleText", ""),
-            ("angleVisible", False),
-            ("angleColor", "000000"),
-            ("trackVisible", False),
-            ("backgroundEnabled", True),
-        ]
 
         # we will now register these parameters
-        self.param_registry = {}
-        self.param_values = {}
-        for index, (param_name, default_value) in enumerate(params):
-            self.param_registry[param_name] = [
-                index,
-                type(default_value),
-                default_value,
-            ]
-            self.param_values[param_name] = default_value
-
+        for index, (param_name, default_value) in enumerate(self.params):
             param_type = type(default_value)
             if param_type == str:
                 self._addStringProperty(param_name, default_value)
@@ -76,22 +141,9 @@ class APBattleVM(ViewModel):
                     )
                 )
 
-    def set_param(self, name, value, use_cache=True):
-        """
-        Updates parameter named `name`. If use_cache is `True`,
-        then no change is sent if the parameter remains the same.
-        """
-        index = self.param_registry[name][0]
-        param_type = self.param_registry[name][1]
-        existing_value = self.param_values[name]
-
-        if type(value) != param_type:
-            raise TypeError(
-                "Type of value expected to be {}. Got: {}".format(param_type, value)
-            )
-
-        if use_cache and value == existing_value:
-            return
+    def set_param(self, index, param_type, value):
+        """Write one property by index. Does no type or change checking --
+        GamefaceWindow.update_params does that before calling this."""
 
         if param_type == str:
             self._setString(index, value)
@@ -100,21 +152,19 @@ class APBattleVM(ViewModel):
         else:
             raise TypeError("Parameter type is unrecognized: {}".format(param_type))
 
-        self.param_values[name] = value
 
 
 # --- the page + the window it lives in -----------------------------------------
 
 
 class APBattleView(ViewImpl):
-    """The registered Gameface view. Its root ViewModel IS our APBattleView --
-    the JS reads it with a bare ModelObserver(), no nested submodel."""
+    """The registered Gameface view. Its root ViewModel is an APBattleVM built
+    from params -- the JS reads it with a bare ModelObserver(), no nested
+    submodel."""
 
-    _layoutID = ModDynAccessor(RES_MAP_ITEM_ID)  # deferred: -1 until OpenWG resolves it
-
-    def __init__(self):
+    def __init__(self, params, layout_id):
         super(APBattleView, self).__init__(
-            ViewSettings(self._layoutID(), ViewFlags.VIEW, APBattleVM())
+            ViewSettings(layout_id, ViewFlags.VIEW, APBattleVM(params))
         )
 
     @property
@@ -127,10 +177,9 @@ class APBattleView(ViewImpl):
 
 class APBattleWindow(WindowImpl):
     """Content-sized (NOT full-screen) so its rectangle can't hit-test across the
-    whole HUD, layer WINDOW (not OVERLAY) so it never sits above the modal
-    in-battle menu. See battle_view.py in the real mod for the long version.
+    whole HUD. Shown without focus so it never steals battle input.
 
-    Centered on screen by default, offset by (x, y) logical px from that center."""
+    Centered on screen, offset by (x, y) logical px from that center."""
 
     def __init__(self, content, x=0, y=0):
         super(APBattleWindow, self).__init__(
@@ -161,63 +210,20 @@ class APBattleWindow(WindowImpl):
             )
 
 
-# --- push -----------------------------------------------------------------------
 
-
-def update_gameface(params):
-    """Public API: call from anywhere (e.g. the armor-pen calc mod) to redraw
-    the label with fresh values. No-op if the window isn't open."""
-    if _active is None:
-        return
-    _window, view = _active
-    view_model = view.viewModel
-
-    if view_model is None:
-        return
-    with view_model.transaction() as tx:
-        for param_name, value in params:
-            tx.set_param(param_name, value)
-
-
-# --- open/close, tied to the battle lifecycle ------------------------------------
-
-_active = None  # (window, view) while open, else None
-
-
-def open_window(x=0, y=0):
-    """x, y: offset in logical px from screen center (positive = right/down)."""
-    global _active
-    if _active is not None:
-        return
-    layout = APBattleView._layoutID()
-    if layout is None or layout < 0:
-        # res_map not registered yet -- ships fine, just needs the one-time
-        # client restart OpenWG triggers the first time it rebuilds res_map.json.
-        return
-    view = APBattleView()
-    window = APBattleWindow(view, x=x, y=y)
-    _active = (window, view)
-    window.load()
-
-
-def close_window():
-    global _active
-    if _active is None:
-        return
-    window, _view = _active
-    _active = None
-    window.destroy()
-
-
-def _on_avatar_ready(*args, **kwargs):
-    try:
-        open_window()
-    except Exception:
-        LOG_CURRENT_EXCEPTION()
-
-
-def _on_avatar_teardown(*args, **kwargs):
-    try:
-        close_window()
-    except Exception:
-        LOG_CURRENT_EXCEPTION()
+ap_window = GamefaceWindow(
+    [
+        ("armorText", ""),
+        ("armorVisible", False),
+        ("armorColor", "000000"),
+        ("probText", ""),
+        ("probVisible", False),
+        ("probColor", "000000"),
+        ("angleText", ""),
+        ("angleVisible", False),
+        ("angleColor", "000000"),
+        ("trackVisible", False),
+        ("backgroundEnabled", True),
+    ],
+    RES_MAP_ITEM_ID
+)

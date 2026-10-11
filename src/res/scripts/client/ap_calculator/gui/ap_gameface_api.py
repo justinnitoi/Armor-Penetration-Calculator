@@ -54,7 +54,7 @@ class APBattleVM(ViewModel):
     this stack -- see setVisible for the bool->string encoding."""
 
     def __init__(self):
-        super(APBattleVM, self).__init__(properties=10, commands=0)
+        super(APBattleVM, self).__init__(properties=11, commands=0)
 
     def _initialize(self):
         super(APBattleVM, self)._initialize()
@@ -73,17 +73,17 @@ class APBattleVM(ViewModel):
         ]
 
         # we will now register these parameters
-        self.param_registry = {}
-        self.param_values = {}
+        self.param_registry = {}  # name: [index, type, default_value]
+        self.param_values = {}  # name: value
         for index, (param_name, default_value) in enumerate(params):
+            param_type = type(default_value)
             self.param_registry[param_name] = [
                 index,
-                type(default_value),
+                param_type,
                 default_value,
             ]
             self.param_values[param_name] = default_value
 
-            param_type = type(default_value)
             if param_type == str:
                 self._addStringProperty(param_name, default_value)
             elif param_type == bool:

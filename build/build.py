@@ -245,7 +245,9 @@ def resolve_wot_root(args):
     if not args.wot_root:
         raise BuildError("Pass --wot-root (the World of Tanks install directory).")
     if not os.path.isdir(args.wot_root):
-        raise BuildError("WoT install not found: {} (pass --wot-root)".format(args.wot_root))
+        raise BuildError(
+            "WoT install not found: {} (pass --wot-root)".format(args.wot_root)
+        )
     return args.wot_root
 
 
@@ -290,7 +292,9 @@ def cmd_deploy(args):
 def cmd_package(args):
     python27 = find_python27(args.python27)
     version = mod_version()
-    out_file = os.path.join(OUT_DIR, "pademinune-AP_Calculator-{}.wotmod".format(version))
+    out_file = os.path.join(
+        OUT_DIR, "pademinune-AP_Calculator-{}.wotmod".format(version)
+    )
 
     # Wiped every run so a package never mixes fresh output with leftovers from
     # a previous src layout.

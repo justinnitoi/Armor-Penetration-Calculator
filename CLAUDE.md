@@ -26,26 +26,35 @@ Close the WoT client first (a running client locks files under its install dir);
 ```
 Output is `bin\wotmods\pademinune-armor-pen-calc-<version>.wotmod`. The version comes from `src/meta.xml`'s `<version>` — that file is the single source of truth for the package version (`src/res/scripts/client/ap_calculator/debug.py`'s `VERSION` is a separate, manually-kept-in-sync constant used only for the in-client log prefix and the settings-panel title).
 
-## What ships vs. what doesn't
+## Game client source dependencies
 
-Only part of the repo ends up in the client. `build.ps1`, `package.ps1`, and `uninstall.ps1` decide what ships by globbing whole directories, not by listing files. So any file dropped into a shipped directory ships, and anything outside those directories never does. Paths are relative to `src/`:
+The mod has no stable API to build on. It imports and monkey-patches stock client modules, so it breaks whenever WG renames or reshapes any of the items below. The reference for these files is the decompiled client at [izeberg/wot-src, `NA` branch](https://github.com/izeberg/wot-src/tree/NA). Paths below are relative to `sources/res/scripts/` in that repo. After a client update, diff these files first.
 
-| Source | Deployed as | Notes |
+**Patched or replicated (highest breakage risk)**: `core/ap_hooks.py`
+- `client/AvatarInputHandler/gun_marker_ctrl.py`, class `_CrosshairShotResults` (not `_StandardShotResult`, which has its own `getShotResult`):
+  - `getShotResult` is wrapped.
+  - `__shotResultDefault` and `__shotResultModernHE` are **replaced wholesale**, with copies of the stock bodies plus armor-tracking additions. When the stock versions change, re-port them by hand: compare the stock method line by line against `my_shot_result_default` / `my_shot_result_modern_he`. Signatures must stay `(cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity)`.
+  - The replacements call these class internals: `_shouldRicochet`, `_computePenetrationArmor`, `_SHELL_EXTRA_DATA`, `_CRIT_ONLY_SHOT_RESULT`, and the name-mangled `__isDestructibleComponent`, `__collectDebugPiercingData`, `__sendDebugInfo`.
+  - They also read fields off the stock objects passed in:
+    - collision details: `compName`, `dist`, `hitAngleCos`, `matInfo`
+    - `matInfo`: `armor`, `kind`, `useHitAngle`, `collideOnceOnly`, `vehicleDamageFactor`, `extra`
+    - shell descriptor: `kind`, `piercingPowerRandomization`, `armorDamage`, `type.piercingPowerLossFactorByDistance`, `type.shieldPenetration`, `type.maxDamage`
+    - `entity.health`
+- `client/AvatarInputHandler/__init__.py`: `AvatarInputHandler.activatePostmortem` is wrapped.
+- `client/vehicle_systems/tankStructure.py`: `TankPartIndexes` is the source of the hardcoded `compName` checks (`0` chassis, `3` gun, `>= 4` extra track pairs). These are literals in `ap_hooks.py`, not imports, so a renumbering fails silently.
+
+**Imported (breaks on rename/move)**
+| Module | Names | Used by |
 |---|---|---|
-| `res/scripts/client/gui/mods/*.py` | `scripts/client/gui/mods/*.pyc` | Compiled with Py2.7, recursive. Only `mod_AP_Calculator.py`, the auto-loaded entry point. |
-| `res/scripts/client/ap_calculator/**/*.py` | `scripts/client/ap_calculator/**/*.pyc` | Compiled, recursive (keeps the subpackage layout). Only `.pyc` ships, never the `.py` source. |
-| `res/gui/AP_Calculator_2/gameface/*` | same path | Copies only the files directly in the folder, not subfolders. `APBattleView.html` (loaded via `coui://` from the res_map entry) pulls in `.css`/`.js`, and the `.css` loads `PFDINMax-CompressedBold.ttf`. |
-| `res/gui/AP_Calculator_2/tooltips/*` | same path | Settings-panel tooltip images, referenced by name from `settings_gui/aslain_settings.py` and `legacy_settings.py`. |
-| `res/gui/AP_Calculator_2/translations/*` | same path | `translations_<locale>.json`, resolved by `settings_gui/language.py`. |
-| `res/mods/configs/res_map/APBattleView.json` | `mods/configs/res_map/` (WoT root, **not** under `res_mods/<ver>`) | A single named file, not a glob. `package.ps1` puts it under `res/` inside the `.wotmod`. |
-| `meta.xml` | `.wotmod` archive root | `package.ps1` only. `build.ps1` doesn't use it. |
+| `client/aih_constants.py` | `SHOT_RESULT` | `core/ap_hooks.py` |
+| `common/items/components/component_constants.py` | `MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS` | `core/ap_hooks.py` |
+| `client/PlayerEvents.py` | `g_playerEvents`: `onAvatarReady`, `onAvatarBecomeNonPlayer`, `onAccountShowGUI` | `core/ap_hooks.py`, `ap_logger.py` |
+| `client/frameworks/wulf/__init__.py` | `PositionAnchor`, `ViewFlags`, `ViewModel`, `ViewSettings`, `WindowFlags`, `WindowLayer` | `gui/ap_gameface_api.py` |
+| `client/gui/impl/pub/__init__.py` | `ViewImpl`, `WindowImpl` | `gui/ap_gameface_api.py` |
+| `common/debug_utils.py` | `LOG_CURRENT_EXCEPTION` | `gui/ap_gameface_api.py` |
+| `client/helpers/__init__.py` | `getClientLanguage` | `settings_gui/language.py` |
 
-**Never shipped:**
-- `src/other_res/`: spare fonts, unused icons, and `wot-background.jpg` (only referenced by a commented-out rule in `APBattleView.css`). To ship a file from here, move it into a shipped directory.
-- `images/`: screenshots and thumbnails for the mod listing or README.
-- `build/`, `.claude/`, and `bin/` (build output, gitignored).
-
-When adding a new asset directory or script root, update the path tables in all three `build/*.ps1` scripts. Otherwise `build.ps1` deploys it but `package.ps1` drops it, or `uninstall.ps1` leaves it behind.
+Engine built-ins (`BigWorld`, `ResMgr`) are native modules with no `.py` in wot-src. The mod uses `BigWorld.player()` (`.name`, `.connectionMgr.serverUserName`) and `BigWorld.wg_openWebBrowser`, plus `ResMgr.openSection`. Third-party imports are not in wot-src either. They come from other mods: `openwg_gameface` (`ModDynAccessor`), `gui.modsSettingsApi`, and `gui.aslainMenu`.
 
 ## Architecture
 

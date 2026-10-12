@@ -26,6 +26,36 @@ Close the WoT client first (a running client locks files under its install dir);
 ```
 Output is `bin\wotmods\pademinune-armor-pen-calc-<version>.wotmod`. The version comes from `src/meta.xml`'s `<version>` — that file is the single source of truth for the package version (`src/res/scripts/client/ap_calculator/debug.py`'s `VERSION` is a separate, manually-kept-in-sync constant used only for the in-client log prefix and the settings-panel title).
 
+## Game client source dependencies
+
+The mod has no stable API to build on. It imports and monkey-patches stock client modules, so it breaks whenever WG renames or reshapes any of the items below. The reference for these files is the decompiled client at [izeberg/wot-src, `NA` branch](https://github.com/izeberg/wot-src/tree/NA). Paths below are relative to `sources/res/scripts/` in that repo. After a client update, diff these files first.
+
+**Patched or replicated (highest breakage risk)**: `core/ap_hooks.py`
+- `client/AvatarInputHandler/gun_marker_ctrl.py`, class `_CrosshairShotResults` (not `_StandardShotResult`, which has its own `getShotResult`):
+  - `getShotResult` is wrapped.
+  - `__shotResultDefault` and `__shotResultModernHE` are **replaced wholesale**, with copies of the stock bodies plus armor-tracking additions. When the stock versions change, re-port them by hand: compare the stock method line by line against `my_shot_result_default` / `my_shot_result_modern_he`. Signatures must stay `(cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity)`.
+  - The replacements call these class internals: `_shouldRicochet`, `_computePenetrationArmor`, `_SHELL_EXTRA_DATA`, `_CRIT_ONLY_SHOT_RESULT`, and the name-mangled `__isDestructibleComponent`, `__collectDebugPiercingData`, `__sendDebugInfo`.
+  - They also read fields off the stock objects passed in:
+    - collision details: `compName`, `dist`, `hitAngleCos`, `matInfo`
+    - `matInfo`: `armor`, `kind`, `useHitAngle`, `collideOnceOnly`, `vehicleDamageFactor`, `extra`
+    - shell descriptor: `kind`, `piercingPowerRandomization`, `armorDamage`, `type.piercingPowerLossFactorByDistance`, `type.shieldPenetration`, `type.maxDamage`
+    - `entity.health`
+- `client/AvatarInputHandler/__init__.py`: `AvatarInputHandler.activatePostmortem` is wrapped.
+- `client/vehicle_systems/tankStructure.py`: `TankPartIndexes` is the source of the hardcoded `compName` checks (`0` chassis, `3` gun, `>= 4` extra track pairs). These are literals in `ap_hooks.py`, not imports, so a renumbering fails silently.
+
+**Imported (breaks on rename/move)**
+| Module | Names | Used by |
+|---|---|---|
+| `client/aih_constants.py` | `SHOT_RESULT` | `core/ap_hooks.py` |
+| `common/items/components/component_constants.py` | `MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS` | `core/ap_hooks.py` |
+| `client/PlayerEvents.py` | `g_playerEvents`: `onAvatarReady`, `onAvatarBecomeNonPlayer`, `onAccountShowGUI` | `core/ap_hooks.py`, `ap_logger.py` |
+| `client/frameworks/wulf/__init__.py` | `PositionAnchor`, `ViewFlags`, `ViewModel`, `ViewSettings`, `WindowFlags`, `WindowLayer` | `gui/ap_gameface_api.py` |
+| `client/gui/impl/pub/__init__.py` | `ViewImpl`, `WindowImpl` | `gui/ap_gameface_api.py` |
+| `common/debug_utils.py` | `LOG_CURRENT_EXCEPTION` | `gui/ap_gameface_api.py` |
+| `client/helpers/__init__.py` | `getClientLanguage` | `settings_gui/language.py` |
+
+Engine built-ins (`BigWorld`, `ResMgr`) are native modules with no `.py` in wot-src. The mod uses `BigWorld.player()` (`.name`, `.connectionMgr.serverUserName`) and `BigWorld.wg_openWebBrowser`, plus `ResMgr.openSection`. Third-party imports are not in wot-src either. They come from other mods: `openwg_gameface` (`ModDynAccessor`), `gui.modsSettingsApi`, and `gui.aslainMenu`.
+
 ## Architecture
 
 **Entry point and load order.** `src/res/scripts/client/gui/mods/mod_AP_Calculator.py` is the file the stock client auto-loads; it does nothing but `import ap_calculator`. That triggers `src/res/scripts/client/ap_calculator/__init__.py`, which imports (in order) `core`, `settings_gui`, then `ap_logger` — import order matters, since each subpackage runs its monkey-patching `init()` calls as an import side effect rather than through any explicit "start" call.

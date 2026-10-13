@@ -5,7 +5,9 @@ GamefaceWindow owns one overlay window and the list of named parameters
 the mod only calls my_window.open_window() / update_params() / close_window();
 APBattleVM, APBattleView and APBattleWindow are the Wulf pieces underneath.
 
-Python 2.7 (BigWorld) runtime. OpenWG GameFace is a hard dependency.
+Python 2.7 (BigWorld) runtime, WoT 2.4.1+. The view is registered natively by
+the client from gui/gen_resources/ap_calculator_2.json -- OpenWG GameFace is
+only needed on the JS side (APBattleView.js imports its libs/model.js).
 """
 
 from debug_utils import LOG_CURRENT_EXCEPTION  # type: ignore
@@ -17,12 +19,29 @@ from frameworks.wulf import (  # type: ignore
     WindowFlags,
     WindowLayer,
 )
+from gui.impl.gen import R  # type: ignore
 from gui.impl.pub import ViewImpl, WindowImpl  # type: ignore
-from openwg_gameface import ModDynAccessor  # type: ignore
 
 
-# Must match the "itemID" in mods/configs/res_map/APBattleView.json.
-RES_MAP_ITEM_ID = "APBattleView"
+# Must match the "R.mods.<RES_MOD_ID>.views.APBattleView" id declared in
+# gui/gen_resources/ap_calculator_2.json.
+RES_MOD_ID = "ap_calculator_2"
+INVALID_RES_ID = -1
+
+
+def _layout_id(mod_name_id):
+    """Numeric layoutID of our view, or INVALID_RES_ID if the client didn't load
+    the gen_resources declaration (pre-2.4.1 client, or the file isn't deployed).
+    Looked up at open time, never cached across runs -- numeric IDs can change
+    between client launches."""
+    # dyn() at every step: plain attribute access raises AttributeError when a
+    # node is missing (possibly even R.mods, if no mod declared anything).
+    node = R
+    for name in ("mods", mod_name_id, "views", "APBattleView"):
+        node = node.dyn(name)
+        if not node:
+            return INVALID_RES_ID
+    return node()
 
 
 class GamefaceWindow(object):
@@ -41,12 +60,13 @@ class GamefaceWindow(object):
         self.param_values = None # None for now because it hasnt been initialized yet
 
         self._active = None
-        self._layoutID = ModDynAccessor(name)
+        self._layoutID = lambda : _layout_id(name)
 
         for index, (param_name, default_value) in enumerate(self.params):
+            param_type = type(default_value)
             self.param_registry[param_name] = [
                 index,
-                type(default_value),
+                param_type,
                 default_value,
             ]
 
@@ -225,5 +245,5 @@ ap_window = GamefaceWindow(
         ("trackVisible", False),
         ("backgroundEnabled", True),
     ],
-    RES_MAP_ITEM_ID
+    RES_MOD_ID
 )

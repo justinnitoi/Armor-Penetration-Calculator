@@ -1,6 +1,6 @@
 ---
 name: gameface-wulf-primer
-description: Use when the user wants to understand HOW WoT's Gameface/Wulf UI stack works from first principles (not just this project's specific widgets) — what Wulf/ViewModel/ViewImpl/WindowImpl are, how res_map + ModDynAccessor register a mod's own view, how ModelObserver connects Python to JS, window position vs size mechanics (and the SURFACE_REASSERT_MS timing trap), click-through/hit-test behavior, or how to deploy a NEW standalone Gameface mod (res_mods vs mods, the mods/configs/res_map path, Python 2.7 bytecode). Complements the harness skills wotmod-gameface-widget (front-end DOM/CSS conventions) and wotmod-architecture (domain/adapter/bridge layering) — this skill is the conceptual "why does any of this work" layer underneath both, aimed at someone learning the stack rather than editing this project's shipped features. For THIS project's actual battle/garage widgets see moe-battle / moe-garage.
+description: Use when the user wants to understand HOW WoT's Gameface/Wulf UI stack works from first principles (not just this project's specific widgets) — what Wulf/ViewModel/ViewImpl/WindowImpl are, how gui/gen_resources + the native R tree register a mod's own view (and the pre-2.4.1 res_map + ModDynAccessor way), how ModelObserver connects Python to JS, window position vs size mechanics (and the SURFACE_REASSERT_MS timing trap), click-through/hit-test behavior, or how to deploy a NEW standalone Gameface mod (res_mods vs mods, the gui/gen_resources path, Python 2.7 bytecode). Complements the harness skills wotmod-gameface-widget (front-end DOM/CSS conventions) and wotmod-architecture (domain/adapter/bridge layering) — this skill is the conceptual "why does any of this work" layer underneath both, aimed at someone learning the stack rather than editing this project's shipped features. For THIS project's actual battle/garage widgets see moe-battle / moe-garage.
 ---
 
 # Gameface + Wulf: how the stack actually works
@@ -17,43 +17,58 @@ of the MoE Calculator's own features.
 2. **Wulf** (`frameworks.wulf`) — **made by Wargaming**. Their own Python abstraction
    over the engine: `WindowImpl`, `ViewImpl`, `ViewModel`. WG's own developers use this
    for their newer UI screens.
-3. **OpenWG GameFace** — **a community-made mod**, not WG's. The base client only lets
-   WG's own code register new Gameface views or inject into WG's own documents; OpenWG
-   patches the client to expose that to third-party mods (`res_map` registration,
-   `ModDynAccessor`, `gf_mod_inject`). It's the door that lets a mod's own view in front
-   of Wulf at all.
+3. **OpenWG GameFace** — **a community-made mod**, not WG's. Before WoT 2.4.1 it was
+   the door that let a mod's own view in front of Wulf at all (`res_map` registration,
+   `ModDynAccessor`). **Since 2.4.1 the WG client registers mod views natively** (see
+   below), and on WG OpenWG is down to: `gf_mod_inject` (injecting CSS/JS into WG's own
+   documents) and its shared JS helper libs (`gui/gameface/mods/libs/*.js`, e.g.
+   `model.js`'s `ModelObserver`). Its res_map helpers are Lesta-only now; on WG they are
+   importable stubs that log a deprecation warning and resolve to `-1`.
 4. **Your mod** — Python domain logic + a `ViewModel` + HTML/CSS/JS on top of all three.
 
-## Registering a new view: res_map → layoutID
+## Registering a new view: gen_resources → R → layoutID (WG 2.4.1+)
 
-- `res_map.json` is WG's registry: string `itemID` → numeric `layoutID` → which
-  compiled HTML/JS/CSS bundle to load. A mod ships a fragment under
-  `mods/configs/res_map/<Name>.json`:
+- The client loads every `gui/gen_resources/*.json` from all mounted resource paths
+  (packaged `.wotmod`s and `res_mods\<version>\`) into the shared `R` tree at startup.
+  No `res_map.json` rewrite, **no restart dance**. A mod ships one declaration file,
+  named after the mod (a mod `images.json` would REPLACE the client's own):
 
   ```json
   [
       {
           "type": "Layout",
-          "path": "coui://gui/gameface/mods/<your_mod>/<Name>.html",
-          "parameters": { "extension": "", "entrance": "<Name>", "impl": "gameface" },
-          "itemID": "<Name>"
+          "id": "R.mods.<your_mod>.views.<Name>",
+          "path": "coui://gui/<your_mod>/<Name>.html",
+          "parameters": { "entrance": "<Name>", "impl": "gameface" }
       }
   ]
   ```
 
-- OpenWG's `ResMapManager` merges mod-provided fragments into the real `res_map.json`
-  at startup — **needs a one-time client restart** the first time this happens (and
-  again any time you ADD a new `itemID`, not just edit one).
-- `ModDynAccessor(itemID)` is a **deferred lookup**: create it early (safe even before
-  the res_map is ready), call it later to resolve the numeric `layoutID` (`-1` /
-  `INVALID_RES_ID` if not yet registered):
+  Strict JSON (no trailing commas — invalid JSON breaks resource loading for the whole
+  UI). IDs start with `R.`, claim your own `R.mods.<mod_id>.*` subtree; first declarer
+  of an ID wins, duplicates are skipped with a warning.
+- Resolve the numeric `layoutID` natively, via `dyn()` at every step — plain attribute
+  access raises `AttributeError` when a node is missing, and `R.mods` itself only
+  exists once some mod declares under it:
 
   ```python
-  _layoutID = ModDynAccessor("SimpleLabelView")   # created early
-  layout = self._layoutID()                        # resolved when actually needed
-  if layout is None or layout < 0:
-      return  # res_map not ready yet -- needs the restart, not an error
+  from gui.impl.gen import R
+
+  def _layout_id():
+      node = R
+      for name in ("mods", "<your_mod>", "views", "<Name>"):
+          node = node.dyn(name)
+          if not node:
+              return -1   # declaration not loaded (pre-2.4.1 client / not deployed)
+      return node()
   ```
+
+  Don't persist numeric IDs between client runs.
+- **Pre-2.4.1 / Lesta (legacy):** a `mods/configs/res_map/<Name>.json` fragment with an
+  `itemID`, merged into `res_map.json` by OpenWG's `ResMapManager` (one-time client
+  restart), resolved with `openwg_gameface.ModDynAccessor(itemID)`. On WG 2.4.1+ this
+  path is dead: OpenWG ignores the fragments and `ModDynAccessor()` always returns `-1`,
+  so a mod still using it just never opens its window.
 
 ## Wulf's three building blocks
 
@@ -67,10 +82,9 @@ Bound together at construction:
 
 ```python
 class MyView(ViewImpl):
-    _layoutID = ModDynAccessor("MyItemID")
-    def __init__(self):
+    def __init__(self, layout_id):   # from _layout_id() above
         super(MyView, self).__init__(
-            ViewSettings(self._layoutID(), ViewFlags.VIEW, MyViewModel()))
+            ViewSettings(layout_id, ViewFlags.VIEW, MyViewModel()))
     @property
     def viewModel(self):
         return self.getViewModel()
@@ -124,8 +138,8 @@ class MyViewModel(ViewModel):
 ## The full connection chain
 
 ```
-res_map entry (HTML+CSS+JS bundle)
-        ↑ resolved by layoutID (via ModDynAccessor)
+gen_resources Layout entry (HTML+CSS+JS bundle)
+        ↑ resolved by layoutID (via R.mods.<mod>.views.<Name>())
    ViewImpl  ←──bound at construction──  ViewModel instance
         ↓ window loads the HTML page
    Gameface engine injects a `model` global into that page's JS scope
@@ -178,7 +192,7 @@ engine.whenReady.then(() => {
 
 - **Standalone registered view vs injected sub-view** — two different `ModelObserver`
   usages:
-  - **Standalone window** (own res_map entry, own window — this pattern): the model
+  - **Standalone window** (own Layout entry, own window — this pattern): the model
     IS the view's own root → `ModelObserver()` with **no feature name**, read fields
     directly (`model.text`).
   - **Injected sub-view** (`gf_mod_inject` appending into an EXISTING WG document —
@@ -310,9 +324,9 @@ as DOM siblings inside one document.
 
 **Rule of thumb**: labels close together (a stack in one corner) → one small `ViewImpl`
 with multiple DOM elements. Labels scattered across the screen → one Window+View+
-ViewModel trio PER region — each needs its OWN `res_map` `itemID` (itemIDs must be
-globally unique; OpenWG assigns resIds positionally, so a collision makes one layout
-unreachable), its own `ModDynAccessor`, its own open/close lifecycle.
+ViewModel trio PER region — each needs its OWN `Layout` entry with its own `R.mods.*`
+id (a duplicate id is skipped, making one layout unreachable), its own open/close
+lifecycle.
 
 ## Deploying a standalone test mod
 
@@ -330,50 +344,42 @@ Loose-file layout (no `res/` prefix — that only exists inside a packaged `.wot
 ZIP root):
 
 ```
-res_mods\<version>\mods\configs\res_map\<Name>.json     <- WG's fixed location for this
-res_mods\<version>\gui\gameface\mods\<your_mod>\...       <- html/css/js
+res_mods\<version>\gui\gen_resources\<your_mod>.json      <- view registration (2.4.1+)
+res_mods\<version>\gui\<your_mod>\...                      <- html/css/js
 res_mods\<version>\scripts\client\gui\mods\mod_x.py       <- or .pyc
 ```
 
-Note `mods` appears twice for unrelated reasons: `res_mods\<version>\` is the top-level
-"loose override" convention; `mods\configs\res_map\` is a FIXED subpath inside the
-resource tree itself (same subpath exists inside a packaged `.wotmod`'s `res/` folder
-too) — not a duplicate, just two different meanings of the word stacked.
-
-One observed working setup put `res_map` directly under `<WoT install>\mods\configs\
-res_map\` (no version segment) rather than nested under `res_mods\<version>\` — worked
-(confirmed via a resolved, non-`-1` `layoutID` in `python.log`), so this may be a
-second valid location OpenWG scans; hasn't been cross-checked against the decompile.
+(Pre-2.4.1 the registration instead lived at `<WoT install>\mods\configs\res_map\`,
+outside any version folder — only relevant for Lesta / old clients now.)
 
 **Gotchas**:
 - `Program Files` is write-protected — deploying there needs an elevated (Administrator)
   shell.
 - **Never leave both `.py` and `.pyc` for the same module in the destination** — a stale
   sibling of either kind can shadow the fresh one and you silently run old code. This
-  project's own `deploy_wotmod.py` explicitly deletes both before every redeploy.
-- `res_map` changes need a client restart to register (OpenWG rebuilds `res_map.json`
-  at startup). JS/CSS/Python edits after that first restart generally take effect on
-  the next battle without a restart, though the corner-overlay-style battle window has
-  no live hot-reload in this project's own workflow (`sync_gameface.py` only covers the
-  garage widget) — when in doubt, restart.
+  project's own `build/build.py deploy` deletes a stale `.py` before copying each `.pyc`.
+- `gen_resources` declarations are read at client startup, so ADDING a new one (or a
+  new id) needs a client restart; JS/CSS/Python edits generally take effect on the next
+  battle without a restart — when in doubt, restart.
 - **Troubleshooting a window that loads (per `python.log`) but shows nothing**: check
   the `ModelObserver` import path depth first (see above) — a failed top-level JS
   import fails completely silently from the game's perspective.
 
 ## Minimal worked example: a static in-battle label
 
-Five files, proven to load (window + view + res_map all confirmed resolving in
-`python.log`); a debugged import-path bug is folded in already. Use as a scaffold for
-any new standalone Gameface window.
+Five files. The window/view/JS parts were proven to load under the pre-2.4.1 res_map
+registration; the registration below is the 2.4.1+ `gen_resources` equivalent. A
+debugged import-path bug is folded in already. Use as a scaffold for any new standalone
+Gameface window.
 
-**`res/mods/configs/res_map/SimpleLabelView.json`**
+**`res/gui/gen_resources/simple_label.json`**
 ```json
 [
     {
         "type": "Layout",
+        "id": "R.mods.simple_label.views.SimpleLabelView",
         "path": "coui://gui/gameface/mods/simple_label/SimpleLabelView.html",
-        "parameters": { "extension": "", "entrance": "SimpleLabelView", "impl": "gameface" },
-        "itemID": "SimpleLabelView"
+        "parameters": { "entrance": "SimpleLabelView", "impl": "gameface" }
     }
 ]
 ```
@@ -434,10 +440,17 @@ above)
 # -*- coding: utf-8 -*-
 from debug_utils import LOG_CURRENT_EXCEPTION
 from frameworks.wulf import ViewModel, ViewSettings, ViewFlags, WindowFlags, WindowLayer
+from gui.impl.gen import R
 from gui.impl.pub import ViewImpl, WindowImpl
-from openwg_gameface import ModDynAccessor
 
-RES_MAP_ITEM_ID = "SimpleLabelView"
+
+def _layout_id():
+    node = R
+    for name in ("mods", "simple_label", "views", "SimpleLabelView"):
+        node = node.dyn(name)
+        if not node:
+            return -1
+    return node()
 
 
 class SimpleLabelVM(ViewModel):
@@ -450,11 +463,9 @@ class SimpleLabelVM(ViewModel):
 
 
 class SimpleLabelView(ViewImpl):
-    _layoutID = ModDynAccessor(RES_MAP_ITEM_ID)
-
-    def __init__(self):
+    def __init__(self, layout_id):
         super(SimpleLabelView, self).__init__(
-            ViewSettings(self._layoutID(), ViewFlags.VIEW, SimpleLabelVM()))
+            ViewSettings(layout_id, ViewFlags.VIEW, SimpleLabelVM()))
 
 
 class SimpleLabelWindow(WindowImpl):
@@ -473,10 +484,10 @@ def open_window():
     global _active
     if _active is not None:
         return
-    layout = SimpleLabelView._layoutID()
-    if layout is None or layout < 0:
-        return   # res_map not registered yet -- needs a one-time client restart
-    view = SimpleLabelView()
+    layout = _layout_id()
+    if layout < 0:
+        return   # gen_resources declaration not loaded
+    view = SimpleLabelView(layout)
     window = SimpleLabelWindow(view)
     _active = (window, view)
     window.load()

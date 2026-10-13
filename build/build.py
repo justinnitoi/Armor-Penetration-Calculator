@@ -11,8 +11,10 @@ Subcommands:
              loose override files, for fast local iteration. Close the client
              first -- a running client locks files under its install dir.
   package    Compile and stage into bin/package/, then zip (ZIP_STORED) into
-             bin/wotmods/pademinune-AP_Calculator-<version>.wotmod, with the
-             version read from src/meta.xml. Does not touch a WoT install.
+             bin/wotmods/pademinune-AP_Calculator-<version>.wotmod. The version
+             is VERSION in ap_calculator/debug.py (the single source of truth);
+             src/meta.xml's <version> is rewritten to match before staging.
+             Does not touch a WoT install.
   uninstall  Remove whatever `deploy` put into res_mods/<version>/, derived from
              the same source tree so the file list never goes stale.
 
@@ -27,19 +29,21 @@ Paths are resolved relative to this file, so it can be run from anywhere.
 """
 
 import argparse
+import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
-import xml.etree.ElementTree as ET
 import zipfile
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC_DIR = os.path.join(REPO_ROOT, "src")
 SRC_RES_DIR = os.path.join(SRC_DIR, "res")
 META_SRC = os.path.join(SRC_DIR, "meta.xml")
+VERSION_SRC = os.path.join(SRC_RES_DIR, "scripts", "client", "ap_calculator", "debug.py")
 BIN_DIR = os.path.join(REPO_ROOT, "bin")
 STAGE_DIR = os.path.join(BIN_DIR, "package")
 OUT_DIR = os.path.join(BIN_DIR, "wotmods")
@@ -235,10 +239,31 @@ def remove_legacy_files(wot_root):
 
 
 def mod_version():
-    version = ET.parse(META_SRC).getroot().findtext("version")
-    if not version or not version.strip():
+    """VERSION from debug.py -- the single source of truth for the mod version.
+    Read as text rather than imported: debug.py is Python 2.7 client code."""
+    with io.open(VERSION_SRC, encoding="utf-8") as fh:
+        match = re.search(r"""^VERSION\s*=\s*["']([^"']+)["']""", fh.read(), re.M)
+    if not match or not match.group(1).strip():
+        raise BuildError('No VERSION = "<version>" line in ' + VERSION_SRC)
+    return match.group(1).strip()
+
+
+def sync_meta_version(version):
+    """Rewrite <version> in src/meta.xml to `version` if it differs. Edits the
+    text in place rather than round-tripping through an XML parser, so the
+    comments and line endings survive."""
+    with io.open(META_SRC, encoding="utf-8", newline="") as fh:
+        text = fh.read()
+    match = re.search(r"<version>(.*?)</version>", text, re.S)
+    if not match:
         raise BuildError("No <version> in " + META_SRC)
-    return version.strip()
+    old = match.group(1).strip()
+    if old == version:
+        return
+    text = text[: match.start(1)] + version + text[match.end(1) :]
+    with io.open(META_SRC, "w", encoding="utf-8", newline="") as fh:
+        fh.write(text)
+    log("Updated meta.xml <version>: {} -> {}".format(old, version))
 
 
 def resolve_wot_root(args):
@@ -292,6 +317,7 @@ def cmd_deploy(args):
 def cmd_package(args):
     python27 = find_python27(args.python27)
     version = mod_version()
+    sync_meta_version(version)
     out_file = os.path.join(
         OUT_DIR, "pademinune-AP_Calculator-{}.wotmod".format(version)
     )

@@ -51,7 +51,7 @@ def safe_get_setting(category, attribute):
     return user_settings[category][attribute]
 
 
-VERSION = "1.9.0"
+VERSION = "1.9.1"
 
 
 def log(message):

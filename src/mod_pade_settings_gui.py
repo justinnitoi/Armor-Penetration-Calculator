@@ -15,7 +15,7 @@ from pade_config import save_flat_config
 from pade_gui import gui_state
 
 try:
-    from gui.modsSettingsApi import g_modsSettingsApi, templates  # type: ignore
+    from gui.aslainMenu import g_modsSettingsApi, templates  # type: ignore
 
     log("Settings api has been detected. Creating settings gui.")
     create_settings_gui = True

@@ -36,9 +36,11 @@ if create_settings_gui:
     MOD_LINKAGE = "pade_armor_calculator"
 
     template = {
-        "modDisplayName": "pademinune's Armor Penetration Calculator {}".format(
+        "modDisplayName": "Armor Penetration Calculator 1".format(
             VERSION
         ),
+        "modAuthor": "pademinune",
+        "modVersion": VERSION,
         "enabled": True,
         "column1": [
             templates.createLabel("<b>— Armor Label —</b>"),

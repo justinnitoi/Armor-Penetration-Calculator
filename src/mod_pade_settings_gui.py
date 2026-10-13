@@ -17,11 +17,17 @@ from pade_gui import gui_state
 try:
     from gui.aslainMenu import g_modsSettingsApi, templates  # type: ignore
 
-    log("Settings api has been detected. Creating settings gui.")
+    log("Modmenu api has been detected. Creating settings gui.")
     create_settings_gui = True
 except ImportError:
-    log("There is no settings api so no settings gui has been drawn.")
-    create_settings_gui = False
+    try:
+        from gui.modsSettingsApi import g_modsSettingsApi, templates  # type: ignore
+
+        log("Izberg settings api has been detected. Creating settings gui.")
+        create_settings_gui = True
+    except ImportError:
+        log("There is no settings api so no settings gui has been drawn.")
+        create_settings_gui = False
 
 
 if create_settings_gui:

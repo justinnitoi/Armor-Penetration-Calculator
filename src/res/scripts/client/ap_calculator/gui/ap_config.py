@@ -55,6 +55,14 @@ def save_config():
         json.dump(non_defaults, fp, indent=4)
 
 
+def _to_str(value):
+    """json.load returns every string as unicode in Python 2; convert back to str
+    so it matches the str defaults and what the rest of the mod expects."""
+    if isinstance(value, unicode): # type: ignore
+        return value.encode("utf-8")
+    return value
+
+
 def load_config():
     with open(CONFIG_PATH) as file:
         non_defaults = json.load(file)
@@ -62,6 +70,7 @@ def load_config():
     user_config = dict(DEFAULT_CONFIG)
 
     for key, value in non_defaults.items():
+        key, value = _to_str(key), _to_str(value)
         if type(value) != type(DEFAULT_CONFIG[key]):
             raise TypeError("Key: {} does not have the expected type.".format(key))
         user_config[key] = value

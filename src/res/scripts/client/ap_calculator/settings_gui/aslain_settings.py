@@ -127,7 +127,7 @@ def _colorSection():
 
 
 template = {
-    "modDisplayName": "Armor Penetration Calculator".format(version=VERSION),
+    "modDisplayName": "Armor Penetration Calculator 2".format(version=VERSION),
     "modAuthor": "pademinune",
     "modVersion": VERSION,
     "enabled": True,

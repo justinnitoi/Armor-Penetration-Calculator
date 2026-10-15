@@ -18,75 +18,41 @@ from . import DISCORD_URL, DONATE_URL, MOD_LINKAGE, VERSION
 from ap_calculator.settings_gui.language import tooltip, tr
 
 
+def create_color_choice(var_name, value, tooltip_name=None):
+    if tooltip_name is None:
+        tooltip_name = var_name
+
+    return templates.createColorChoice(
+        tr("{}.title".format(tooltip_name)),
+        var_name,
+        value,
+        tooltip=tooltip(
+            "{}.tooltip_header".format(tooltip_name),
+            "{}.tooltip_body".format(tooltip_name),
+        ),
+    )
+
+
 def _colorSection():
     normal = [
-        templates.createColorChoice(
-            tr("colors.high_chance.title"),
-            "colors.high_chance",
-            Colors.HIGH_CHANCE,
-            tooltip=tooltip(
-                "colors.high_chance.tooltip_header", "colors.high_chance.tooltip_body"
-            ),
-        ),
-        templates.createColorChoice(
-            tr("colors.medium_chance.title"),
-            "colors.medium_chance",
-            Colors.MEDIUM_CHANCE,
-            tooltip=tooltip(
-                "colors.medium_chance.tooltip_header",
-                "colors.medium_chance.tooltip_body",
-            ),
-        ),
-        templates.createColorChoice(
-            tr("colors.low_chance.title"),
-            "colors.low_chance",
-            Colors.LOW_CHANCE,
-            tooltip=tooltip(
-                "colors.low_chance.tooltip_header", "colors.low_chance.tooltip_body"
-            ),
-        ),
-        templates.createColorChoice(
-            tr("colors.ricochet.title"),
-            "colors.ricochet",
-            Colors.RICOCHET,
-            tooltip=tooltip(
-                "colors.ricochet.tooltip_header", "colors.ricochet.tooltip_body"
-            ),
-        ),
+        create_color_choice("colors.high_chance", Colors.HIGH_CHANCE),
+        create_color_choice("colors.medium_chance", Colors.MEDIUM_CHANCE),
+        create_color_choice("colors.low_chance", Colors.LOW_CHANCE),
+        create_color_choice("colors.ricochet", Colors.RICOCHET),
     ]
+
     colorblind = [
-        templates.createColorChoice(
-            tr("colors.high_chance.title"),
-            "colorblind.high_chance",
-            Colorblind.HIGH_CHANCE,
-            tooltip=tooltip(
-                "colors.high_chance.tooltip_header", "colors.high_chance.tooltip_body"
-            ),
+        create_color_choice(
+            "colorblind.high_chance", Colorblind.HIGH_CHANCE, "colors.high_chance"
         ),
-        templates.createColorChoice(
-            tr("colors.medium_chance.title"),
-            "colorblind.medium_chance",
-            Colorblind.MEDIUM_CHANCE,
-            tooltip=tooltip(
-                "colors.medium_chance.tooltip_header",
-                "colors.medium_chance.tooltip_body",
-            ),
+        create_color_choice(
+            "colorblind.medium_chance", Colorblind.MEDIUM_CHANCE, "colors.medium_chance"
         ),
-        templates.createColorChoice(
-            tr("colors.low_chance.title"),
-            "colorblind.low_chance",
-            Colorblind.LOW_CHANCE,
-            tooltip=tooltip(
-                "colors.low_chance.tooltip_header", "colors.low_chance.tooltip_body"
-            ),
+        create_color_choice(
+            "colorblind.low_chance", Colorblind.LOW_CHANCE, "colors.low_chance"
         ),
-        templates.createColorChoice(
-            tr("colors.ricochet.title"),
-            "colorblind.ricochet",
-            Colorblind.RICOCHET,
-            tooltip=tooltip(
-                "colors.ricochet.tooltip_header", "colors.ricochet.tooltip_body"
-            ),
+        create_color_choice(
+            "colorblind.ricochet", Colorblind.RICOCHET, "colors.ricochet"
         ),
     ]
 

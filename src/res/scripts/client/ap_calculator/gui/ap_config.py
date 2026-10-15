@@ -58,7 +58,7 @@ def save_config():
 def _to_str(value):
     """json.load returns every string as unicode in Python 2; convert back to str
     so it matches the str defaults and what the rest of the mod expects."""
-    if isinstance(value, unicode): # type: ignore
+    if isinstance(value, unicode):  # type: ignore
         return value.encode("utf-8")
     return value
 

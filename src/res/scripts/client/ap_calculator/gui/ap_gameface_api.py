@@ -57,10 +57,10 @@ class GamefaceWindow(object):
         self.name = name
 
         self.param_registry = {}
-        self.param_values = None # None for now because it hasnt been initialized yet
+        self.param_values = None  # None for now because it hasnt been initialized yet
 
         self._active = None
-        self._layoutID = lambda : _layout_id(name)
+        self._layoutID = lambda: _layout_id(name)
 
         for index, (param_name, default_value) in enumerate(self.params):
             param_type = type(default_value)
@@ -76,21 +76,20 @@ class GamefaceWindow(object):
         the res_map entry yet."""
         if self._active is not None:
             return
-        
+
         layout = self._layoutID()
         if layout is None or layout < 0:
             # res_map not registered yet -- ships fine, just needs the one-time
             # client restart OpenWG triggers the first time it rebuilds res_map.json.
             return
-        view = APBattleView(
-            self.params,
-            self._layoutID()
-        )
+        view = APBattleView(self.params, self._layoutID())
         window = APBattleWindow(view)
         self._active = (window, view)
-        self.param_values = {param_name: default_value for param_name, default_value in self.params}
+        self.param_values = {
+            param_name: default_value for param_name, default_value in self.params
+        }
         window.load()
-    
+
     def update_params(self, updated_params):
         """Push new values to the window in one transaction.
 
@@ -105,13 +104,15 @@ class GamefaceWindow(object):
         if view_model is None or self.param_values is None:
             return
 
-        payload = [] # list of (index, type, new_value)
+        payload = []  # list of (index, type, new_value)
 
         for param_name, new_value in updated_params:
             param_type = self.param_registry[param_name][1]
             if type(new_value) != param_type:
                 raise TypeError(
-                    "Type of value expected to be {}. Got: {}".format(param_type, type(new_value))
+                    "Type of value expected to be {}. Got: {}".format(
+                        param_type, type(new_value)
+                    )
                 )
             elif new_value != self.param_values[param_name]:
                 self.param_values[param_name] = new_value
@@ -173,7 +174,6 @@ class APBattleVM(ViewModel):
             raise TypeError("Parameter type is unrecognized: {}".format(param_type))
 
 
-
 # --- the page + the window it lives in -----------------------------------------
 
 
@@ -230,7 +230,6 @@ class APBattleWindow(WindowImpl):
             )
 
 
-
 ap_window = GamefaceWindow(
     [
         ("armorText", ""),
@@ -245,5 +244,5 @@ ap_window = GamefaceWindow(
         ("trackVisible", False),
         ("backgroundEnabled", True),
     ],
-    RES_MOD_ID
+    RES_MOD_ID,
 )

@@ -9,9 +9,7 @@ from ap_calculator.gui.ap_constants import (
     get_missed_body_color,
     get_ricochet_color,
 )
-from ap_calculator.gui.ap_gameface_api import (
-    ap_window
-)
+from ap_calculator.gui.ap_gameface_api import ap_window
 
 
 class GuiState(object):

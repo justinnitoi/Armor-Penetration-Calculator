@@ -43,7 +43,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC_DIR = os.path.join(REPO_ROOT, "src")
 SRC_RES_DIR = os.path.join(SRC_DIR, "res")
 META_SRC = os.path.join(SRC_DIR, "meta.xml")
-VERSION_SRC = os.path.join(SRC_RES_DIR, "scripts", "client", "ap_calculator", "debug.py")
+VERSION_SRC = os.path.join(
+    SRC_RES_DIR, "scripts", "client", "ap_calculator", "debug.py"
+)
 BIN_DIR = os.path.join(REPO_ROOT, "bin")
 STAGE_DIR = os.path.join(BIN_DIR, "package")
 OUT_DIR = os.path.join(BIN_DIR, "wotmods")

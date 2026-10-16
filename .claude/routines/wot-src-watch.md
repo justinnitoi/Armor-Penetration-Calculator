@@ -40,14 +40,13 @@ need a mod update:
 | `sources/res/scripts/client/PlayerEvents.py` | `g_playerEvents.onAvatarReady`, `onAvatarBecomeNonPlayer`, `onAccountShowGUI` |
 | `sources/res/scripts/client/aih_constants.py` | `SHOT_RESULT` |
 | `sources/res/scripts/common/items/components/component_constants.py` | `MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS` |
+| `sources/res/scripts/client/gui/impl/gen/resources/__init__.py` | `R` must still exist and support `.dyn()`; `_layout_id()` walks `R.dyn("mods")...dyn("APBattleView")` to find the `gen_resources` view. A break here makes the window silently never open |
 
 **Secondary** — review, but these rarely break the mod:
 
 | wot-src path | What the mod depends on |
 |---|---|
 | `sources/res/scripts/client/frameworks/wulf/` | `PositionAnchor`, `ViewFlags`, `ViewModel`, `ViewSettings`, `WindowFlags`, `WindowLayer` (`gui/ap_gameface_api.py`) |
-| `sources/res/scripts/client/gui/impl/gen/resources/__init__.py` | `R` (native root node since 2.4.1.0: `GuiApplication...resourceManager.getRootNode()`); `_layout_id()` walks it with `R.dyn("mods")...dyn("APBattleView")` to find the `gen_resources` view. A change here can make the window silently never open |
-| `sources/res/scripts/client/frameworks/wulf/resource_manager.py` | `ResourceManager.getRootNode()` (source of `R`) |
 | `sources/res/scripts/client/gui/impl/pub/` | `ViewImpl`, `WindowImpl` |
 | `sources/res/scripts/client/helpers/__init__.py` | `getClientLanguage` only |
 | `sources/res/scripts/common/debug_utils.py` | `LOG_CURRENT_EXCEPTION` only |
@@ -83,6 +82,11 @@ need a mod update:
      (`_CrosshairShotResults__isDestructibleComponent`,
      `__collectDebugPiercingData`, `__sendDebugInfo`, `__shotResultDefault`,
      `__shotResultModernHE`) still exists on `_CrosshairShotResults`.
+   - For `gui/impl/gen/resources/__init__.py`: confirm `R` is still exported
+     from `gui.impl.gen` and is still a resource-tree root that the mod can
+     walk with `.dyn(name)` (see `_layout_id()` in `gui/ap_gameface_api.py`).
+     The `.dyn()` behavior itself is native, so flag any change to how `R` is
+     built as **needs a human decision** (in-client test required).
    - For every other changed file: confirm each symbol the mod imports or
      patches still exists with a compatible signature.
    Classify the outcome: **no action needed**, **fix ported**, or

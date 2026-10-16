@@ -81,3 +81,19 @@ So if you have 400mm penetration, bouncing off targets with under 350mm effectiv
 
 Credit to this [reddit post](https://www.reddit.com/r/WorldofTanks/comments/4z53s0/infographic_damage_spread_in_world_of_tanks/) for doing
 the research and discovering the distribution.
+
+## Two mods, two branches
+
+This repository holds two separate mods that are released separately: this one, the original **Armor Penetration Calculator** (branch [`v1`](../../tree/v1), GUIFlash overlay), and **Armor Penetration Calculator 2** (branch [`v2`](../../tree/v2), Gameface overlay). Each branch has its own code and releases.
+
+## Contributing
+
+Bug reports, fixes, and features are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first, especially the section about which branch to target.
+
+## License
+
+Copyright (C) 2026 pademinune (Justin Nitoi).
+
+The mod's source code is licensed under the [GNU General Public License v3.0](LICENSE). You can use, modify, and redistribute it, but any version you distribute must also be released under GPL-3.0 with its source code available.
+
+World of Tanks and its assets, names, and client code belong to Wargaming. This project is not affiliated with or endorsed by Wargaming.

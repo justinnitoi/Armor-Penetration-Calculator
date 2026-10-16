@@ -53,6 +53,8 @@ The mod has no stable API to build on. It imports and monkey-patches stock clien
 | `client/PlayerEvents.py` | `g_playerEvents`: `onAvatarReady`, `onAvatarBecomeNonPlayer`, `onAccountShowGUI` | `core/ap_hooks.py`, `ap_logger.py` |
 | `client/frameworks/wulf/__init__.py` | `PositionAnchor`, `ViewFlags`, `ViewModel`, `ViewSettings`, `WindowFlags`, `WindowLayer` | `gui/ap_gameface_api.py` |
 | `client/gui/impl/gen/__init__.py` | `R` | `gui/ap_gameface_api.py` |
+| `client/gui/impl/gen/resources/__init__.py` | `R` (native root node: `resourceManager.getRootNode()`) | `gui/ap_gameface_api.py` (`_layout_id()` uses `R.dyn(...)`) |
+| `client/frameworks/wulf/resource_manager.py` | `ResourceManager.getRootNode()` | indirectly, via `R` |
 | `client/gui/impl/pub/__init__.py` | `ViewImpl`, `WindowImpl` | `gui/ap_gameface_api.py` |
 | `common/debug_utils.py` | `LOG_CURRENT_EXCEPTION` | `gui/ap_gameface_api.py` |
 | `client/helpers/__init__.py` | `getClientLanguage` | `settings_gui/language.py` |

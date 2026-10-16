@@ -46,6 +46,8 @@ need a mod update:
 | wot-src path | What the mod depends on |
 |---|---|
 | `sources/res/scripts/client/frameworks/wulf/` | `PositionAnchor`, `ViewFlags`, `ViewModel`, `ViewSettings`, `WindowFlags`, `WindowLayer` (`gui/ap_gameface_api.py`) |
+| `sources/res/scripts/client/gui/impl/gen/resources/__init__.py` | `R` (native root node since 2.4.1.0: `GuiApplication...resourceManager.getRootNode()`); `_layout_id()` walks it with `R.dyn("mods")...dyn("APBattleView")` to find the `gen_resources` view. A change here can make the window silently never open |
+| `sources/res/scripts/client/frameworks/wulf/resource_manager.py` | `ResourceManager.getRootNode()` (source of `R`) |
 | `sources/res/scripts/client/gui/impl/pub/` | `ViewImpl`, `WindowImpl` |
 | `sources/res/scripts/client/helpers/__init__.py` | `getClientLanguage` only |
 | `sources/res/scripts/common/debug_utils.py` | `LOG_CURRENT_EXCEPTION` only |

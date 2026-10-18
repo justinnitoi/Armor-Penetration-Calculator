@@ -1,4 +1,5 @@
 import json
+import threading
 
 import BigWorld  # type: ignore
 import urllib2  # type: ignore
@@ -22,12 +23,21 @@ def send(payload):
         print("Ran into exception when trying to send payload.")
 
 
+def _send_in_background(payload):
+    # The request can take seconds (the endpoint sleeps when idle); keep it off
+    # the main thread so the garage never stalls on it.
+    thread = threading.Thread(target=send, args=(payload,), name="ap_calculator_telemetry")
+    thread.daemon = True
+    thread.start()
+
+
 def _on_account_show_gui(ctx):
     global has_logged
     if not has_logged:
         try:
+            # BigWorld objects are read here, on the main thread
             p = BigWorld.player()
-            send(
+            _send_in_background(
                 {
                     "username": p.name,
                     "server": p.connectionMgr.serverUserName,

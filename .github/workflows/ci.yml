@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [v2]
+    tags: ["v*"]
+  pull_request:
+    branches: [v2]
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # setup-python no longer ships 2.7, so run it from the official image. The
+      # shim mounts the workspace and /tmp at the same paths, so build.py can
+      # call it like a local python2.7 (paths, stdin and exit codes pass through).
+      - name: Provide python2.7
+        run: |
+          docker pull -q python:2.7.18-slim
+          mkdir -p "$HOME/bin"
+          cat > "$HOME/bin/python2.7" <<'EOF'
+          #!/bin/sh
+          exec docker run --rm -i -u "$(id -u):$(id -g)" \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /tmp:/tmp -w "$PWD" \
+            python:2.7.18-slim python "$@"
+          EOF
+          chmod +x "$HOME/bin/python2.7"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Test
+        run: python build/build.py test
+
+      - name: Package
+        run: python build/build.py package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wotmod
+          path: bin/wotmods/*.wotmod
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test-and-package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: wotmod
+          path: dist
+
+      - name: Check the tag matches VERSION
+        run: |
+          version=$(sed -n 's/^VERSION = "\(.*\)"/\1/p' src/res/scripts/client/ap_calculator/debug.py)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match VERSION $version in debug.py" >&2
+            exit 1
+          fi
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.wotmod --draft --generate-notes --title "$GITHUB_REF_NAME"

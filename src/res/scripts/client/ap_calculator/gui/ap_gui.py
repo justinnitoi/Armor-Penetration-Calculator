@@ -6,7 +6,7 @@ from ap_calculator.gui.ap_constants import (
     ProbLabelSettings,
     TrackIndicatorSettings,
     get_color_from_prob,
-    get_missed_body_color,
+    is_high_chance,
     get_ricochet_color,
 )
 from ap_calculator.gui.ap_gameface_api import ap_window
@@ -76,7 +76,6 @@ class GuiState(object):
                 self.angle_label.update_gui(angle, color)
         elif not hit_body:
             # shell only hits spaced armor or tracks
-            color = get_missed_body_color()
             self.hide_labels()
         else:
             color = get_color_from_prob(prob)
@@ -88,8 +87,9 @@ class GuiState(object):
                 self.angle_label.update_gui(angle, color)
 
         if TrackIndicatorSettings.ENABLED:
-            if hit_track and color == Colors.HIGH_CHANCE:
-                # hit track and green pen chance
+            # by chance, not color: colorblind mode and custom colors used to
+            # make a color comparison fail
+            if hit_track and hit_body and not ricochet and is_high_chance(prob):
                 self.track_indicator.show()
             else:
                 self.track_indicator.hide()

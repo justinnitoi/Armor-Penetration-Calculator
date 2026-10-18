@@ -48,7 +48,12 @@ python build/build.py package
 
 Close the game client before deploying (it locks its files), and use an elevated shell if your install is under `Program Files`.
 
-There are **no automated tests and no CI**. Testing is manual: deploy, launch the game, and go into a battle (the Training Room or a Topography Lesson works well). Check the overlay with the shell types and situations your change affects, and check `python.log` for errors.
+```
+# Run the offline tests (Python 2.7; downloads one stock game file into tests/.cache/ the first time)
+python build/build.py test
+```
+
+The tests check the armor math against the game's own shot-result code, plus the config, overlay state and translations. CI runs them on every pull request. They can't see the overlay itself, so also test in game: deploy, launch the game, and go into a battle (the Training Room or a Topography Lesson works well). Check the overlay with the shell types and situations your change affects, and check `python.log` for errors.
 
 ### Code layout
 

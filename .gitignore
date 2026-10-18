@@ -2,3 +2,4 @@ bin/
 *.pyc
 benchmarks/
 .ruff_cache/
+tests/.cache/

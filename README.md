@@ -66,7 +66,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 
 ## Contributing
 
-Bug reports, fixes, translations, and features are welcome, for either mod. Read [CONTRIBUTING.md](CONTRIBUTING.md) first, especially the section about which branch to target.
+Bug reports, fixes, translations, and features are welcome, for either mod. Read [CONTRIBUTING.md](CONTRIBUTING.md) first, especially the section about which branch to target. See [ROADMAP.md](ROADMAP.md) for what's planned.
 
 ## Support
 

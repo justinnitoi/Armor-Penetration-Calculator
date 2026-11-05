@@ -119,6 +119,8 @@ class GamefaceWindow(object):
                 index = self.param_registry[param_name][0]
                 payload.append((index, param_type, new_value))
 
+        if not payload:
+            return
         with view_model.transaction() as tx:
             for index, param_type, value in payload:
                 tx.set_param(index, param_type, value)

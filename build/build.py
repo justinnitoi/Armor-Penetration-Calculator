@@ -17,12 +17,15 @@ Subcommands:
              Does not touch a WoT install.
   uninstall  Remove whatever `deploy` put into res_mods/<version>/, derived from
              the same source tree so the file list never goes stale.
+  test       Run the offline test suite (tests/run_tests.py) with the same
+             Python 2.7 interpreter the build compiles with.
 
 Examples:
 
   python build/build.py deploy --wot-root "C:/Games/World_of_Tanks_NA"
   python build/build.py deploy --version 2.4.1.0 --python27 "C:/Python27/python.exe"
   python build/build.py package
+  python build/build.py test
   python build/build.py uninstall --wot-root "C:/Games/World_of_Tanks_NA"
 
 Paths are resolved relative to this file, so it can be run from anywhere.
@@ -49,6 +52,7 @@ VERSION_SRC = os.path.join(
 BIN_DIR = os.path.join(REPO_ROOT, "bin")
 STAGE_DIR = os.path.join(BIN_DIR, "package")
 OUT_DIR = os.path.join(BIN_DIR, "wotmods")
+TEST_RUNNER = os.path.join(REPO_ROOT, "tests", "run_tests.py")
 
 DEFAULT_CLIENT_VERSION = "2.4.1.0"
 DEFAULT_WOT_ROOT = r"C:\Program Files\World_of_Tanks_NA" if os.name == "nt" else None
@@ -357,12 +361,23 @@ def cmd_uninstall(args):
     log("Done.")
 
 
+def cmd_test(args):
+    python27 = find_python27(args.python27)
+    log("Running tests with {} ...".format(python27))
+    try:
+        returncode = subprocess.call([python27, "-B", TEST_RUNNER])
+    except OSError as e:
+        raise BuildError("Could not run '{}': {}".format(python27, e))
+    if returncode != 0:
+        raise BuildError("Tests failed (exit {}).".format(returncode))
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description=__doc__.split("\n\n")[0],
         epilog="Run `%(prog)s <subcommand> -h` for that subcommand's options.",
     )
-    sub = parser.add_subparsers(dest="command", metavar="{deploy,package,uninstall}")
+    sub = parser.add_subparsers(dest="command", metavar="{deploy,package,test,uninstall}")
     sub.required = True
 
     def add_wot_args(p):
@@ -393,6 +408,10 @@ def main(argv=None):
     p = sub.add_parser("package", help="build bin/wotmods/<name>.wotmod")
     add_python27_arg(p)
     p.set_defaults(func=cmd_package)
+
+    p = sub.add_parser("test", help="run the offline test suite with Python 2.7")
+    add_python27_arg(p)
+    p.set_defaults(func=cmd_test)
 
     p = sub.add_parser("uninstall", help="remove what deploy put into a WoT install")
     add_wot_args(p)

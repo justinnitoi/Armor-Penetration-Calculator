@@ -37,22 +37,37 @@ def is_jailbreak():
 
 
 def update_global_settings(new_settings):
-    """Updates g_user_settings variable"""
-    relevant_settings = {k: v for k, v in new_settings.items() if k in DEFAULT_CONFIG}
+    """Updates g_user_settings from a settings panel's values. Values are
+    coerced to their default's type (settings APIs can hand back unicode
+    strings or floats, which the overlay would reject)."""
     global g_user_settings
-    g_user_settings.update(relevant_settings)
+    for key, value in new_settings.items():
+        key = _to_str(key)
+        if key not in DEFAULT_CONFIG:
+            continue
+        try:
+            g_user_settings[key] = _coerce(key, value)
+        except ValueError:
+            log("Ignoring invalid value {!r} for setting {!r}.".format(value, key))
+
+
+# Written into config.json alongside the overrides. Bump it, and migrate in
+# load_config(), if a key is ever renamed or changes meaning.
+CONFIG_VERSION = 1
+_VERSION_KEY = "config_version"
 
 
 def save_config():
     """Saves g_user_settings to disk"""
     global g_user_settings
     non_defaults = {k: v for k, v in g_user_settings.items() if v != DEFAULT_CONFIG[k]}
+    non_defaults[_VERSION_KEY] = CONFIG_VERSION
 
     if not os.path.exists(CONFIG_FOLDER):
         os.makedirs(CONFIG_FOLDER)
 
     with open(CONFIG_PATH, "w") as fp:
-        json.dump(non_defaults, fp, indent=4)
+        json.dump(non_defaults, fp, indent=4, sort_keys=True)
 
 
 def _to_str(value):
@@ -63,27 +78,75 @@ def _to_str(value):
     return value
 
 
+def _coerce(key, value):
+    """Returns value as the type of DEFAULT_CONFIG[key]. Raises ValueError if it
+    can't be (an int and a float convert to each other; nothing else does)."""
+    default = DEFAULT_CONFIG[key]
+    value = _to_str(value)
+    if type(value) == type(default):
+        return value
+    # bool is an int subclass; never let one stand in for the other
+    if isinstance(default, bool) or isinstance(value, bool):
+        raise ValueError(key)
+    if isinstance(default, (int, float)) and isinstance(value, (int, float)):
+        return type(default)(value)
+    raise ValueError(key)
+
+
 def load_config():
+    """Returns (settings, needs_save). A bad or unknown entry is dropped on its
+    own (and logged) rather than resetting every setting."""
     with open(CONFIG_PATH) as file:
-        non_defaults = json.load(file)
+        saved = json.load(file)
+    if not isinstance(saved, dict):
+        raise ValueError("config root is not an object")
 
     user_config = dict(DEFAULT_CONFIG)
+    needs_save = saved.get(_VERSION_KEY) != CONFIG_VERSION
 
-    for key, value in non_defaults.items():
-        key, value = _to_str(key), _to_str(value)
-        if type(value) != type(DEFAULT_CONFIG[key]):
-            raise TypeError("Key: {} does not have the expected type.".format(key))
-        user_config[key] = value
+    for key, value in saved.items():
+        key = _to_str(key)
+        if key == _VERSION_KEY:
+            continue
+        if key not in DEFAULT_CONFIG:
+            log("Dropping unknown setting {!r} from config.json.".format(key))
+            needs_save = True
+            continue
+        try:
+            user_config[key] = _coerce(key, value)
+        except ValueError:
+            log("Resetting setting {!r}: {!r} is not a valid value.".format(key, value))
+            needs_save = True
 
-    return user_config
+    return user_config, needs_save
+
+
+def _back_up_unreadable_config():
+    """Keeps an unreadable config.json as config.json.bak before it's replaced."""
+    try:
+        backup = CONFIG_PATH + ".bak"
+        if os.path.exists(backup):
+            os.remove(backup)
+        os.rename(CONFIG_PATH, backup)
+        log("config.json could not be read; saved it as config.json.bak and reset settings.")
+    except OSError:
+        pass
 
 
 JAILBROKEN = is_jailbreak()
 if JAILBROKEN:
     log("Mod is jailbroken.")
+_needs_save = False
 try:
-    g_user_settings = load_config()
-except:
-    # if the config is invalid, reset it
-    g_user_settings = dict(DEFAULT_CONFIG)
-    save_config()
+    g_user_settings, _needs_save = load_config()
+except IOError:
+    # first launch: no config yet
+    g_user_settings, _needs_save = dict(DEFAULT_CONFIG), True
+except Exception:
+    _back_up_unreadable_config()
+    g_user_settings, _needs_save = dict(DEFAULT_CONFIG), True
+if _needs_save:
+    try:
+        save_config()
+    except Exception:
+        log("Could not save config.json.")

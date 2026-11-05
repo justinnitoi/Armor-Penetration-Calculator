@@ -42,6 +42,12 @@ Each branch has its own code, build scripts, and releases. Pick the branch for t
 
 Settings are stored in `mods/configs/pademinune/Armor Penetration Calculator 2/config.json`. Delete that file to reset to defaults.
 
+## Troubleshooting
+
+- **No labels at all.** The mod reads the same calculation the game uses to color your reticle by penetration chance, so that indicator must be on. In the game's reticle settings, use a reticle style that turns red/yellow/green with your penetration chance (in every view mode you use). Also check that OpenWG Gameface is installed.
+- **Server reticle.** With the server reticle enabled, the labels follow the server reticle, since that is where the shell actually goes.
+- **After a game update.** If `python.log` says the client is incompatible with this mod version, the mod has switched its overlay off so it can't affect the game. Wait for an updated release.
+
 ## Telemetry
 
 Once per game launch, when the garage first loads, the mod sends one request to `wot-telemetry.onrender.com` containing your **player name, server, and mod version**. It is used only to count how many people use each version. It sends nothing else and nothing during battles. You can read the code in [`ap_logger.py`](src/res/scripts/client/ap_calculator/ap_logger.py).

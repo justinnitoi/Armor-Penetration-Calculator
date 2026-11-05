@@ -1,419 +1,201 @@
-from aih_constants import SHOT_RESULT as _SHOT_RESULT  # type: ignore
+"""Hooks into the stock client's shot-result code and battle lifecycle.
+
+The stock gun_marker_ctrl._CrosshairShotResults methods that color the reticle
+are wrapped, never replaced: the stock method always runs first and its result
+is returned untouched, then shot_analysis re-walks the same collisions to
+compute the overlay's numbers. Any error on the overlay side is logged and
+swallowed, so the mod can never make the reticle worse than vanilla.
+
+If the stock class no longer looks the way this code expects (after a client
+update), init() logs why and patches nothing.
+"""
+
+import inspect
+
+import aih_constants  # type: ignore
 from AvatarInputHandler import (  # type: ignore
     AvatarInputHandler,
     gun_marker_ctrl,
 )
-from items.components.component_constants import (  # type: ignore
-    MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS,
-)
+from items.components import component_constants  # type: ignore
 from PlayerEvents import g_playerEvents  # type: ignore
 
-from ap_calculator.debug import VERSION, log
+from ap_calculator.debug import log, log_exception
 from ap_calculator.gui.ap_gui import gui_state
 from ap_calculator.core.ap_math import gaussian_probability, arccos
+from ap_calculator.core.shot_analysis import analyze_default, analyze_modern_he
+
+_SHOT_RESULT = aih_constants.SHOT_RESULT
+_MARKER_TYPE = aih_constants.GUN_MARKER_TYPE
+_SHIELD_FACTOR = component_constants.MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS
+# 0.0 at the time of writing; read it rather than assume it stays that way
+_ABSORPTION_FACTOR = getattr(component_constants, "MODERN_HE_DAMAGE_ABSORPTION_FACTOR", 0.0)
+
+_SHOT_RESULTS_CLS = gun_marker_ctrl._CrosshairShotResults
+_DEFAULT_NAME = "_CrosshairShotResults__shotResultDefault"
+_MODERN_HE_NAME = "_CrosshairShotResults__shotResultModernHE"
+_SHOT_RESULT_ARGS = [
+    "cls", "gunMarker", "collisionsDetails", "fullPiercingPower", "shell", "minPP", "maxPP", "entity"
+]
+_GET_SHOT_RESULT_ARGS = ["cls", "gunMarker", "excludeTeam", "piercingMultiplier"]
+# Class internals shot_analysis reads off the stock class.
+_REQUIRED_ATTRS = [
+    "_shouldRicochet",
+    "_computePenetrationArmor",
+    "_SHELL_EXTRA_DATA",
+    "_CrosshairShotResults__isDestructibleComponent",
+]
+
+# False while the stock crosshair is resolving a marker the overlay should not
+# follow (the client marker, when the server reticle is on). See
+# _install_marker_filter.
+_overlay_allowed = True
 
 
-def call_update_gui(
-    avg_pen,
-    armor_val,
-    ricochet,
-    hit_body,
-    hit_track,
-    hit_gun,
-    hit_angle_cos,
-    alpha_dmg,
-    enemy_hp,
-):
-    """alpha_dmg is a tuple of (near_alpha, far_alpha). enemy_hp is an integer of the remaining enemy hp"""
-    angle = arccos(hit_angle_cos)
-
+def call_update_gui(analysis, avg_pen):
+    """Pushes one shot's analysis to the overlay."""
     prob = 0
-    if not ricochet and hit_body:
-        prob = gaussian_probability(avg_pen, armor_val)
+    if not analysis.ricochet and analysis.hit_body:
+        prob = gaussian_probability(avg_pen, analysis.armor)
 
     gui_state.update_gui(
-        int(armor_val),
+        int(analysis.armor),
         int(prob),
-        ricochet,
-        hit_body,
-        int(angle),
-        hit_track,
+        analysis.ricochet,
+        analysis.hit_body,
+        int(arccos(analysis.hit_angle_cos)),
+        analysis.hit_track,
     )
 
 
-# functin override
-def my_shot_result_default(
-    cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity
-):
-    """
-    Override for getShotResultDefault in game code.
-    Is only called when looking at an enemy tank with non HE loaded.
-    """
-    # pademinune armor mod variables
-    total_armor_val = 0.0
-    ricochet = False
-    hit_body = False
-    hit_track = False
-    hit_gun = False
-    min_hit_angle_cos = 1
-
-    # Since we are outside the class, we must use the mangled names
-    isDestructible = cls._CrosshairShotResults__isDestructibleComponent
-    collectDebug = cls._CrosshairShotResults__collectDebugPiercingData
-    sendDebug = cls._CrosshairShotResults__sendDebugInfo
-
-    result = _SHOT_RESULT.NOT_PIERCED
-    isJet = False
-    jetStartDist = None
-    piercingPower = fullPiercingPower
-    dispersion = round(piercingPower) * shell.piercingPowerRandomization
-    minPiercingPower = round(round(piercingPower) - dispersion)
-    maxPiercingPower = round(round(piercingPower) + dispersion)
-    ignoredMaterials = set()
-    debugPiercingsList = []
-
-    for cDetails in collisionsDetails:
-        if not isDestructible(entity, cDetails.compName):
-            break
-
-        # Track detection
-        # indexes are from client/vehicle_systems/tankStructure.py in source code
-        # 0 is chassis, >= 4 are extra track pairs
-        if cDetails.compName == 0 or cDetails.compName >= 4:
-            hit_track = True
-        elif cDetails.compName == 3:
-            hit_gun = True
-
-        if isJet:
-            jetDist = cDetails.dist - jetStartDist
-            if jetDist > 0.0:
-                if cls._SHELL_EXTRA_DATA[shell.kind].hasPenetrationLoss:
-                    jetLossPPByDist = shell.type.piercingPowerLossFactorByDistance
-                else:
-                    jetLossPPByDist = 0.0
-                lossByDist = 1.0 - jetDist * jetLossPPByDist
-
-                # add dissipation amount onto total armor
-                lost_pen = max(
-                    0, piercingPower * (1 - lossByDist)
-                )  # max ensures no negative penetration dropoffs (when models overlap)
-                total_armor_val += lost_pen
-
-                piercingPower *= lossByDist
-                minPiercingPower = round(minPiercingPower * lossByDist)
-                maxPiercingPower = round(maxPiercingPower * lossByDist)
-
-        if cDetails.matInfo is None:
-            result = cls._CRIT_ONLY_SHOT_RESULT
-        else:
-            matInfo = cDetails.matInfo
-            if (cDetails.compName, matInfo.kind) in ignoredMaterials:
-                continue
-            if matInfo.armor is None:
-                result = _SHOT_RESULT.UNDEFINED
-                continue
-
-            hitAngleCos = cDetails.hitAngleCos if matInfo.useHitAngle else 1.0
-            piercingPercent = 1000.0
-
-            if not isJet and cls._shouldRicochet(shell, hitAngleCos, matInfo):
-                # shell ricochet
-                ricochet = True
-                min_hit_angle_cos = hitAngleCos
-                collectDebug(
-                    debugPiercingsList,
-                    None,
-                    hitAngleCos,
-                    minPiercingPower,
-                    maxPiercingPower,
-                    piercingPercent,
-                    matInfo,
-                    _SHOT_RESULT.NOT_PIERCED,
-                )
-                break
-
-            penetrationArmor = cls._computePenetrationArmor(shell, hitAngleCos, matInfo)
-            total_armor_val += penetrationArmor
-
-            if piercingPower > 0.0:
-                piercingPercent = (
-                    100.0
-                    + (penetrationArmor - piercingPower) / fullPiercingPower * 100.0
-                )
-                piercingPower -= penetrationArmor
-                minPiercingPower = round(minPiercingPower - penetrationArmor)
-                maxPiercingPower = round(maxPiercingPower - penetrationArmor)
-
-            if matInfo.vehicleDamageFactor:
-                # main armor plate
-                hit_body = True
-                min_hit_angle_cos = hitAngleCos
-                if minPP < piercingPercent < maxPP:
-                    result = _SHOT_RESULT.LITTLE_PIERCED
-                elif piercingPercent <= minPP:
-                    result = _SHOT_RESULT.GREAT_PIERCED
-                collectDebug(
-                    debugPiercingsList,
-                    penetrationArmor,
-                    hitAngleCos,
-                    minPiercingPower,
-                    maxPiercingPower,
-                    piercingPercent,
-                    matInfo,
-                    result,
-                )
-                break
-            else:
-                # spaced armor
-                debugResut = _SHOT_RESULT.NOT_PIERCED
-                if minPP < piercingPercent < maxPP:
-                    debugResut = _SHOT_RESULT.LITTLE_PIERCED
-                elif piercingPercent <= minPP:
-                    debugResut = _SHOT_RESULT.GREAT_PIERCED
-                if matInfo.extra:
-                    if piercingPercent <= maxPP:
-                        result = cls._CRIT_ONLY_SHOT_RESULT
-                collectDebug(
-                    debugPiercingsList,
-                    penetrationArmor,
-                    hitAngleCos,
-                    minPiercingPower,
-                    maxPiercingPower,
-                    piercingPercent,
-                    matInfo,
-                    debugResut,
-                )
-
-            if matInfo.collideOnceOnly:
-                ignoredMaterials.add((cDetails.compName, matInfo.kind))
-
-        # don't break early so that it can compute all the armor
-        # if piercingPower <= 0.0:
-        #     break
-
-        if cls._SHELL_EXTRA_DATA[shell.kind].hasPenetrationLoss:
-            isJet = True
-            mInfo = cDetails.matInfo
-            armor = mInfo.armor if mInfo is not None else 0.0
-            jetStartDist = cDetails.dist + armor * 0.001
-
-    sendDebug(gunMarker, debugPiercingsList, minPP, maxPP, fullPiercingPower)
-
-    # pademinune armor mod calc
-    call_update_gui(
-        fullPiercingPower,
-        total_armor_val,
-        ricochet,
-        hit_body,
-        hit_track,
-        hit_gun,
-        min_hit_angle_cos,
-        shell.armorDamage,
-        entity.health,
-    )
-
-    return result
+def _as_list(collisionsDetails):
+    # Both the stock method and the analysis iterate it; make sure a one-shot
+    # iterator can't leave the second pass empty.
+    if isinstance(collisionsDetails, (list, tuple)):
+        return collisionsDetails
+    return list(collisionsDetails)
 
 
-def my_shot_result_modern_he(
-    cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity
-):
-    """
-    Override for __shotResultModernHE in game code.
-    Called when looking at an enemy tank with modern HE loaded.
-    """
-    # pademinune armor mod variables
-    total_armor_val = 0.0
-    hit_body = False
-    hit_track = False
-    hit_gun = False
-    min_hit_angle_cos = 1
+def _make_default_wrapper(original):
+    def my_shot_result_default(
+        cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity
+    ):
+        """Wraps stock __shotResultDefault (enemy under reticle, non modern-HE shell)."""
+        collisionsDetails = _as_list(collisionsDetails)
+        result = original(
+            cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity
+        )
+        if _overlay_allowed:
+            try:
+                analysis = analyze_default(cls, collisionsDetails, fullPiercingPower, shell, entity)
+                call_update_gui(analysis, fullPiercingPower)
+            except Exception:
+                log_exception("shot analysis (default)")
+        return result
 
-    # Since we are outside the class, we must use the mangled names
-    isDestructible = cls._CrosshairShotResults__isDestructibleComponent
-    collectDebug = cls._CrosshairShotResults__collectDebugPiercingData
-    sendDebug = cls._CrosshairShotResults__sendDebugInfo
+    return my_shot_result_default
 
-    result = _SHOT_RESULT.NOT_PIERCED
-    ignoredMaterials = set()
-    piercingPower = fullPiercingPower
-    dispersion = round(piercingPower) * shell.piercingPowerRandomization
-    minPiercingPower = round(round(piercingPower) - dispersion)
-    maxPiercingPower = round(round(piercingPower) + dispersion)
-    explosionDamageAbsorption = 0
-    debugPiercingsList = []
 
-    try:
-        for cDetails in collisionsDetails:
-            if not isDestructible(entity, cDetails.compName):
-                sendDebug(
-                    gunMarker, debugPiercingsList, minPP, maxPP, fullPiercingPower
-                )
-                call_update_gui(
+def _make_modern_he_wrapper(original):
+    def my_shot_result_modern_he(
+        cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity
+    ):
+        """Wraps stock __shotResultModernHE (enemy under reticle, modern HE shell)."""
+        collisionsDetails = _as_list(collisionsDetails)
+        result = original(
+            cls, gunMarker, collisionsDetails, fullPiercingPower, shell, minPP, maxPP, entity
+        )
+        if _overlay_allowed:
+            try:
+                analysis = analyze_modern_he(
+                    cls,
+                    collisionsDetails,
                     fullPiercingPower,
-                    total_armor_val,
-                    False,
-                    hit_body,
-                    hit_track,
-                    hit_gun,
-                    min_hit_angle_cos,
-                    shell.armorDamage,
-                    entity.health,
+                    shell,
+                    maxPP,
+                    entity,
+                    _SHIELD_FACTOR,
+                    _ABSORPTION_FACTOR,
                 )
-                return result
+                call_update_gui(analysis, fullPiercingPower)
+            except Exception:
+                log_exception("shot analysis (modern HE)")
+        return result
 
-            # Track detection
-            if cDetails.compName == 0 or cDetails.compName >= 4:
-                hit_track = True
-            elif cDetails.compName == 3:
-                hit_gun = True
-
-            matInfo = cDetails.matInfo
-            if (
-                matInfo is not None
-                and (cDetails.compName, matInfo.kind) not in ignoredMaterials
-            ):
-                hitAngleCos = cDetails.hitAngleCos if matInfo.useHitAngle else 1.0
-                piercingPercent = 1000.0
-                penetrationArmor = 0
-
-                if fullPiercingPower > 0.0:
-                    penetrationArmor = cls._computePenetrationArmor(
-                        shell, hitAngleCos, matInfo
-                    )
-                    piercingPercent = (
-                        100.0
-                        + (penetrationArmor - piercingPower) / fullPiercingPower * 100.0
-                    )
-
-                if matInfo.vehicleDamageFactor:
-                    # main hull plate
-                    hit_body = True
-                    min_hit_angle_cos = hitAngleCos
-                    total_armor_val += penetrationArmor
-                    piercingPower -= penetrationArmor
-                    minPiercingPower = round(minPiercingPower - penetrationArmor)
-                    maxPiercingPower = round(maxPiercingPower - penetrationArmor)
-                    if piercingPercent <= minPP and explosionDamageAbsorption == 0:
-                        result = _SHOT_RESULT.GREAT_PIERCED
-                    else:
-                        result = _SHOT_RESULT.LITTLE_PIERCED
-                    collectDebug(
-                        debugPiercingsList,
-                        penetrationArmor,
-                        hitAngleCos,
-                        minPiercingPower,
-                        maxPiercingPower,
-                        piercingPercent,
-                        matInfo,
-                        result,
-                    )
-                    sendDebug(
-                        gunMarker, debugPiercingsList, minPP, maxPP, fullPiercingPower
-                    )
-                    call_update_gui(
-                        fullPiercingPower,
-                        total_armor_val,
-                        False,
-                        hit_body,
-                        hit_track,
-                        hit_gun,
-                        min_hit_angle_cos,
-                        shell.armorDamage,
-                        entity.health,
-                    )
-                    return result
-
-                if shell.type.shieldPenetration:
-                    shieldPenetration = (
-                        penetrationArmor
-                        * MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS
-                    )
-                    # accumulate 3x nominal armor as virtual armor cost
-                    total_armor_val += shieldPenetration
-                    piercingPower -= shieldPenetration
-                    minPiercingPower = round(minPiercingPower - shieldPenetration)
-                    maxPiercingPower = round(maxPiercingPower - shieldPenetration)
-                    # explosionDamageAbsorption += penetrationArmor * 0.0
-                    # # MODERN_HE_DAMAGE_ABSORPTION_FACTOR is 0.0
-
-                if (
-                    piercingPercent > maxPP
-                    or not shell.type.shieldPenetration
-                    or explosionDamageAbsorption >= shell.type.maxDamage
-                ):
-                    collectDebug(
-                        debugPiercingsList,
-                        penetrationArmor,
-                        hitAngleCos,
-                        minPiercingPower,
-                        maxPiercingPower,
-                        piercingPercent,
-                        matInfo,
-                        _SHOT_RESULT.NOT_PIERCED,
-                    )
-                    sendDebug(
-                        gunMarker, debugPiercingsList, minPP, maxPP, fullPiercingPower
-                    )
-                    call_update_gui(
-                        fullPiercingPower,
-                        total_armor_val,
-                        False,
-                        hit_body,
-                        hit_track,
-                        hit_gun,
-                        min_hit_angle_cos,
-                        shell.armorDamage,
-                        entity.health,
-                    )
-                    return _SHOT_RESULT.NOT_PIERCED
-
-                if matInfo.extra and piercingPercent <= maxPP:
-                    collectDebug(
-                        debugPiercingsList,
-                        penetrationArmor,
-                        hitAngleCos,
-                        minPiercingPower,
-                        maxPiercingPower,
-                        piercingPercent,
-                        matInfo,
-                        cls._CRIT_ONLY_SHOT_RESULT,
-                    )
-                    result = cls._CRIT_ONLY_SHOT_RESULT
-
-                if matInfo.collideOnceOnly:
-                    ignoredMaterials.add((cDetails.compName, matInfo.kind))
-
-    except Exception as e:
-        log("my_shot_result_modern_he error: %s" % str(e))
-
-    sendDebug(gunMarker, debugPiercingsList, minPP, maxPP, fullPiercingPower)
-    call_update_gui(
-        fullPiercingPower,
-        total_armor_val,
-        False,
-        hit_body,
-        hit_track,
-        hit_gun,
-        min_hit_angle_cos,
-        shell.armorDamage,
-        entity.health,
-    )
-
-    return result
+    return my_shot_result_modern_he
 
 
-original_getShotResult = gun_marker_ctrl._CrosshairShotResults.getShotResult.__func__
+def _make_get_shot_result_wrapper(original):
+    def my_get_shot_result(cls, gunMarker, excludeTeam=0, piercingMultiplier=1):
+        """Wraps stock getShotResult. Only called while the reticle is visible."""
+        result = original(cls, gunMarker, excludeTeam, piercingMultiplier)
+        if result == _SHOT_RESULT.UNDEFINED and _overlay_allowed:
+            try:
+                if gui_state.is_visible():
+                    gui_state.hide_all()
+            except Exception:
+                log_exception("hiding overlay")
+        return result
+
+    return my_get_shot_result
 
 
-def my_get_shot_result(cls, gunMarker, excludeTeam=0, piercingMultiplier=1):
-    """Override for original getShotResult. Is only called when reticle is visible."""
-    result = original_getShotResult(cls, gunMarker, excludeTeam, piercingMultiplier)
-    if result == _SHOT_RESULT.UNDEFINED:
-        # each hide() call below no-ops on its own if that widget is already hidden
-        if gui_state.is_visible():
-            gui_state.hide_all()
-    return result
+def _argnames(method):
+    return inspect.getargspec(method.__func__).args
+
+
+def _check_compatibility(cls):
+    """Returns a list of reasons the stock class doesn't match what this mod
+    expects (empty if it does)."""
+    problems = []
+    for name in _REQUIRED_ATTRS + [_DEFAULT_NAME, _MODERN_HE_NAME, "getShotResult"]:
+        if not hasattr(cls, name):
+            problems.append("missing {}".format(name))
+    if problems:
+        return problems
+    for name in (_DEFAULT_NAME, _MODERN_HE_NAME):
+        if _argnames(getattr(cls, name)) != _SHOT_RESULT_ARGS:
+            problems.append("{} signature changed".format(name))
+    if _argnames(cls.getShotResult) != _GET_SHOT_RESULT_ARGS:
+        problems.append("getShotResult signature changed")
+    return problems
+
+
+def _install_marker_filter():
+    """With the server reticle on, the stock crosshair resolves the shot result
+    once per marker (client and server) on each update, so the overlay would
+    alternate between two results. Follow only the server marker in that case.
+
+    Optional: if the stock plugin moved, log it and keep following every marker."""
+    try:
+        from gui.Scaleform.daapi.view.battle.shared.crosshair import plugins  # type: ignore
+        from gui.battle_control.controllers.crosshair_proxy import (  # type: ignore
+            GunMarkersSetInfo,
+        )
+
+        plugin_cls = plugins.ShotResultIndicatorPlugin
+        name = "_ShotResultIndicatorPlugin__onGunMarkerStateChanged"
+        original = getattr(plugin_cls, name).__func__
+        markers_info = GunMarkersSetInfo()
+    except Exception:
+        log_exception("installing the server reticle filter")
+        return
+
+    def my_on_gun_marker_state_changed(self, markerType, *args, **kwargs):
+        global _overlay_allowed
+        try:
+            _overlay_allowed = (
+                markerType == _MARKER_TYPE.SERVER or not markers_info.isServerMarkerActivated
+            )
+        except Exception:
+            log_exception("server reticle filter")
+            _overlay_allowed = True
+        try:
+            return original(self, markerType, *args, **kwargs)
+        finally:
+            _overlay_allowed = True
+
+    setattr(plugin_cls, name, my_on_gun_marker_state_changed)
 
 
 def on_load_match(*args, **kwargs):
@@ -432,35 +214,33 @@ original_activate_postmortem = AvatarInputHandler.activatePostmortem
 def my_activate_postmortem(self, *args, **kwargs):
     """Called when your vehicle is destroyed"""
     original_activate_postmortem(self, *args, **kwargs)
-    gui_state.hide_all()
-
-
-# overriding source code functions
+    try:
+        gui_state.hide_all()
+    except Exception:
+        log_exception("activatePostmortem")
 
 
 def init():
-    # Called whenever reticle is visible
-    gun_marker_ctrl._CrosshairShotResults.getShotResult = classmethod(
-        my_get_shot_result
-    )
+    cls = _SHOT_RESULTS_CLS
+    problems = _check_compatibility(cls)
+    if problems:
+        log(
+            "This game client is incompatible with this mod version; the overlay is "
+            "disabled. ({})".format("; ".join(problems))
+        )
+        return
 
-    # Called only when looking at an enemy tank with non HE shell
-    gun_marker_ctrl._CrosshairShotResults._CrosshairShotResults__shotResultDefault = (
-        classmethod(my_shot_result_default)
+    cls.getShotResult = classmethod(_make_get_shot_result_wrapper(cls.getShotResult.__func__))
+    setattr(cls, _DEFAULT_NAME, classmethod(_make_default_wrapper(getattr(cls, _DEFAULT_NAME).__func__)))
+    setattr(
+        cls,
+        _MODERN_HE_NAME,
+        classmethod(_make_modern_he_wrapper(getattr(cls, _MODERN_HE_NAME).__func__)),
     )
+    _install_marker_filter()
 
-    # Called only when looking at an enemy tank with modern HE shell
-    gun_marker_ctrl._CrosshairShotResults._CrosshairShotResults__shotResultModernHE = (
-        classmethod(my_shot_result_modern_he)
-    )
-
-    # Called when tank is created
     g_playerEvents.onAvatarReady += on_load_match
-
-    # Called once when the player leaves a match
     g_playerEvents.onAvatarBecomeNonPlayer += on_leave_match
-
-    # Called when your tank is destroyed
     AvatarInputHandler.activatePostmortem = my_activate_postmortem
 
 

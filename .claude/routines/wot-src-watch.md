@@ -35,11 +35,13 @@ need a mod update:
 
 | wot-src path | What the mod depends on |
 |---|---|
-| `sources/res/scripts/client/AvatarInputHandler/gun_marker_ctrl.py` | `_CrosshairShotResults.getShotResult`, `__shotResultDefault`, `__shotResultModernHE` (overridden; the two `__shotResult*` bodies are largely copied into `ap_hooks.py`), and mangled helpers `__isDestructibleComponent`, `__collectDebugPiercingData`, `__sendDebugInfo` called by name |
+| `sources/res/scripts/client/AvatarInputHandler/gun_marker_ctrl.py` | `_CrosshairShotResults.getShotResult`, `__shotResultDefault`, `__shotResultModernHE` (wrapped; the two `__shotResult*` bodies' armor logic is mirrored in `core/shot_analysis.py`, so a body change means re-checking the mirror), their signatures (checked at startup), and the internals `_shouldRicochet`, `_computePenetrationArmor`, `_SHELL_EXTRA_DATA`, mangled `__isDestructibleComponent` |
+| `sources/res/scripts/client/gui/Scaleform/daapi/view/battle/shared/crosshair/plugins.py` | `ShotResultIndicatorPlugin.__onGunMarkerStateChanged(markerType, ...)` (wrapped for the server reticle filter); this plugin is the only caller of `getShotResult` |
 | `sources/res/scripts/client/AvatarInputHandler/__init__.py` | `AvatarInputHandler.activatePostmortem` (wrapped), `gun_marker_ctrl` import |
 | `sources/res/scripts/client/PlayerEvents.py` | `g_playerEvents.onAvatarReady`, `onAvatarBecomeNonPlayer`, `onAccountShowGUI` |
-| `sources/res/scripts/client/aih_constants.py` | `SHOT_RESULT` |
-| `sources/res/scripts/common/items/components/component_constants.py` | `MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS` |
+| `sources/res/scripts/client/aih_constants.py` | `SHOT_RESULT`, `GUN_MARKER_TYPE` |
+| `sources/res/scripts/common/items/components/component_constants.py` | `MODERN_HE_PIERCING_POWER_REDUCTION_FACTOR_FOR_SHIELDS`, `MODERN_HE_DAMAGE_ABSORPTION_FACTOR` |
+| `sources/res/scripts/client/gui/battle_control/controllers/crosshair_proxy.py` | `GunMarkersSetInfo.isServerMarkerActivated` |
 | `sources/res/scripts/client/gui/impl/gen/resources/__init__.py` | `R` must still exist and support `.dyn()`; `_layout_id()` walks `R.dyn("mods")...dyn("APBattleView")` to find the `gen_resources` view. A break here makes the window silently never open |
 
 **Secondary** — review, but these rarely break the mod:

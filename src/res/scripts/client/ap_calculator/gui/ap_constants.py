@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from ap_calculator.gui.ap_config import DEFAULT_CONFIG, JAILBROKEN, g_user_settings
 
 
@@ -57,13 +58,6 @@ def get_ricochet_color():
         return Colorblind.RICOCHET
 
 
-def get_missed_body_color():
-    if not Colorblind.ENABLED:
-        return Colors.LOW_CHANCE
-    else:
-        return Colorblind.LOW_CHANCE
-
-
 def _hex_to_rgb(hex_color):
     return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
 
@@ -82,25 +76,36 @@ def _lerp_color(color_a, color_b, t):
     return _rgb_to_hex(rgb)
 
 
+# Penetration chance (%) at or below which a shot counts as low chance, and at
+# or above which it counts as high chance.
+LOW_CHANCE_MAX = 7
+HIGH_CHANCE_MIN = 93
+_GRADIENT_MIDPOINT = 50
+
+
+def is_high_chance(prob):
+    return prob >= HIGH_CHANCE_MIN
+
+
 def _get_color_from_prob_gradient(cls, prob):
-    if prob <= 7:
+    if prob <= LOW_CHANCE_MAX:
         return cls.LOW_CHANCE
-    elif prob >= 93:
+    elif is_high_chance(prob):
         return cls.HIGH_CHANCE
-    elif prob < 50:
+    elif prob < _GRADIENT_MIDPOINT:
         # red-orange: fades from the low chance color into orange
-        t = (prob - 7) / float(50 - 7)
+        t = (prob - LOW_CHANCE_MAX) / float(_GRADIENT_MIDPOINT - LOW_CHANCE_MAX)
         return _lerp_color(cls.LOW_CHANCE, cls.MEDIUM_CHANCE, t)
     else:
         # orange-green: fades from orange into the high chance color
-        t = (prob - 50) / float(93 - 50)
+        t = (prob - _GRADIENT_MIDPOINT) / float(HIGH_CHANCE_MIN - _GRADIENT_MIDPOINT)
         return _lerp_color(cls.MEDIUM_CHANCE, cls.HIGH_CHANCE, t)
 
 
 def _get_color_from_prob_legacy(cls, prob):
-    if prob <= 7:
+    if prob <= LOW_CHANCE_MAX:
         return cls.LOW_CHANCE
-    elif prob >= 93:
+    elif is_high_chance(prob):
         return cls.HIGH_CHANCE
     else:
         return cls.MEDIUM_CHANCE

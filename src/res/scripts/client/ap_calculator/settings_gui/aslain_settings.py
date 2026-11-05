@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from gui.aslainMenu import g_modsSettingsApi, templates  # type: ignore
 
 from ap_calculator.gui.ap_config import (

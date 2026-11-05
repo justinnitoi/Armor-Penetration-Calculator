@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from gui.modsSettingsApi import g_modsSettingsApi, templates  # type: ignore
 
 from ap_calculator.gui.ap_config import save_config, update_global_settings
